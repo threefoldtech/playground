@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-interface Profile {
+export interface Profile {
   mnemonics: string
   ssh: string
   twinId: number

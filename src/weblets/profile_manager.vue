@@ -25,8 +25,9 @@
               size="small"
               :variant="migrateMode ? undefined : 'outlined'"
               @click="migrateMode = !migrateMode"
+              :disabled="!isValidMnemonics"
             >
-              Got Old Deployments? Migrate Now!
+              {{ migrateMode ? 'Back To Profile' : 'Got Old Deployments? Migrate Now!' }}
             </v-btn>
             <v-btn color="error" size="small" @click="show = false"> Close </v-btn>
           </div>
@@ -56,19 +57,33 @@
 
         <template v-else>
           <v-card-text>
-            <div class="d-flex">
-              <v-text-field
-                label="Mnemonics"
-                hint="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
-                persistent-hint
-                autofocus
-                :type="showMnemonics ? 'text' : 'password'"
-                :append-inner-icon="showMnemonics ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
-                @click:append-inner="showMnemonics = !showMnemonics"
-                v-model="profileManager.mnemonics"
-              />
-              <v-btn color="primary" size="small" class="mt-3 ml-2"> Create Account </v-btn>
-            </div>
+            <v-form ref="mnemonicsForm" v-model="isValidMnemonicsInput">
+              <div class="d-flex">
+                <v-text-field
+                  label="Mnemonics"
+                  hint="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
+                  :persistent-hint="mnemonicsError === null"
+                  autofocus
+                  :type="showMnemonics ? 'text' : 'password'"
+                  :append-inner-icon="showMnemonics ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+                  @click:append-inner="showMnemonics = !showMnemonics"
+                  v-model="profileManager.mnemonics"
+                  :rules="[validateMnemonicsInput]"
+                  :disabled="mnemonicsLoading"
+                  :loading="mnemonicsLoading"
+                  :error-messages="mnemonicsError ? [mnemonicsError] : []"
+                  @input="mnemonicsError = null"
+                />
+                <v-btn
+                  color="primary"
+                  size="small"
+                  class="mt-3 ml-2"
+                  :disabled="isValidMnemonics || mnemonicsLoading"
+                >
+                  Create Account
+                </v-btn>
+              </div>
+            </v-form>
 
             <div class="d-flex mt-5">
               <v-textarea
@@ -76,8 +91,11 @@
                 hint="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
                 persistent-hint
                 v-model="profileManager.ssh"
+                :disabled="!isValidMnemonics"
               />
-              <v-btn color="primary" size="small" class="mt-3 ml-2"> Generate SSH Keys </v-btn>
+              <v-btn color="primary" size="small" class="mt-3 ml-2" :disabled="!isValidMnemonics">
+                Generate SSH Keys
+              </v-btn>
             </div>
           </v-card-text>
 
@@ -85,29 +103,60 @@
 
           <v-card-actions>
             <v-spacer />
-            <v-btn color="secondary"> Active </v-btn>
+            <v-btn color="secondary" :disabled="!isValidMnemonics"> Active </v-btn>
           </v-card-actions>
         </template>
       </v-card>
     </v-dialog>
   </section>
 </template>
-
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useProfileManager } from '../stores'
+import type { VForm } from 'vuetify/components/VForm'
+import { getGrid } from '../utils/grid'
 
 const profileManager = useProfileManager()
 
 const show = ref(true)
-const migrateMode = ref(true)
+const migrateMode = ref(false)
 
 const showMnemonics = ref(false)
+const mnemonicsForm = ref<VForm>(null)
+watch(show, (s) => {
+  if (s && profileManager.mnemonics.length > 0) {
+    nextTick(() => mnemonicsForm.value.validate())
+  }
+})
+const isValidMnemonicsInput = ref(false)
+const mnemonicsCanLoadGrid = ref(false)
+const mnemonicsLoading = ref(false)
+const mnemonicsError = ref<string>(null)
+const isValidMnemonics = computed(() => isValidMnemonicsInput.value && mnemonicsCanLoadGrid.value)
+watch(isValidMnemonicsInput, async (valid) => {
+  if (!valid) {
+    mnemonicsCanLoadGrid.value = false
+    return
+  }
+  if (mnemonicsCanLoadGrid.value) return
+  mnemonicsLoading.value = true
+  mnemonicsError.value = null
+  getGrid(profileManager)
+    .then(() => (mnemonicsCanLoadGrid.value = true))
+    .catch(() => (mnemonicsError.value = `Couldn't load grid client using this mnemonics.`))
+    .finally(() => (mnemonicsLoading.value = false))
+})
+
 const showPassword = ref(false)
 </script>
 
 <script lang="ts">
+import { validateMnemonicsInput } from '../utils/validators'
+
 export default {
-  name: 'ProfileManager'
+  name: 'ProfileManager',
+  methods: {
+    validateMnemonicsInput
+  }
 }
 </script>
