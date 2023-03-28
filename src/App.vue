@@ -1,9 +1,11 @@
 <template>
-  <p>Playground | dashboard</p>
+  <v-app>
+    <v-navigation-drawer theme="dark" permanent>
+      <v-list>
+        <v-list-item title="Home" value="home"></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  </v-app>
 </template>
 
-<script lang="ts" setup>
-import { GridClient } from 'grid3_client'
-
-console.log(GridClient)
-</script>
+<script lang="ts" setup></script>
