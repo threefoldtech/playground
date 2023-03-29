@@ -1,7 +1,7 @@
 import { ref, reactive, computed } from 'vue'
 
-export function usePasswordInput() {
-  const show = ref(false)
+export function usePasswordInput(defaultShow = false) {
+  const show = ref(defaultShow)
 
   return reactive({
     props: {
