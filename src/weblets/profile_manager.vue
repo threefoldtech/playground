@@ -2,6 +2,7 @@
   <section>
     <v-dialog v-model="show" scrollable width="90%">
       <template v-slot:activator="{ props }">
+        {{ log(props) }}
         <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
           <v-icon icon="mdi-account" size="x-large" class="mr-2" />
           <div>
@@ -146,6 +147,10 @@ watch(isValidMnemonicsInput, async (valid) => {
     .catch(() => (mnemonicsError.value = `Couldn't load grid client using this mnemonics.`))
     .finally(() => (mnemonicsLoading.value = false))
 })
+
+function log(x: any) {
+  console.log(x)
+}
 
 const showPassword = ref(false)
 </script>
