@@ -5,25 +5,27 @@ export interface Profile {
   ssh: string
   twinId: number
   address: string
+  balance: { free: number; locked: number }
 }
 
 interface State {
   mnemonics: string
-  ssh: string
-  loading: boolean
-  profile?: Profile
+  profile: Profile | null
 }
 
 const useProfileManager = defineStore('profile-manager', {
   state: (): State => {
     return {
       mnemonics: '',
-      ssh: '',
-      loading: false
+      profile: null
     }
   },
 
-  actions: {}
+  actions: {
+    setProfile(profile: Profile | null) {
+      this.profile = profile
+    }
+  }
 })
 
 export { useProfileManager }

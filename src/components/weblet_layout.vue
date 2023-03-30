@@ -2,7 +2,7 @@
   <v-card>
     <section class="d-flex align-center">
       <div>
-        <v-card-title v-if="$slots.title">
+        <v-card-title v-if="$slots.title" class="font-weight-bold">
           <slot name="title" />
         </v-card-title>
         <v-card-subtitle v-if="$slots.subtitle">

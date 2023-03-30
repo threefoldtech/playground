@@ -1,167 +1,252 @@
 <template>
   <section>
-    <v-dialog v-model="show" scrollable width="90%">
+    <v-dialog v-model="openDialog" scrollable width="80%">
       <template v-slot:activator="{ props }">
-        {{ log(props) }}
         <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
           <v-icon icon="mdi-account" size="x-large" class="mr-2" />
           <div>
-            <p><strong> Profile Manager</strong></p>
-            <!-- <p>Balance: <strong>1111 TFT</strong></p>
-            <p>Locked: <strong>1111 TFT</strong></p> -->
+            <p v-if="!profileManager.profile"><strong> Profile Manager</strong></p>
+            <template v-else>
+              <p>
+                Balance: <strong>{{ profileManager.profile.balance.free }} TFT</strong>
+              </p>
+              <p>
+                Locked: <strong>{{ profileManager.profile.balance.locked }} TFT</strong>
+              </p>
+            </template>
           </div>
         </v-card>
       </template>
-      <v-card>
-        <section class="d-flex align-center">
-          <div>
-            <v-card-title> Profile Manager </v-card-title>
-            <v-card-subtitle> Please visit the manual get started. </v-card-subtitle>
-          </div>
-          <v-spacer />
-          <div class="mr-4">
-            <v-btn
-              color="primary"
-              class="mr-2"
-              size="small"
-              :variant="migrateMode ? undefined : 'outlined'"
-              @click="migrateMode = !migrateMode"
-              :disabled="!isValidMnemonics"
-            >
-              {{ migrateMode ? 'Back To Profile' : 'Got Old Deployments? Migrate Now!' }}
-            </v-btn>
-            <v-btn color="error" size="small" @click="show = false"> Close </v-btn>
-          </div>
-        </section>
 
-        <v-divider class="mt-5 mb-2" />
-
-        <template v-if="migrateMode">
-          <v-card-text>
-            <v-text-field
-              label="Password"
-              persistent-hint
-              hint="Please insert your old password (aka. 'store secret') which you want to migrate your deployments from."
-              :type="showPassword ? 'text' : 'password'"
-              :append-inner-icon="showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
-              @click:append-inner="showPassword = !showPassword"
-            />
-          </v-card-text>
-
-          <v-divider class="mt-5" />
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn color="secondary"> Migrate </v-btn>
-          </v-card-actions>
+      <weblet-layout>
+        <template #title> Profile Manager </template>
+        <template #subtitle>
+          Please visit
+          <a
+            class="app-link"
+            href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
+            target="_blank"
+          >
+            the manual
+          </a>
+          get started.
+        </template>
+        <template #header-actions>
+          <v-btn color="error" @click="openDialog = false"> Close </v-btn>
         </template>
 
-        <template v-else>
-          <v-card-text>
-            <v-form ref="mnemonicsForm" v-model="isValidMnemonicsInput">
-              <div class="d-flex">
-                <v-text-field
-                  label="Mnemonics"
-                  hint="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
-                  :persistent-hint="mnemonicsError === null"
-                  autofocus
-                  :type="showMnemonics ? 'text' : 'password'"
-                  :append-inner-icon="showMnemonics ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
-                  @click:append-inner="showMnemonics = !showMnemonics"
-                  v-model="profileManager.mnemonics"
-                  :rules="[validateMnemonicsInput]"
-                  :disabled="mnemonicsLoading"
-                  :loading="mnemonicsLoading"
-                  :error-messages="mnemonicsError ? [mnemonicsError] : []"
-                  @input="mnemonicsError = null"
-                />
-                <v-btn
-                  color="primary"
-                  size="small"
-                  class="mt-3 ml-2"
-                  :disabled="isValidMnemonics || mnemonicsLoading"
-                >
-                  Create Account
-                </v-btn>
-              </div>
-            </v-form>
+        <template #default v-if="!profileManager.profile">
+          <v-tooltip
+            text="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
+            location="bottom"
+            max-width="700px"
+          >
+            <template #activator="{ props }">
+              <password-input-wrapper>
+                <template #default="{ props: passwordInputProps }">
+                  <v-text-field
+                    label="Mnemonics"
+                    placeholder="Please insert your mnemonics"
+                    v-bind="{ ...props, ...passwordInputProps }"
+                    v-model="profileManager.mnemonics"
+                    :error-messages="mnemonicsError"
+                    @input="mnemonicsError !== '' ? (mnemonicsError = '') : null"
+                    :loading="loading"
+                    :disabled="loading || createAccountLoading"
+                  />
+                </template>
+              </password-input-wrapper>
+            </template>
+          </v-tooltip>
+        </template>
 
-            <div class="d-flex mt-5">
-              <v-textarea
-                label="Public SSH Key"
-                hint="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-                persistent-hint
-                v-model="profileManager.ssh"
-                :disabled="!isValidMnemonics"
+        <template #default v-else>
+          <copy-input-wrapper :data="profileManager.profile.mnemonics">
+            <template #default="{ props }">
+              <v-text-field
+                label="Mnemonics"
+                readonly
+                v-model="profileManager.profile.mnemonics"
+                v-bind="props"
               />
-              <v-btn color="primary" size="small" class="mt-3 ml-2" :disabled="!isValidMnemonics">
-                Generate SSH Keys
-              </v-btn>
-            </div>
-          </v-card-text>
+            </template>
+          </copy-input-wrapper>
 
-          <v-divider class="mt-5" />
+          <v-tooltip
+            text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
+            location="bottom"
+            max-width="700px"
+          >
+            <template #activator="{ props }">
+              <copy-input-wrapper :data="profileManager.profile.ssh">
+                <template #default="{ props: copyInputProps }">
+                  <v-textarea
+                    no-resize
+                    :spellcheck="false"
+                    label="Public SSH Key"
+                    v-model="profileManager.profile.ssh"
+                    v-bind="{ ...props, ...copyInputProps }"
+                    :disabled="sshLoading || sshUpdating"
+                    :loading="sshLoading || sshUpdating"
+                    :hint="
+                      sshUpdating
+                        ? 'Updating your public ssh key.'
+                        : sshLoading
+                        ? 'Generating a new public ssh key.'
+                        : undefined
+                    "
+                    persistent-hint
+                  />
+                </template>
+              </copy-input-wrapper>
+            </template>
+          </v-tooltip>
 
-          <v-card-actions>
+          <v-row class="mb-3">
             <v-spacer />
-            <v-btn color="secondary" :disabled="!isValidMnemonics"> Active </v-btn>
-          </v-card-actions>
+            <v-btn color="primary" variant="text" :loading="sshUpdating" @click="onUpdatePublicSSH">
+              Update Public SSH Key
+            </v-btn>
+            <v-btn
+              color="secondary"
+              variant="text"
+              :disabled="sshUpdating"
+              :loading="sshLoading"
+              @click="onGenerateSSH"
+            >
+              Generate SSH Keys
+            </v-btn>
+          </v-row>
+
+          <copy-input-wrapper :data="profileManager.profile.twinId">
+            <template #default="{ props }">
+              <v-text-field
+                label="Twin ID"
+                readonly
+                v-model="profileManager.profile.twinId"
+                v-bind="props"
+              />
+            </template>
+          </copy-input-wrapper>
+
+          <copy-input-wrapper :data="profileManager.profile.address">
+            <template #default="{ props }">
+              <v-text-field
+                label="Address"
+                readonly
+                v-model="profileManager.profile.address"
+                v-bind="props"
+              />
+            </template>
+          </copy-input-wrapper>
         </template>
-      </v-card>
+
+        <template #footer-actions v-if="!profileManager.profile">
+          <v-btn
+            color="secondary"
+            @click="onCreateAccount"
+            :disabled="loading"
+            :loading="createAccountLoading"
+          >
+            Don't have account? Create One
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="activate"
+            :loading="loading"
+            :disabled="createAccountLoading"
+          >
+            Activate
+          </v-btn>
+        </template>
+      </weblet-layout>
     </v-dialog>
   </section>
 </template>
 <script lang="ts" setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref } from 'vue'
+import { validateMnemonic } from 'bip39'
+import { generateKeyPair } from 'web-ssh-keygen'
 import { useProfileManager } from '../stores'
-import type { VForm } from 'vuetify/components/VForm'
-import { getGrid } from '../utils/grid'
+import { getGrid, createAccount, loadProfile, storeSSH } from '../utils/grid'
+import { downloadAsFile } from '../utils/helpers'
 
+const openDialog = ref(true)
 const profileManager = useProfileManager()
+const loading = ref(false)
 
-const show = ref(true)
-const migrateMode = ref(false)
+/* Mnemonics */
+const mnemonicsError = ref('')
+async function activate() {
+  mnemonicsError.value = ''
+  loading.value = true
+  sessionStorage.removeItem('seeds')
 
-const showMnemonics = ref(false)
-const mnemonicsForm = ref<VForm>(null)
-watch(show, (s) => {
-  if (s && profileManager.mnemonics.length > 0) {
-    nextTick(() => mnemonicsForm.value.validate())
+  const { mnemonics } = profileManager
+
+  if (!validateMnemonic(mnemonics)) {
+    loading.value = false
+    return (mnemonicsError.value = `Mnemonics doesn't seem to be valid.`)
   }
-})
-const isValidMnemonicsInput = ref(false)
-const mnemonicsCanLoadGrid = ref(false)
-const mnemonicsLoading = ref(false)
-const mnemonicsError = ref<string>(null)
-const isValidMnemonics = computed(() => isValidMnemonicsInput.value && mnemonicsCanLoadGrid.value)
-watch(isValidMnemonicsInput, async (valid) => {
-  if (!valid) {
-    mnemonicsCanLoadGrid.value = false
-    return
-  }
-  if (mnemonicsCanLoadGrid.value) return
-  mnemonicsLoading.value = true
-  mnemonicsError.value = null
-  getGrid(profileManager)
-    .then(() => (mnemonicsCanLoadGrid.value = true))
-    .catch(() => (mnemonicsError.value = `Couldn't load grid client using this mnemonics.`))
-    .finally(() => (mnemonicsLoading.value = false))
-})
 
-function log(x: any) {
-  console.log(x)
+  try {
+    let grid = await getGrid({ mnemonics })
+    if (!grid) {
+      throw new Error('Failed to load grid for this user.')
+    }
+    const profile = await loadProfile(mnemonics, grid)
+    profileManager.setProfile(profile)
+    sessionStorage.setItem('seeds', mnemonics)
+  } catch (e) {
+    mnemonicsError.value = (e as Error).message
+  }
+
+  loading.value = false
 }
 
-const showPassword = ref(false)
+/* Create Account */
+const createAccountLoading = ref(false)
+const isCreatedAccount = ref(false) /* should be used */
+async function onCreateAccount() {
+  createAccountLoading.value = true
+
+  const account = await createAccount()
+  createAccountLoading.value = false
+  isCreatedAccount.value = true
+
+  profileManager.mnemonics = account.mnemonic
+  activate()
+}
+
+/* SSH */
+const sshLoading = ref(false)
+const sshUpdating = ref(false)
+async function onGenerateSSH() {
+  sshLoading.value = true
+  profileManager.profile!.ssh = ''
+
+  const keys = await generateKeyPair({
+    alg: 'RSASSA-PKCS1-v1_5',
+    hash: 'SHA-256',
+    name: 'Threefold',
+    size: 4096
+  })
+  const grid = await getGrid({ mnemonics: profileManager.profile!.mnemonics })
+  await storeSSH(grid!, keys.publicKey)
+  downloadAsFile('id_rsa', keys.privateKey)
+  profileManager.profile!.ssh = keys.publicKey
+  sshLoading.value = false
+}
+async function onUpdatePublicSSH() {
+  sshUpdating.value = true
+  const grid = await getGrid({ mnemonics: profileManager.profile!.mnemonics })
+  await storeSSH(grid!, profileManager.profile!.ssh)
+  sshUpdating.value = false
+}
 </script>
 
 <script lang="ts">
-import { validateMnemonicsInput } from '../utils/validators'
-
 export default {
-  name: 'ProfileManager',
-  methods: {
-    validateMnemonicsInput
-  }
+  name: 'ProfileManager'
 }
 </script>

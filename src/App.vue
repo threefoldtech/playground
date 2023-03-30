@@ -22,3 +22,12 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" global>
+.app-link {
+  text-decoration: none;
+  font-weight: bold;
+  color: #0d47a1;
+  cursor: pointer;
+}
+</style>

@@ -1,5 +1,6 @@
 import { validateMnemonic } from 'bip39'
 
 export function validateMnemonicsInput(data: string) {
-  return validateMnemonic(data) ? true : "Mnemonic doesn't seem to be valid."
+  if (!data) return 'Mnemonics is required.'
+  return validateMnemonic(data) ? true : "Mnemonics doesn't seem to be valid."
 }
