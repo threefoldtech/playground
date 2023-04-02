@@ -209,7 +209,7 @@ import { useProfileManager } from '../stores'
 import { getGrid, createAccount, loadProfile, storeSSH } from '../utils/grid'
 import { downloadAsFile } from '../utils/helpers'
 
-const openDialog = ref(true)
+const openDialog = ref(false)
 const profileManager = useProfileManager()
 const loading = ref(false)
 
