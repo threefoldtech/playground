@@ -3,14 +3,16 @@
     <h6 class="text-h5 mb-4">Nodes Filter</h6>
 
     <v-autocomplete
-      :disabled="loading"
+      :disabled="disabled"
       label="Farm Name"
       :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
       clearable
+      :loading="farmLoading"
     ></v-autocomplete>
+    {{ farms.length }}
 
     <v-autocomplete
-      :disabled="loading"
+      :disabled="disabled"
       label="Country"
       :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
       clearable
@@ -24,7 +26,7 @@
       label="Node ID"
       :items="nodes"
       :loading="loading"
-      :disabled="loading"
+      :disabled="disabled"
       return-object
       item-title="nodeId"
       item-value="nodeId"
@@ -39,10 +41,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useProfileManager } from '../stores/profile_manager'
+import { gqlClient, gridProxyClient } from '../clients'
 import { getGrid } from '../utils/grid'
 import type { NodeInfo } from 'grid3_client'
+import type { Farm } from 'tf_gridproxy_client'
+import { getFarms } from '../utils/get_farms'
 
 defineProps<{ modelValue?: number }>()
 const $emit = defineEmits<{
@@ -76,6 +81,42 @@ async function suggest() {
   }
   loading.value = false
 }
+
+const farms = ref<Farm[]>([])
+const farmLoading = ref(false)
+onMounted(loadFarms)
+async function loadFarms() {
+  farmLoading.value = true
+
+  const farms = await getFarms(false)
+  console.log(farms)
+
+  // const { totalCount } = await gqlClient.farmsConnection(
+  //   { totalCount: true },
+  //   { orderBy: ['farmID_ASC'] }
+  // )
+  // console.log(totalCount)
+
+  // const farms = await gqlClient.farms(
+  //   { farmID: true },
+  //   { orderBy: ['farmID_ASC'], limit: totalCount }
+  // )
+  // console.log({ farms })
+
+  // const { count } = await gridProxyClient.farms.list({ retCount: true })
+  // const data = await Promise.all(
+  //   Array.from({ length: Math.ceil(count! / 100) }).map((_, i) => {
+  //     return gridProxyClient.farms.list({ page: i + 1 })
+  //   })
+  // )
+  // console.log('gridproxy', data.map((x) => x.data).flat(1))
+
+  farmLoading.value = false
+}
+
+const disabled = computed(() => {
+  return loading.value || farmLoading.value
+})
 </script>
 
 <script lang="ts">
