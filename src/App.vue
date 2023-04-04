@@ -8,8 +8,8 @@
 
     <v-main>
       <ProfileManager />
-      {{ nodeId }}
-      <SelectNodeId v-model="nodeId" />
+      <v-switch label="publicIP" v-model="publicIP" />
+      <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
     </v-main>
   </v-app>
 </template>
@@ -28,8 +28,9 @@ export default {
   setup() {
     const nodeId = ref<number>(0)
     const title = ref('')
+    const publicIP = ref(false)
 
-    return { nodeId, title }
+    return { nodeId, title, publicIP }
   }
 }
 </script>
