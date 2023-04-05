@@ -11,7 +11,7 @@
       item-title="name"
       return-object
       v-model="farm"
-    ></v-autocomplete>
+    />
 
     <v-autocomplete
       :disabled="disabled"
@@ -20,7 +20,7 @@
       clearable
       v-model="country"
       :loading="countriesLoading"
-    ></v-autocomplete>
+    />
 
     <v-btn class="mb-5" color="primary" size="small" @click="suggest" :disabled="disabled">
       Apply Filters And Suggest Nodes
