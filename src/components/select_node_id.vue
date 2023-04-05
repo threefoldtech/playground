@@ -35,6 +35,7 @@
       item-title="nodeId"
       item-value="nodeId"
       v-model="node"
+      :multiple="$props.multiple"
     >
       <template #item="{ props, item }">
         <v-list-item v-bind="props" :title="'NodeID(' + item.title + ')'" />
@@ -62,10 +63,18 @@ export interface Deps {
 
 const profileManager = useProfileManager()
 
-const node = ref<NodeInfo>()
-const props = defineProps<{ modelValue?: number; deps: Deps }>()
-const $emit = defineEmits<{ (event: 'update:modelValue', value?: number): void }>()
-watch(node, (node) => $emit('update:modelValue', node ? +node.nodeId : undefined))
+const node = ref<NodeInfo | NodeInfo[]>()
+const props = defineProps<{ modelValue?: number | number[]; deps: Deps; multiple?: boolean }>()
+const $emit = defineEmits<{ (event: 'update:modelValue', value?: number | number[]): void }>()
+watch(node, (node) => {
+  let value: number[] | number | undefined
+  if (props.multiple && node) {
+    value = (node as NodeInfo[]).map((n) => n.nodeId)
+  } else if (node) {
+    value = (node as NodeInfo).nodeId
+  }
+  $emit('update:modelValue', value)
+})
 
 const farm = ref<{ name: string; farmID: number }>()
 const farms = ref<{ name: string; farmID: number }[]>([])
@@ -99,7 +108,12 @@ const nodes = ref<NodeInfo[]>([])
 const loading = ref(false)
 async function suggest() {
   loading.value = true
-  const currentNode = node.value?.nodeId
+  const currentNodes = !node.value
+    ? []
+    : props.multiple
+    ? (node.value as NodeInfo[]).map((n) => n.nodeId)
+    : [(node.value as NodeInfo).nodeId]
+
   node.value = undefined
   const grid = await getGrid(profileManager.profile!)
   if (grid) {
@@ -117,9 +131,17 @@ async function suggest() {
       .then((_nodes) => {
         nodes.value = _nodes
         if (_nodes.length === 0) return
-        let index = _nodes.findIndex((n) => n.nodeId === currentNode)
-        index = index > -1 ? index : 0
-        node.value = _nodes[index]
+        if (!props.multiple) {
+          let index = _nodes.findIndex((n) => n.nodeId === currentNodes[0])
+          index = index > -1 ? index : 0
+          node.value = _nodes[index]
+        } else {
+          let nodeSet = _nodes.filter((n) => currentNodes.includes(n.nodeId))
+          if (nodeSet.length === 0) {
+            nodeSet.push(_nodes[0])
+          }
+          node.value = nodeSet
+        }
       })
       .catch(() => null)
       .finally(() => (loading.value = false))
