@@ -21,6 +21,8 @@
     "grid3_client": "^2.0.0-rc12",
     "pinia": "^2.0.32",
     "qrcode": "^1.5.1",
+    "tf_gridproxy_client": "^1.0.2",
+    "tfgrid-gql": "^1.0.1",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
     "vuetify": "^3.1.11",
