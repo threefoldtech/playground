@@ -128,17 +128,17 @@ async function suggest() {
         sru: props.deps.ssd,
         publicIPs: props.deps.publicIp
       })
-      .then((_nodes) => {
-        nodes.value = _nodes
-        if (_nodes.length === 0) return
+      .then((fetchedNodes) => {
+        nodes.value = fetchedNodes
+        if (fetchedNodes.length === 0) return
         if (!props.multiple) {
-          let index = _nodes.findIndex((n) => n.nodeId === currentNodes[0])
+          let index = fetchedNodes.findIndex((n) => n.nodeId === currentNodes[0])
           index = index > -1 ? index : 0
-          node.value = _nodes[index]
+          node.value = fetchedNodes[index]
         } else {
-          let nodeSet = _nodes.filter((n) => currentNodes.includes(n.nodeId))
+          let nodeSet = fetchedNodes.filter((n) => currentNodes.includes(n.nodeId))
           if (nodeSet.length === 0) {
-            nodeSet.push(_nodes[0])
+            nodeSet.push(fetchedNodes[0])
           }
           node.value = nodeSet
         }
