@@ -8,6 +8,7 @@
 
     <v-main>
       <ProfileManager />
+      <DynamicTabs :tabs="tabs" />
       <v-switch label="publicIP" v-model="publicIP" />
       <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
     </v-main>
@@ -16,6 +17,9 @@
 
 <script lang="ts">
 import ProfileManager from './weblets/profile_manager.vue'
+import DynamicTabs from './components/dynamic-tabs.vue'
+import Tab_1 from './components/tab_1.vue'
+import Tab_2 from './components/tab_2.vue'
 import SelectNodeId from './components/select_node_id.vue'
 import { ref } from 'vue'
 
@@ -23,14 +27,19 @@ export default {
   name: 'App',
   components: {
     ProfileManager,
+    DynamicTabs,
     SelectNodeId
   },
   setup() {
     const nodeId = ref<number>(0)
     const title = ref('')
     const publicIP = ref(false)
+    const tabs = ref([
+      { label: 'Tab 1', component: Tab_1 },
+      { label: 'Tab 2', component: Tab_2 }
+    ])
 
-    return { nodeId, title, publicIP }
+    return { nodeId, title, publicIP, tabs }
   }
 }
 </script>
