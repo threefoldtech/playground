@@ -1,7 +1,7 @@
 <template>
   <v-toolbar-title>Select Gateway Node</v-toolbar-title>
   <v-autocomplete
-    label="Gateway node "
+    label="Choose your node"
     :items="items"
     :loading="loading"
     item-text="nodeDomain"
@@ -15,7 +15,6 @@
       </div>
     </template>
   </v-autocomplete>
-  {{ items }}
 </template>
 
 <script lang="ts" setup>
@@ -31,16 +30,16 @@ const $emit = defineEmits<{ (event: 'update:modelValue', value?: GatewayNodes): 
 const loading = ref(true)
 const items = ref<GatewayNodes[]>([])
 const selectedNode = ref()
-const loadMoreNodes = ref(1)
 
 // used variables and instances
 const profileManager = useProfileManager()
 let gridInstance: GridClient | null
 let noMoreResults = false
+let loadMoreNodes = 1
 
 //methods
 const handleGetGetWayNodes = async (grid: GridClient) => {
-  loadGateWayNodes(grid, loadMoreNodes.value).then((res) => {
+  loadGateWayNodes(grid, loadMoreNodes).then((res) => {
     loading.value = false
     items.value = [...res]
   })
@@ -48,7 +47,7 @@ const handleGetGetWayNodes = async (grid: GridClient) => {
 
 const handleLoadMoreGateWayNodes = async () => {
   if (noMoreResults) return
-  loadMoreNodes.value = loadMoreNodes.value + 1
+  loadMoreNodes = loadMoreNodes + 1
   handleGetGetWayNodes(gridInstance!).then((res: any) => {
     if (res) {
       items.value = res.concat(items.value)

@@ -6593,6 +6593,11 @@ text-table@^0.2.0:
   resolved "https://registry.npmjs.org/text-table/-/text-table-0.2.0.tgz"
   integrity sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==
 
+tf_gridproxy_client@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/tf_gridproxy_client/-/tf_gridproxy_client-1.0.2.tgz#058f6020f68e9ace27406ae4a2af61efce3ad840"
+  integrity sha512-uV0Id9qJLAf4C/7gRdCa3x2bYKJAfWg/EhW6z3XFVXSaV+Mv8BjQKSeH18OBJXpvfdTeIkIhbR8I/WZbXFycrg==
+
 tfgrid-api-client@1.27.0:
   version "1.27.0"
   resolved "https://registry.npmjs.org/tfgrid-api-client/-/tfgrid-api-client-1.27.0.tgz"
@@ -6602,6 +6607,13 @@ tfgrid-api-client@1.27.0:
     bip39 "^3.0.3"
     bn.js "^5.1.3"
     ip-regex "^4.3.0"
+
+tfgrid-gql@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tfgrid-gql/-/tfgrid-gql-1.0.1.tgz#9c93c2d409badac2cec417e3719b78665617fea7"
+  integrity sha512-y3kouojhe+ky3/8ET+iCPPQcfSZgBDkzfFaY61wYM2IzmAPWV/3c1fAEhL6zbWT/7uTKZFuhyOsnmCXpxGCS4Q==
+  dependencies:
+    ts-mixer "^6.0.2"
 
 throttleit@^1.0.0:
   version "1.0.0"
@@ -6693,6 +6705,11 @@ tr46@~0.0.3:
   version "0.0.3"
   resolved "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz"
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
+
+ts-mixer@^6.0.2:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-6.0.3.tgz#69bd50f406ff39daa369885b16c77a6194c7cae6"
+  integrity sha512-k43M7uCG1AkTyxgnmI5MPwKoUvS/bRvLvUb7+Pgpdlmok8AoqmUaZxUUw8zKM5B1lqZrt41GjYgnvAi0fppqgQ==
 
 ts-rmb-client-base@1.0.0:
   version "1.0.0"
