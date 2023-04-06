@@ -9,6 +9,7 @@
     <v-main>
       <ProfileManager />
       <QrcodeGenerator data="data" />
+      <SelectGateWayNode />
     </v-main>
   </v-app>
 </template>
@@ -16,12 +17,14 @@
 <script lang="ts">
 import ProfileManager from './weblets/profile_manager.vue'
 import QrcodeGenerator from './components/qrcode_generator.vue'
+import SelectGateWayNode from './components/select_gateway_node.vue'
 
 export default {
   name: 'App',
   components: {
     ProfileManager,
-    QrcodeGenerator
+    QrcodeGenerator,
+    SelectGateWayNode
   }
 }
 </script>
