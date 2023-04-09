@@ -4,7 +4,7 @@
     label="Choose your node"
     :items="items"
     :loading="loading"
-    item-text="nodeDomain"
+    item-title="nodeDomain"
     item-value="nodeId"
     return-object
     v-model="selectedNode"
