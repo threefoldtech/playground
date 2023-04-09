@@ -9,21 +9,21 @@
     <v-main>
       <ProfileManager />
       <v-switch label="publicIP" v-model="publicIP" />
-      <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
+      <SelectFarm v-model="nodeId" :deps="{ publicIp: publicIP }" />
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
 import ProfileManager from './weblets/profile_manager.vue'
-import SelectNodeId from './components/select_node_id.vue'
+import SelectFarm from './components/select_farm.vue'
 import { ref } from 'vue'
 
 export default {
   name: 'App',
   components: {
     ProfileManager,
-    SelectNodeId
+    SelectFarm
   },
   setup() {
     const nodeId = ref<number>(0)
