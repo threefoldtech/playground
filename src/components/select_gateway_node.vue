@@ -4,12 +4,11 @@
     label="Choose your node"
     :items="items"
     :loading="loading"
-    item-title="nodeDomain"
+    item-title="publicConfig.domain"
     item-value="nodeId"
-    return-object
     v-model="selectedNode"
   >
-    <template v-slot:append-item>
+    <template v-slot:append-item v-if="!noMoreResults">
       <div v-intersect="handleLoadMoreGateWayNodes" class="pa-4 teal--text">
         Loading more items ...
       </div>
@@ -20,21 +19,20 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { loadGateWayNodes } from '../utils/gateway'
-import type { GatewayNodes } from '../utils/gateway'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import type { GridClient } from 'grid3_client'
+import type { GridClient, NodeInfo } from 'grid3_client'
 
 //states
-const $emit = defineEmits<{ (event: 'update:modelValue', value?: GatewayNodes): void }>()
+defineProps<{ modelValue: number }>()
+const $emit = defineEmits<{ (event: 'update:modelValue', value?: number): void }>()
 const loading = ref(true)
-const items = ref<GatewayNodes[]>([])
-const selectedNode = ref()
+const items = ref<NodeInfo[]>([])
+const selectedNode = ref<number>()
+const noMoreResults = ref(false)
 
 // used variables and instances
 const profileManager = useProfileManager()
-let gridInstance: GridClient | null
-let noMoreResults = false
 let loadMoreNodes = 1
 
 //methods
@@ -46,24 +44,24 @@ const handleGetGetWayNodes = async (grid: GridClient) => {
 }
 
 const handleLoadMoreGateWayNodes = async () => {
-  if (noMoreResults) return
+  if (noMoreResults.value) return
   loadMoreNodes = loadMoreNodes + 1
-  handleGetGetWayNodes(gridInstance!).then((res: any) => {
+  const grid = await getGrid(profileManager)
+  handleGetGetWayNodes(grid!).then((res: any) => {
     if (res) {
       items.value = res.concat(items.value)
     } else {
-      noMoreResults = true
+      noMoreResults.value = true
     }
   })
 }
 //hooks
 onMounted(async () => {
   const grid = await getGrid(profileManager)
-  gridInstance = grid
   handleGetGetWayNodes(grid!)
 })
 watch(selectedNode, (selectedNode) => {
-  $emit('update:modelValue', selectedNode)
+  $emit('update:modelValue', selectedNode ? +selectedNode : selectedNode)
 })
 </script>
 <script lang="ts">
