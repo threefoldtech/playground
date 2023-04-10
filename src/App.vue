@@ -10,6 +10,11 @@
       <ProfileManager />
       <v-switch label="publicIP" v-model="publicIP" />
       <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
+      <InputValidator :rules="rules">
+        <template #default="{ props }">
+          <v-text-field label="test" v-model="valueInput" v-bind="props"> </v-text-field>
+        </template>
+      </InputValidator>
     </v-main>
   </v-app>
 </template>
@@ -17,20 +22,32 @@
 <script lang="ts">
 import ProfileManager from './weblets/profile_manager.vue'
 import SelectNodeId from './components/select_node_id.vue'
+import InputValidator from './components/input_validator.vue'
 import { ref } from 'vue'
 
 export default {
   name: 'App',
   components: {
     ProfileManager,
-    SelectNodeId
+    SelectNodeId,
+    InputValidator
   },
   setup() {
     const nodeId = ref<number>(0)
     const title = ref('')
     const publicIP = ref(false)
+    const valueInput = ref('')
 
-    return { nodeId, title, publicIP }
+    const testRule = (value: string) => {
+      if (value && value.length > 10) {
+        return 'Value is More than 10 chars' as string
+      }
+      return null
+    }
+
+    const rules = [testRule]
+
+    return { nodeId, title, publicIP, valueInput, rules }
   }
 }
 </script>
