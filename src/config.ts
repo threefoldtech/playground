@@ -3,11 +3,13 @@ import type { App, Component } from 'vue'
 import PasswordInputWrapper from './components/password_input_wrapper.vue'
 import WebletLayout from './components/weblet_layout.vue'
 import CopyInputWrapper from './components/copy_input_wrapper.vue'
+import DTabs from './components/dynamic_tabs.vue'
 
 const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   PasswordInputWrapper,
   WebletLayout,
-  CopyInputWrapper
+  CopyInputWrapper,
+  DTabs
 }
 
 export function defineGlobalComponents(app: App<Element>) {
