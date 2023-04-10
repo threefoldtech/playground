@@ -9,14 +9,14 @@
     <v-main>
       <ProfileManager />
       <v-switch label="publicIP" v-model="publicIP" />
-      <SelectFarm v-model="nodeId" :deps="{ publicIp: publicIP }" />
+      <SelectFarm v-model="farm" :filters="{ publicIp: publicIP, cpu: 5000000000 }" />
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
 import ProfileManager from './weblets/profile_manager.vue'
-import SelectFarm from './components/select_farm.vue'
+import SelectFarm, { type Farm } from './components/select_farm.vue'
 import { ref } from 'vue'
 
 export default {
@@ -26,11 +26,11 @@ export default {
     SelectFarm
   },
   setup() {
-    const nodeId = ref<number>(0)
+    const farm = ref<Farm>()
     const title = ref('')
-    const publicIP = ref(false)
+    const publicIP = ref(true)
 
-    return { nodeId, title, publicIP }
+    return { farm, title, publicIP }
   }
 }
 </script>
