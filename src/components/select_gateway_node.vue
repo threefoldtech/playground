@@ -24,7 +24,7 @@ import { getGrid } from '../utils/grid'
 import type { GridClient, NodeInfo } from 'grid3_client'
 
 //states
-defineProps<{ modelValue: number }>()
+defineProps<{ modelValue?: number }>()
 const $emit = defineEmits<{ (event: 'update:modelValue', value?: number): void }>()
 const loading = ref(true)
 const items = ref<NodeInfo[]>([])
@@ -37,23 +37,33 @@ let loadMoreNodes = 1
 
 //methods
 const handleGetGetWayNodes = async (grid: GridClient) => {
-  loadGateWayNodes(grid, loadMoreNodes).then((res) => {
-    loading.value = false
-    items.value = [...res]
-  })
+  loadGateWayNodes(grid, loadMoreNodes)
+    .then((res) => {
+      loading.value = false
+      items.value = [...res]
+    })
+    .catch((error: any) => {
+      noMoreResults.value = true
+      console.error('Error occurred while calling handleGetGetWayNodes API:', error)
+    })
 }
 
 const handleLoadMoreGateWayNodes = async () => {
   if (noMoreResults.value) return
   loadMoreNodes = loadMoreNodes + 1
   const grid = await getGrid(profileManager)
-  handleGetGetWayNodes(grid!).then((res: any) => {
-    if (res) {
-      items.value = res.concat(items.value)
-    } else {
+  handleGetGetWayNodes(grid!)
+    .then((res: any) => {
+      if (res) {
+        items.value = res.concat(items.value)
+      } else {
+        noMoreResults.value = true
+      }
+    })
+    .catch((error: any) => {
       noMoreResults.value = true
-    }
-  })
+      console.error('Error occurred while calling handleGetGetWayNodes API:', error)
+    })
 }
 //hooks
 onMounted(async () => {
