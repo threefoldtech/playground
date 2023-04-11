@@ -10,7 +10,7 @@
       <ProfileManager />
       <v-switch label="publicIP" v-model="publicIP" />
       <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
-      <InputValidator :rules="rules">
+      <InputValidator :rules="rules" :asyncRules="asyncRules">
         <template #default="{ props }">
           <v-text-field label="test" v-model="valueInput" v-bind="props"> </v-text-field>
         </template>
@@ -24,6 +24,7 @@ import ProfileManager from './weblets/profile_manager.vue'
 import SelectNodeId from './components/select_node_id.vue'
 import InputValidator from './components/input_validator.vue'
 import { ref } from 'vue'
+import { getGrid } from './utils/grid'
 
 export default {
   name: 'App',
@@ -42,12 +43,20 @@ export default {
       if (value && value.length > 10) {
         return 'Value is More than 10 chars' as string
       }
-      return null
+      return ''
     }
+    const testasyncRule = async (value: string) => {
+      const grid = await getGrid(ProfileManager.profile!)
 
+      if (value && !grid) {
+        return 'Api error' as string
+      }
+      return ''
+    }
+    const asyncRules = [testasyncRule]
     const rules = [testRule]
 
-    return { nodeId, title, publicIP, valueInput, rules }
+    return { nodeId, title, publicIP, valueInput, rules, asyncRules }
   }
 }
 </script>
