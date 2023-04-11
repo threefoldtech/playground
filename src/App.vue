@@ -40,6 +40,7 @@ export default {
     const valueInput = ref('')
 
     const testRule = (value: string) => {
+      console.log("🚀 ~ file: App.vue:43 ~ testRule ~ value:", value)
       if (value && value.length > 10) {
         return 'Value is More than 10 chars' as string
       }

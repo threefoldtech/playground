@@ -1,18 +1,20 @@
 <template>
-  <slot :props="{ onInput, errorMessages, onBlur }"></slot>
+  <slot :props="{ onInput, errorMessages, onBlur: focused ? undefined : onBlur }"></slot>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { ref, type PropType } from 'vue'
 import { watch } from 'vue'
 
-export type Rule = (value?: any) => string
-export type asyncRule = (value: string) => Promise<string>
-
+export type Rule = (value?: any) => string | null | undefined
+export type asyncRule = (
+  value: string
+) => Promise<string | null | undefined> | string | null | undefined
 const props = defineProps<{ rules: Rule[]; asyncRules: asyncRule[] }>()
+
 //states
 let inputValue = ref('')
-let errorMessages = ref<any>('')
+let errorMessages = ref<string>('')
 
 //varaibles
 let focused = false
@@ -22,7 +24,6 @@ const onInput = (event: any) => {
 }
 
 const onBlur = (event: any) => {
-  if (focused) return
   validate(event.target.value)
   focused = true
 }
@@ -33,10 +34,10 @@ const validate = async (writtenValue: any) => {
     errorMessages.value = await validateRules(writtenValue, props.asyncRules)
   }
 }
-const validateRules = async (value: any, rules?: Rule[] | asyncRule[]) => {
-  if (!rules) return ''
-  for (var i = 0; i < rules.length; ++i) {
-    const ruleRes = await rules[i](value)
+const validateRules = async (value: any, theRules: Rule[] | asyncRule[]) => {
+  if (!theRules) return ''
+  for (var i = 0; i < theRules.length; ++i) {
+    const ruleRes = await theRules[i](value)
 
     if (ruleRes) {
       return ruleRes
