@@ -8,14 +8,19 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 
+//types
 export type Rule = (value?: any) => string | null | undefined
 export type asyncRule = (
   value: string
 ) => Promise<string | null | undefined> | string | null | undefined
-
+enum InputStatuess {
+  Valid = 'VALID',
+  INVALID = 'INVALID'
+}
+////
 const props = defineProps<{
   rules: Rule[]
-  asyncRules: asyncRule[]
+  asyncRules?: asyncRule[]
   modelValue?: string
   inputStatus?: string
 }>()
@@ -48,7 +53,7 @@ const validate = async (writtenValue: any) => {
     errorMessages.value = await validateRules(writtenValue, props.asyncRules)
   }
 }
-const validateRules = async (value: any, theRules: Rule[] | asyncRule[]) => {
+const validateRules = async (value: any, theRules?: Rule[] | asyncRule[]) => {
   if (!theRules) return ''
   for (var i = 0; i < theRules.length; ++i) {
     const ruleRes = await theRules[i](value)
@@ -61,18 +66,17 @@ const validateRules = async (value: any, theRules: Rule[] | asyncRule[]) => {
 }
 
 const handleInputStatues = () => {
-  console.log('statue')
   if (errorMessages.value.length == 0) {
-    $emit('update:inputStatus', 'V')
+    $emit('update:inputStatus', InputStatuess.Valid)
   } else {
-    $emit('update:inputStatus', 'IN')
+    $emit('update:inputStatus', InputStatuess.INVALID)
   }
 }
 
 const resetInput = () => {
   $emit('update:modelValue', '')
 }
-watch(errorMessages, (errorMessages) => {
+watch(errorMessages, () => {
   handleInputStatues()
 })
 //hooks

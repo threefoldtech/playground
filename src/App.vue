@@ -10,12 +10,7 @@
       <ProfileManager />
       <v-switch label="publicIP" v-model="publicIP" />
       <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
-      <InputValidator
-        :rules="rules"
-        :asyncRules="asyncRules"
-        v-model="valueInput"
-        v-model:inputStatus="inputStatus"
-      >
+      <InputValidator :rules="rules" v-model="valueInput" v-model:inputStatus="inputStatus">
         <template #default="{ props }">
           <v-text-field label="test" v-model="valueInput" v-bind="props" />
         </template>
@@ -46,7 +41,6 @@ export default {
     const inputStatus = ref('aloo')
 
     const testRule = (value: string) => {
-      console.log('🚀 ~ file: App.vue:43 ~ testRule ~ value:', value)
       if (value && value.length > 10) {
         return 'Value is More than 10 chars' as string
       }
