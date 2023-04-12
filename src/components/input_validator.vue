@@ -1,88 +1,104 @@
 <template>
   <slot
-    :props="{ onInput, errorMessages, onBlur: focused ? undefined : onBlur, resetInput }"
+    :props="{
+      onInput: touched ? onInput : undefined,
+      onBlur: touched ? undefined : onBlur,
+      errorMessages: errorMessage,
+      error: !!errorMessage,
+      loading: inputStatus === ValidatorStatus.PENDING,
+      hint: inputStatus === ValidatorStatus.PENDING ? 'Validating ...' : undefined,
+      'persistent-hint': inputStatus === ValidatorStatus.PENDING
+    }"
   ></slot>
-  {{ $props.inputStatus }}
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, type PropType } from 'vue'
+import debounce from 'lodash/debounce.js'
 
-//types
-export type Rule = (value?: any) => string | null | undefined
-export type asyncRule = (
-  value: string
-) => Promise<string | null | undefined> | string | null | undefined
-enum InputStatuess {
-  Valid = 'VALID',
-  INVALID = 'INVALID'
-}
-////
-const props = defineProps<{
-  rules: Rule[]
-  asyncRules?: asyncRule[]
-  modelValue?: string
-  inputStatus?: string
-}>()
-const $emit = defineEmits<{
-  (event: 'update:modelValue', value?: string): void
-  (event: 'update:inputStatus', value?: string): void
-}>()
+export type RuleReturn = { message: string; [key: string]: any } | undefined | void
+export type SyncRule = (value: string) => RuleReturn
+export type AsyncRule = (value: string) => Promise<RuleReturn>
 
-//states
-
-let errorMessages = ref<string>('')
-
-//varaibles
-let focused = false
-//methods
-const onInput = (event: any) => {
-  if (focused) {
-    validate(event.target.value)
+const props = defineProps({
+  status: {
+    type: String as PropType<ValidatorStatus>,
+    required: false
+  },
+  rules: {
+    type: Array as PropType<SyncRule[]>,
+    required: true
+  },
+  asyncRules: {
+    type: Array as PropType<AsyncRule[]>,
+    required: false,
+    default: [] as AsyncRule[]
   }
-}
+})
+const emits = defineEmits<{
+  (events: 'update:status', value: ValidatorStatus): void
+  (events: 'update:valid', value: boolean): void
+}>()
 
-const onBlur = (event: any) => {
-  validate(event.target.value)
-  focused = true
-}
+const touched = ref(false)
+const errorMessage = ref<string>()
+const required = ref(false)
+const inputStatus = ref<ValidatorStatus>()
+watch(inputStatus, (s) => {
+  emits('update:valid', s === ValidatorStatus.VALID)
+  if (s) emits('update:status', s)
+})
 
-const validate = async (writtenValue: any) => {
-  errorMessages.value = await validateRules(writtenValue, props.rules)
-  if (errorMessages.value.length == 0) {
-    errorMessages.value = await validateRules(writtenValue, props.asyncRules)
-  }
-}
-const validateRules = async (value: any, theRules?: Rule[] | asyncRule[]) => {
-  if (!theRules) return ''
-  for (var i = 0; i < theRules.length; ++i) {
-    const ruleRes = await theRules[i](value)
-
-    if (ruleRes) {
-      return ruleRes
+onMounted(() => {
+  for (const rule of props.rules) {
+    const error = rule('')
+    if (error && error.required) {
+      required.value = true
+      break
     }
   }
-  return ''
-}
-
-const handleInputStatues = () => {
-  if (errorMessages.value.length == 0) {
-    $emit('update:inputStatus', InputStatuess.Valid)
-  } else {
-    $emit('update:inputStatus', InputStatuess.INVALID)
-  }
-}
-
-const resetInput = () => {
-  $emit('update:modelValue', '')
-}
-watch(errorMessages, () => {
-  handleInputStatues()
+  inputStatus.value = required.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
 })
-//hooks
+
+function onBlur(event: Event) {
+  touched.value = true
+  validate(getValue(event))
+}
+
+const onInput = debounce((event: Event) => validate(getValue(event)), 250)
+
+function reset() {
+  touched.value = false
+  errorMessage.value = undefined
+  inputStatus.value = undefined
+}
+
+async function validate(value: string) {
+  errorMessage.value = undefined
+  inputStatus.value = ValidatorStatus.PENDING
+  for (const rule of [...props.rules, ...props.asyncRules]) {
+    const error = await rule(value)
+    if (error) {
+      errorMessage.value = error.message
+      break
+    }
+  }
+  inputStatus.value = errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
+}
+
+function getValue(e: Event): string {
+  const input = e.target as HTMLInputElement
+  return input.value
+}
 </script>
 
 <script lang="ts">
+export enum ValidatorStatus {
+  VALID = 'VALID',
+  INVALID = 'INVALID',
+  PENDING = 'PENDING'
+}
+
 export default {
   name: 'InputValidator'
 }
