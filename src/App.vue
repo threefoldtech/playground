@@ -14,7 +14,7 @@
             :active="$route.path === item.route"
           >
             <template v-slot:prepend v-if="item.icon">
-              <v-img class="mr-4" width="28" :src="'/images/icons/' + item.icon" />
+              <v-img class="mr-4" width="26" :src="'/images/icons/' + item.icon" />
             </template>
 
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -23,11 +23,28 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main> </v-main>
+    <v-main>
+      <v-container fluid>
+        <DisclaimerToolbar />
+        <div class="my-4 d-flex justify-end">
+          <ProfileManager />
+        </div>
+        <router-view />
+      </v-container>
+    </v-main>
   </v-app>
 </template>
 
 <script lang="ts" setup>
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+watch(
+  () => route.meta,
+  (meta) => (document.title = 'TF Playground' + (meta && 'title' in meta ? ` | ${meta.title}` : ``))
+)
+
 const routes: AppRoute[] = [
   {
     title: 'DEPLOYMENTS',
@@ -62,6 +79,9 @@ const routes: AppRoute[] = [
 </script>
 
 <script lang="ts">
+import DisclaimerToolbar from './components/disclaimer_toolbar.vue'
+import ProfileManager from './weblets/profile_manager.vue'
+
 interface AppRoute {
   title: string
   items: AppRouteItem[]
@@ -73,7 +93,11 @@ interface AppRouteItem {
   icon?: string
 }
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    DisclaimerToolbar,
+    ProfileManager
+  }
 }
 </script>
 
