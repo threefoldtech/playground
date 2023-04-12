@@ -8,29 +8,17 @@
 
     <v-main>
       <ProfileManager />
-      <v-switch label="publicIP" v-model="publicIP" />
-      <SelectFarm v-model="farm" :filters="{ publicIp: publicIP, cpu: 5000000000 }" />
+      <QrcodeGenerator data="data" />
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
-import ProfileManager from './weblets/profile_manager.vue'
-import SelectFarm, { type Farm } from './components/select_farm.vue'
-import { ref } from 'vue'
-
 export default {
   name: 'App',
-  components: {
-    ProfileManager,
-    SelectFarm
-  },
+  components: {},
   setup() {
-    const farm = ref<Farm>()
-    const title = ref('')
-    const publicIP = ref(true)
-
-    return { farm, title, publicIP }
+    return {}
   }
 }
 </script>
