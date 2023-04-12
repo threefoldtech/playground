@@ -2,9 +2,17 @@
   <v-app>
     <v-navigation-drawer width="280" permanent>
       <v-list>
+        <v-list-item>
+          <v-img src="/images/logoTF.png" />
+        </v-list-item>
+        <v-list-item>
+          <v-card color="primary">
+            <v-card-text class="text-center">{{ network.toLocaleUpperCase() }}NET</v-card-text>
+          </v-card>
+        </v-list-item>
+
         <template v-for="route in routes" :key="route.title">
           <v-list-subheader>{{ route.title }}</v-list-subheader>
-
           <v-list-item
             v-for="item in route.items"
             :key="item.route"
@@ -14,7 +22,12 @@
             :active="$route.path === item.route"
           >
             <template v-slot:prepend v-if="item.icon">
-              <v-img class="mr-4" width="26" :src="'/images/icons/' + item.icon" />
+              <v-img
+                class="mr-4"
+                width="26"
+                :src="'/images/icons/' + item.icon"
+                :alt="item.title"
+              />
             </template>
 
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -76,6 +89,9 @@ const routes: AppRoute[] = [
     ]
   }
 ]
+
+// eslint-disable-next-line no-undef
+const network = process.env.NETWORK as string
 </script>
 
 <script lang="ts">
