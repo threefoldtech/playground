@@ -1,7 +1,7 @@
 import { GridClient, NetworkEnv, BackendStorageType } from 'grid3_client'
 import type { Profile } from '../stores/profile_manager'
 
-const NETWORK = NetworkEnv.dev
+const NETWORK = process.env.NETWORK as NetworkEnv
 
 export async function getGrid(profile: Pick<Profile, 'mnemonics'>) {
   if (!profile) return null

@@ -2,62 +2,117 @@
   <v-app>
     <v-navigation-drawer width="280" permanent>
       <v-list>
-        <v-list-item title="Home" value="home"></v-list-item>
+        <v-list-item>
+          <v-img src="/images/logoTF.png" />
+        </v-list-item>
+        <v-list-item>
+          <v-card color="primary">
+            <v-card-text class="text-center">{{ network.toLocaleUpperCase() }}NET</v-card-text>
+          </v-card>
+        </v-list-item>
+
+        <template v-for="route in routes" :key="route.title">
+          <v-list-subheader>{{ route.title }}</v-list-subheader>
+          <v-list-item
+            v-for="item in route.items"
+            :key="item.route"
+            :value="item.route"
+            @click="$router.push(item.route)"
+            active-color="primary"
+            :active="$route.path === item.route"
+          >
+            <template v-slot:prepend v-if="item.icon">
+              <v-img
+                class="mr-4"
+                width="26"
+                :src="'/images/icons/' + item.icon"
+                :alt="item.title"
+              />
+            </template>
+
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </template>
       </v-list>
     </v-navigation-drawer>
 
     <v-main>
-      <ProfileManager />
-      <v-switch label="publicIP" v-model="publicIP" />
-      <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
-      <InputValidator :rules="rules" v-model="valueInput" v-model:inputStatus="inputStatus">
-        <template #default="{ props }">
-          <v-text-field label="test" v-model="valueInput" v-bind="props" />
-        </template>
-      </InputValidator>
+      <v-container fluid>
+        <DisclaimerToolbar />
+        <div class="my-4 d-flex justify-end">
+          <ProfileManager />
+        </div>
+        <router-view />
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
-<script lang="ts">
-import ProfileManager from './weblets/profile_manager.vue'
-import SelectNodeId from './components/select_node_id.vue'
-import InputValidator from './components/input_validator.vue'
-import { ref } from 'vue'
-import { getGrid } from './utils/grid'
+<script lang="ts" setup>
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+watch(
+  () => route.meta,
+  (meta) => (document.title = 'TF Playground' + (meta && 'title' in meta ? ` | ${meta.title}` : ``))
+)
+
+const routes: AppRoute[] = [
+  {
+    title: 'DEPLOYMENTS',
+    items: [
+      { title: 'Full Virtual Machine', icon: 'vm.png', route: '/' },
+      { title: 'Micro Virtual Machine', icon: 'vm.png', route: '/vm' },
+      { title: 'Kubernetes', icon: 'kubernetes.png', route: '/kubernetes' },
+      { title: 'CapRover', icon: 'caprover.png', route: '/caprover' },
+      { title: 'Peertube', icon: 'peertube.png', route: '/peertube' },
+      { title: 'Funkwhale', icon: 'funkwhale.png', route: '/funkwhale' },
+      { title: 'Mattermost', icon: 'mattermost.png', route: '/mattermost' },
+      { title: 'Discourse', icon: 'discourse.png', route: '/discourse' },
+      { title: 'Taiga', icon: 'taiga.png', route: '/taiga' },
+      { title: 'Owncloud', icon: 'owncloud.png', route: '/owncloud' },
+      { title: 'Presearch', icon: 'presearch.png', route: '/presearch' },
+      { title: 'Subsquid', icon: 'subsquid.png', route: '/subsquid' },
+      { title: 'Casperlabs', icon: 'casperlabs.png', route: '/casperlabs' },
+      { title: 'Algorand', icon: 'algorand.png', route: '/algorand' },
+      { title: 'Node Pilot', icon: 'vm.png', route: '/nodepilot' },
+      { title: 'Wordpress', icon: 'wordpress.png', route: '/wordpress' },
+      { title: 'Umbrel', icon: 'umbrel.png', route: '/umbrel' }
+    ]
+  },
+  {
+    title: 'MY ACCOUNT',
+    items: [
+      { title: 'Contracts', route: '/contractslist' },
+      { title: 'Deployments', route: '/deployedlist' }
+    ]
+  }
+]
+
+// eslint-disable-next-line no-undef
+const network = process.env.NETWORK as string
+</script>
+
+<script lang="ts">
+import DisclaimerToolbar from './components/disclaimer_toolbar.vue'
+import ProfileManager from './weblets/profile_manager.vue'
+
+interface AppRoute {
+  title: string
+  items: AppRouteItem[]
+}
+
+interface AppRouteItem {
+  title: string
+  route: string
+  icon?: string
+}
 export default {
   name: 'App',
   components: {
-    ProfileManager,
-    SelectNodeId,
-    InputValidator
-  },
-  setup() {
-    const nodeId = ref<number>(0)
-    const title = ref('')
-    const publicIP = ref(false)
-    const valueInput = ref('asda')
-    const inputStatus = ref('aloo')
-
-    const testRule = (value: string) => {
-      if (value && value.length > 10) {
-        return 'Value is More than 10 chars' as string
-      }
-      return ''
-    }
-    const testasyncRule = async (value: string) => {
-      const grid = await getGrid(ProfileManager.profile!)
-
-      if (value && !grid) {
-        return 'Api error' as string
-      }
-      return ''
-    }
-    const asyncRules = [testasyncRule]
-    const rules = [testRule]
-
-    return { nodeId, title, publicIP, valueInput, rules, asyncRules, inputStatus }
+    DisclaimerToolbar,
+    ProfileManager
   }
 }
 </script>
