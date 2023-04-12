@@ -1,15 +1,28 @@
 <template>
-  <slot :props="{ onInput, errorMessages, onBlur: focused ? undefined : onBlur }"></slot>
+  <slot
+    :props="{ onInput, errorMessages, onBlur: focused ? undefined : onBlur, resetInput }"
+  ></slot>
+  {{ $props.inputStatus }}
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 export type Rule = (value?: any) => string | null | undefined
 export type asyncRule = (
   value: string
 ) => Promise<string | null | undefined> | string | null | undefined
-const props = defineProps<{ rules: Rule[]; asyncRules: asyncRule[] }>()
+
+const props = defineProps<{
+  rules: Rule[]
+  asyncRules: asyncRule[]
+  modelValue?: string
+  inputStatus?: string
+}>()
+const $emit = defineEmits<{
+  (event: 'update:modelValue', value?: string): void
+  (event: 'update:inputStatus', value?: string): void
+}>()
 
 //states
 
@@ -47,6 +60,21 @@ const validateRules = async (value: any, theRules: Rule[] | asyncRule[]) => {
   return ''
 }
 
+const handleInputStatues = () => {
+  console.log('statue')
+  if (errorMessages.value.length == 0) {
+    $emit('update:inputStatus', 'V')
+  } else {
+    $emit('update:inputStatus', 'IN')
+  }
+}
+
+const resetInput = () => {
+  $emit('update:modelValue', '')
+}
+watch(errorMessages, (errorMessages) => {
+  handleInputStatues()
+})
 //hooks
 </script>
 

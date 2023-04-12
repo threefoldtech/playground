@@ -10,9 +10,14 @@
       <ProfileManager />
       <v-switch label="publicIP" v-model="publicIP" />
       <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
-      <InputValidator :rules="rules" :asyncRules="asyncRules">
+      <InputValidator
+        :rules="rules"
+        :asyncRules="asyncRules"
+        v-model="valueInput"
+        v-model:inputStatus="inputStatus"
+      >
         <template #default="{ props }">
-          <v-text-field label="test" v-bind="props" />
+          <v-text-field label="test" v-model="valueInput" v-bind="props" />
         </template>
       </InputValidator>
     </v-main>
@@ -37,7 +42,8 @@ export default {
     const nodeId = ref<number>(0)
     const title = ref('')
     const publicIP = ref(false)
-    const valueInput = ref('')
+    const valueInput = ref('asda')
+    const inputStatus = ref('aloo')
 
     const testRule = (value: string) => {
       console.log('🚀 ~ file: App.vue:43 ~ testRule ~ value:', value)
@@ -56,8 +62,8 @@ export default {
     }
     const asyncRules = [testasyncRule]
     const rules = [testRule]
-    const X = ref('s')
-    return { nodeId, title, publicIP, valueInput, rules, asyncRules }
+
+    return { nodeId, title, publicIP, valueInput, rules, asyncRules, inputStatus }
   }
 }
 </script>
