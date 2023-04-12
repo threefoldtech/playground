@@ -12,7 +12,7 @@
       <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" />
       <InputValidator :rules="rules" :asyncRules="asyncRules">
         <template #default="{ props }">
-          <v-text-field label="test" v-model="valueInput" v-bind="props"> </v-text-field>
+          <v-text-field label="test" v-bind="props" />
         </template>
       </InputValidator>
     </v-main>
@@ -40,7 +40,7 @@ export default {
     const valueInput = ref('')
 
     const testRule = (value: string) => {
-      console.log("🚀 ~ file: App.vue:43 ~ testRule ~ value:", value)
+      console.log('🚀 ~ file: App.vue:43 ~ testRule ~ value:', value)
       if (value && value.length > 10) {
         return 'Value is More than 10 chars' as string
       }
@@ -56,7 +56,7 @@ export default {
     }
     const asyncRules = [testasyncRule]
     const rules = [testRule]
-
+    const X = ref('s')
     return { nodeId, title, publicIP, valueInput, rules, asyncRules }
   }
 }

@@ -3,8 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, type PropType } from 'vue'
-import { watch } from 'vue'
+import { ref } from 'vue'
 
 export type Rule = (value?: any) => string | null | undefined
 export type asyncRule = (
@@ -13,14 +12,16 @@ export type asyncRule = (
 const props = defineProps<{ rules: Rule[]; asyncRules: asyncRule[] }>()
 
 //states
-let inputValue = ref('')
+
 let errorMessages = ref<string>('')
 
 //varaibles
 let focused = false
 //methods
 const onInput = (event: any) => {
-  inputValue.value = event.target.value
+  if (focused) {
+    validate(event.target.value)
+  }
 }
 
 const onBlur = (event: any) => {
@@ -47,11 +48,6 @@ const validateRules = async (value: any, theRules: Rule[] | asyncRule[]) => {
 }
 
 //hooks
-watch(inputValue, (inputValue) => {
-  if (focused) {
-    validate(inputValue)
-  }
-})
 </script>
 
 <script lang="ts">
