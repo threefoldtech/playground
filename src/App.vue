@@ -9,33 +9,16 @@
     <v-main>
       <ProfileManager />
       <QrcodeGenerator data="data" />
-      <SelectGateWayNode v-model="selectedNode" />
-      <v-switch label="publicIP" v-model="publicIP" />
-      <!-- <SelectNodeId v-model="nodeId" :deps="{ publicIp: publicIP }" /> -->
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
-import ProfileManager from './weblets/profile_manager.vue'
-import QrcodeGenerator from './components/qrcode_generator.vue'
-import SelectGateWayNode from './components/select_gateway_node.vue'
-import SelectNodeId from './components/select_node_id.vue'
-import { ref } from 'vue'
-
 export default {
   name: 'App',
-  components: {
-    ProfileManager,
-    QrcodeGenerator,
-    SelectGateWayNode
-  },
+  components: {},
   setup() {
-    const nodeId = ref<number>(0)
-    const title = ref('')
-    const publicIP = ref(false)
-    const selectedNode = ref()
-    return { nodeId, title, publicIP, selectedNode }
+    return {}
   }
 }
 </script>
