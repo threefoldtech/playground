@@ -5,7 +5,7 @@
         <v-card-title v-if="$slots.title" class="font-weight-bold">
           <slot name="title" />
         </v-card-title>
-        <v-card-subtitle v-if="$slots.subtitle">
+        <v-card-subtitle v-if="$slots.subtitle" :style="{ whiteSpace: 'initial' }">
           <slot name="subtitle" />
         </v-card-subtitle>
       </div>

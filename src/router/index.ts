@@ -9,6 +9,11 @@ const router = createRouter({
       meta: { title: 'Full Virtual Machine' }
     },
     {
+      path: '/kubernetes',
+      component: () => import('../views/kubernetes_view.vue'),
+      meta: { title: 'Kubernetes' }
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: () => import('../views/not_yet_implemented.vue'),
       meta: { title: 'Not Yet Implemented' }
