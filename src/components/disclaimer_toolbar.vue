@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>Disclaimer</v-card-title>
+    <v-card-title class="font-weight-bold">Disclaimer</v-card-title>
     <v-card-text>
       This is a development environment. We're still ironing out the kinks. If there are any issues,
       please let us know
