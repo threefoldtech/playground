@@ -1,13 +1,14 @@
 <template>
-  <div>full_virtual_machine</div>
+  <FullVm />
 </template>
 
-<script lang="ts" setup>
-console.log('full_virtual_machine')
-</script>
-
 <script lang="ts">
+import FullVm from '../weblets/full_vm.vue'
+
 export default {
-  name: 'FullVirtualMachine'
+  name: 'FullVirtualMachine',
+  components: {
+    FullVm
+  }
 }
 </script>
