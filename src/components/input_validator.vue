@@ -13,12 +13,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, type PropType } from 'vue'
+import { ref, watch, onMounted, getCurrentInstance, onUnmounted, type PropType } from 'vue'
 import debounce from 'lodash/debounce.js'
 
 export type RuleReturn = { message: string; [key: string]: any } | undefined | void
 export type SyncRule = (value: string) => RuleReturn
 export type AsyncRule = (value: string) => Promise<RuleReturn>
+
+const uid = getCurrentInstance()!.uid
 
 const props = defineProps({
   status: {
@@ -38,6 +40,8 @@ const props = defineProps({
 const emits = defineEmits<{
   (events: 'update:status', value: ValidatorStatus): void
   (events: 'update:valid', value: boolean): void
+  (events: 'unregister', value: number): void
+  (events: 'valid', uid: number, boolean: boolean, reset: () => void): void
 }>()
 
 const touched = ref(false)
@@ -46,6 +50,7 @@ const required = ref(false)
 const inputStatus = ref<ValidatorStatus>()
 watch(inputStatus, (s) => {
   emits('update:valid', s === ValidatorStatus.VALID)
+  emits('valid', uid!, s === ValidatorStatus.VALID, reset)
   if (s) emits('update:status', s)
 })
 
@@ -59,6 +64,7 @@ onMounted(() => {
   }
   inputStatus.value = required.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
 })
+onUnmounted(() => emits('unregister', uid!))
 
 function onBlur(event: Event) {
   touched.value = true
@@ -67,6 +73,7 @@ function onBlur(event: Event) {
 
 const onInput = debounce((event: Event) => validate(getValue(event)), 250)
 
+defineExpose({ reset })
 function reset() {
   touched.value = false
   errorMessage.value = undefined

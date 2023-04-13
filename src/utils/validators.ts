@@ -1,8 +1,8 @@
 import validator from 'validator'
 import type { IsFQDNOptions } from 'validator/lib/isFQDN'
-import { Options } from 'validator/lib/isBoolean'
-import { IsEmailOptions } from 'validator/lib/isEmail'
-import { IsURLOptions } from 'validator/lib/isURL'
+import type { Options } from 'validator/lib/isBoolean'
+import type { IsEmailOptions } from 'validator/lib/isEmail'
+import type { IsURLOptions } from 'validator/lib/isURL'
 
 export function required(msg: string) {
   return (value: string) => {

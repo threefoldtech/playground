@@ -1,63 +1,48 @@
 <template>
   <slot
     :form="{
-      onRegisterInput,
-      onUnregisterInput
+      onValid,
+      onUnregister
     }"
   ></slot>
 </template>
 
 <script lang="ts" setup>
-import type { ComponentInternalInstance } from 'vue'
+import { ref, watch } from 'vue'
 
-const components: ComponentInternalInstance[] = []
+defineProps<{ modelValue: boolean }>()
+const emits = defineEmits<{ (events: 'update:modelValue', value: boolean): void }>()
 
-function onRegisterInput(instance: ComponentInternalInstance | null) {
-  //   console.log(instance!.setupState)
+const inputsValiadtion = ref<{ [uid: number]: boolean }>({})
+const inputsReset = {} as { [uid: number]: () => void }
 
-  if (!instance) return
-  components.push(instance)
+watch(
+  inputsValiadtion,
+  (inps) => {
+    emits('update:modelValue', !Object.values(inps).some((v) => v === false))
+  },
+  { deep: true }
+)
+
+function onValid(uid: number, value: boolean, reset: () => void): void {
+  inputsValiadtion.value[uid] = value
+  inputsReset[uid] = reset
 }
 
-function onUnregisterInput(instance: ComponentInternalInstance | null) {
-  const index = instance ? components.findIndex((input) => input === instance) : -1
-  if (index > -1) {
-    components.splice(index, 1)
+function onUnregister(uid: number): void {
+  delete inputsValiadtion.value[uid]
+  delete inputsReset[uid]
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+defineExpose({
+  reset() {
+    Object.values(inputsReset).forEach((fn) => fn())
   }
-}
-
-/* import {
-  onMounted,
-  onUnmounted,
-  getCurrentInstance,
-  type ComponentInternalInstance,
-  ref
-} from 'vue'
-
-const emits = defineEmits<{
-  (event: 'registerInput', value: ComponentInternalInstance | null): void
-  (event: 'unregisterInput', value: ComponentInternalInstance | null): void
-}>()
-
-function reset() {
-  console.log('reset')
-}
-
-const props = ref('asd')
-
-function setProps(c: string) {
-  props.value = c
-}
-
-onMounted(() => emits('registerInput', getCurrentInstance()))
-onUnmounted(() => emits('unregisterInput', getCurrentInstance())) */
+})
 </script>
 
 <script lang="ts">
-// import InputValidator from './input_validator.vue'
-
-// console.log(InputValidator.name)
-
 export default {
   name: 'FormValidator'
 }
