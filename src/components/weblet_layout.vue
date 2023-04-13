@@ -17,9 +17,12 @@
 
     <v-divider class="mt-5 mb-2" />
 
-    <v-card-text> <slot /> </v-card-text>
+    <v-card-text>
+      <slot v-if="profileManager.profile || disableAlerts" />
+      <v-alert type="info" v-else> Please activate a profile from the profile manager </v-alert>
+    </v-card-text>
 
-    <template v-if="$slots['footer-actions']">
+    <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
       <v-divider class="mt-5" />
       <v-card-actions>
         <v-spacer />
@@ -28,6 +31,20 @@
     </template>
   </v-card>
 </template>
+
+<script lang="ts" setup>
+import { useProfileManager } from '../stores'
+
+defineProps({
+  disableAlerts: {
+    type: Boolean,
+    required: false,
+    default: false
+  }
+})
+
+const profileManager = useProfileManager()
+</script>
 
 <script lang="ts">
 export default {

@@ -44,7 +44,9 @@
     </template>
 
     <template #footer-actions>
-      <v-btn variant="tonal" color="primary" @click="deploy"> Deploy </v-btn>
+      <v-btn variant="tonal" color="primary" @click="deploy" :loading="loading" :disabled="loading">
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -69,7 +71,9 @@ function addWorker() {
   workers.value.push(createWorker())
 }
 
+const loading = ref(false)
 async function deploy() {
+  loading.value = true
   const grid = await getGrid(profileManager.profile!)
   deployK8s(grid!, {
     name: name.value,
@@ -80,6 +84,7 @@ async function deploy() {
   })
     .then(console.log)
     .catch(console.log)
+    .finally(() => (loading.value = false))
 }
 </script>
 

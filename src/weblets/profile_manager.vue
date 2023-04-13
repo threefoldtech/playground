@@ -18,7 +18,7 @@
         </v-card>
       </template>
 
-      <weblet-layout>
+      <weblet-layout disable-alerts>
         <template #title> Profile Manager </template>
         <template #subtitle>
           Please visit
