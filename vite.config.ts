@@ -4,8 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-const NETWORK = process.env.NETWORK || 'dev'
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue(), nodePolyfills()],
@@ -15,6 +13,9 @@ export default defineConfig({
     }
   },
   define: {
-    'process.env': { NETWORK }
+    'process.env': {
+      NETWORK: process.env.NETWORK || 'dev',
+      INTERNAL_SOLUTION_PROVIDER_ID: process.env.INTERNAL_SOLUTION_PROVIDER_ID || 1
+    }
   }
 })

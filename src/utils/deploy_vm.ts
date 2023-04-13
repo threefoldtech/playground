@@ -18,7 +18,11 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
   vms.metadata = options.metadata
   vms.description = options.description
   await grid.machines.deploy(vms)
-  return grid.machines.getObj(vms.name)
+  return loadVM(grid, vms.name)
+}
+
+export async function loadVM(grid: GridClient, name: string) {
+  return grid.machines.getObj(name)
 }
 
 async function createMachine(grid: GridClient, machine: Machine): Promise<MachineModel> {
@@ -30,14 +34,15 @@ async function createMachine(grid: GridClient, machine: Machine): Promise<Machin
     farmName: machine.farmName,
     hru: machine.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
     sru: machine.disks?.reduce((total, disk) => total + disk.size, machine.rootFilesystemSize || 0),
-    publicIPs: machine.publicIp
+    publicIPs: machine.publicIpv4
   }
 
   const vm = new MachineModel()
   vm.name = machine.name
   vm.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId
   vm.disks = createDisks(machine.disks)
-  vm.public_ip = machine.publicIp || false
+  vm.public_ip = machine.publicIpv4 || false
+  vm.public_ip6 = machine.publicIpv6 || false
   vm.planetary = machine.planetary || true
   vm.cpu = machine.cpu
   vm.memory = machine.memory
@@ -118,7 +123,8 @@ export interface Machine {
   name: string
   farmId: number
   farmName?: string
-  publicIp?: boolean
+  publicIpv4?: boolean
+  publicIpv6?: boolean
   planetary?: boolean
   cpu: number
   memory: number
@@ -134,7 +140,7 @@ export interface Machine {
 
 export interface DeployVMOptions {
   name: string
-  network?: NetworkModel
+  network?: Network
   machines: Machine[]
   metadata?: string
   description?: string

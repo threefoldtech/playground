@@ -1,7 +1,7 @@
 <template>
   <v-autocomplete
     label="VM Image"
-    :items="images"
+    :items="[...$props.images, { name: 'Other' }]"
     return-object
     item-title="name"
     v-model="image"
@@ -31,41 +31,41 @@ export interface VmImage {
   entryPoint: string
 }
 
-defineProps<{ flist?: string; entryPoint?: string }>()
+const props = defineProps<{ flist?: string; entryPoint?: string; images: VmImage[] }>()
 const emits = defineEmits<{
   (event: 'update:flist', value?: string): void
   (event: 'update:entryPoint', value?: string): void
 }>()
 
-const images: VmImage[] = [
-  {
-    name: 'Ubuntu-22.04',
-    flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist',
-    entryPoint: '/sbin/zinit init'
-  },
-  {
-    name: 'Alpine-3',
-    flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist',
-    entryPoint: '/entrypoint.sh'
-  },
-  {
-    name: 'CentOS-8',
-    flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist',
-    entryPoint: '/entrypoint.sh'
-  },
-  {
-    name: 'Nixos',
-    flist: 'https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist',
-    entryPoint: '/entrypoint.sh'
-  },
-  {
-    name: 'Other',
-    flist: 'other',
-    entryPoint: ''
-  }
-]
+// const images: VmImage[] = [
+//   {
+//     name: 'Ubuntu-22.04',
+//     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist',
+//     entryPoint: '/sbin/zinit init'
+//   },
+//   {
+//     name: 'Alpine-3',
+//     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist',
+//     entryPoint: '/entrypoint.sh'
+//   },
+//   {
+//     name: 'CentOS-8',
+//     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist',
+//     entryPoint: '/entrypoint.sh'
+//   },
+//   {
+//     name: 'Nixos',
+//     flist: 'https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist',
+//     entryPoint: '/entrypoint.sh'
+//   },
+//   {
+//     name: 'Other',
+//     flist: 'other',
+//     entryPoint: ''
+//   }
+// ]
 
-const image = ref<VmImage>(images[0])
+const image = ref<VmImage>(props.images[0])
 watch(
   image,
   (vm) => {

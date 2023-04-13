@@ -81,14 +81,15 @@ onMounted(loadFarms)
 
 const shouldBeUpdated = ref(false)
 watch(
-  () => props.filters,
+  () => ({ ...props.filters, country: country.value }),
   debounce((value, oldValue) => {
     if (
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
       value.ssd === oldValue.ssd &&
       value.disk === oldValue.disk &&
-      value.publicIp === oldValue.publicIp
+      value.publicIp === oldValue.publicIp &&
+      value.country === oldValue.country
     )
       return
 
