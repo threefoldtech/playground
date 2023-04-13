@@ -3,12 +3,12 @@ import {
   type FilterOptions,
   randomChoice,
   DiskModel,
-  NetworkModel,
   MachinesModel,
   MachineModel,
   QSFSDiskModel,
   generateString
 } from 'grid3_client'
+import { createNetwork, type Network } from './deploy_helpers'
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
   const vms = new MachinesModel()
@@ -34,7 +34,8 @@ async function createMachine(grid: GridClient, machine: Machine): Promise<Machin
     farmName: machine.farmName,
     hru: machine.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
     sru: machine.disks?.reduce((total, disk) => total + disk.size, machine.rootFilesystemSize || 0),
-    publicIPs: machine.publicIpv4
+    publicIPs: machine.publicIpv4,
+    availableFor: grid.twinId
   }
 
   const vm = new MachineModel()
@@ -50,7 +51,7 @@ async function createMachine(grid: GridClient, machine: Machine): Promise<Machin
   vm.flist = machine.flist
   vm.entrypoint = machine.entryPoint
   vm.env = createEnvs(machine.envs)
-  vm.solutionProviderID = machine.solutionProviderID
+  vm.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!
   vm.qsfs_disks = createQsfsDisks(machine.qsfsDisks)
   return vm
 }
@@ -68,14 +69,6 @@ function createQsfsDisks(disks: QsfsDisk[] = []): QSFSDiskModel[] {
   })
 }
 
-function createNetwork(network: Network = {}): NetworkModel {
-  const nw = new NetworkModel()
-  nw.name = network.name || 'NW' + generateString(10)
-  nw.ip_range = network.ipRange || '10.20.0.0/16'
-  nw.addAccess = network.addAccess || false
-  return nw
-}
-
 function createEnvs(envs: Env[] = []): { [key: string]: string } {
   return envs.reduce((result, env) => {
     result[env.key] = env.value
@@ -91,12 +84,6 @@ function createDisks(disks: Disk[] = []): DiskModel[] {
     d.mountpoint = disk.mountPoint
     return d
   })
-}
-
-export interface Network {
-  name?: string
-  ipRange?: string
-  addAccess?: boolean
 }
 
 export interface Env {
@@ -134,7 +121,6 @@ export interface Machine {
   envs?: Env[]
   disks?: Disk[]
   country?: string
-  solutionProviderID?: number
   qsfsDisks?: QsfsDisk[]
 }
 

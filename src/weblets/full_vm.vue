@@ -129,8 +129,6 @@ async function deploy() {
         publicIpv6: ipv6.value,
         planetary: planetary.value,
         envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
-        // eslint-disable-next-line no-undef
-        solutionProviderID: +process.env.INTERNAL_SOLUTION_PROVIDER_ID!,
         rootFilesystemSize: 2
       }
     ],
@@ -145,8 +143,9 @@ async function deploy() {
 
 <script lang="ts">
 import SelectVmImage, { type VmImage } from '../components/select_vm_image.vue'
-import SelectFarmId, { type Farm } from '../components/select_farm.vue'
+import SelectFarmId from '../components/select_farm.vue'
 import ExpandableLayout from '../components/expandable_layout.vue'
+import type { Farm } from '../types'
 
 export default {
   name: 'FullVm',

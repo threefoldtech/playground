@@ -22,11 +22,7 @@ import { useProfileManager } from '../stores/profile_manager'
 import { getGrid } from '../utils/grid'
 import { getFarms } from '../utils/get_farms'
 import debounce from 'lodash/debounce.js'
-
-export interface Farm {
-  name: string
-  farmID: number
-}
+import type { Farm } from '../types'
 
 export interface Filters {
   publicIp?: boolean
@@ -64,7 +60,8 @@ async function loadFarms() {
     mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     hru: filters.disk,
     sru: filters.ssd,
-    publicIPs: filters.publicIp
+    publicIPs: filters.publicIp,
+    availableFor: grid!.twinId
   })
 
   if (oldFarm) {
