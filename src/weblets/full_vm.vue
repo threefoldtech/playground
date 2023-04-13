@@ -19,9 +19,9 @@
         <template #config>
           <v-text-field label="Name" v-model="name" />
           <SelectVmImage :images="images" v-model:flist="flist" v-model:entry-point="entryPoint" />
-          <v-text-field label="CPU (vCores)" type="number" v-model="cpu" />
-          <v-text-field label="Memory (MB)" type="number" v-model="memory" />
-          <v-text-field label="Disk Size (GB)" type="number" v-model="diskSize" />
+          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" />
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" />
+          <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" />
           <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
           <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
           <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
