@@ -22,11 +22,7 @@ import { useProfileManager } from '../stores/profile_manager'
 import { getGrid } from '../utils/grid'
 import { getFarms } from '../utils/get_farms'
 import debounce from 'lodash/debounce.js'
-
-export interface Farm {
-  name: string
-  farmID: number
-}
+import type { Farm } from '../types'
 
 export interface Filters {
   publicIp?: boolean

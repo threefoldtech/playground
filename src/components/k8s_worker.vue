@@ -23,21 +23,10 @@ defineProps<{ modelValue: K8SWorker }>()
 </script>
 
 <script lang="ts">
-import SelectFarm, { type Farm } from './select_farm.vue'
+import SelectFarm from './select_farm.vue'
 import { generateString } from 'grid3_client'
 import RootFsSize from './root_fs_size.vue'
-
-export interface K8SWorker {
-  name: string
-  cpu: number
-  memory: number
-  diskSize: number
-  ipv4: boolean
-  ipv6: boolean
-  planetary: boolean
-  rootFsSize: number
-  farm?: Farm
-}
+import type { K8SWorker, Farm } from '../types'
 
 export function createWorker(name: string = 'WR' + generateString(9)): K8SWorker {
   return {
