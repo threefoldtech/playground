@@ -50,7 +50,9 @@
     </template>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy">Deploy</v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :loading="loading" :disabled="loading">
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -111,7 +113,9 @@ function addDisk() {
   })
 }
 
+const loading = ref(false)
 async function deploy() {
+  loading.value = true
   const grid = await getGrid(profileManager.profile!)
   deployVM(grid!, {
     name: name.value,
@@ -138,6 +142,7 @@ async function deploy() {
       console.log(vm)
     })
     .catch(console.log)
+    .finally(() => (loading.value = false))
 }
 </script>
 
