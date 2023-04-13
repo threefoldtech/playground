@@ -60,7 +60,8 @@ async function loadFarms() {
     mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     hru: filters.disk,
     sru: filters.ssd,
-    publicIPs: filters.publicIp
+    publicIPs: filters.publicIp,
+    availableFor: grid!.twinId
   })
 
   if (oldFarm) {

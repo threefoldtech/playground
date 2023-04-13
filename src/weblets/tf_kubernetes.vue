@@ -31,7 +31,6 @@
 
         <template #master>
           <K8SWorker v-model="master" />
-          {{ master }}
         </template>
 
         <template #workers>
@@ -45,7 +44,7 @@
     </template>
 
     <template #footer-actions>
-      <v-btn variant="tonal" color="primary"> Deploy </v-btn>
+      <v-btn variant="tonal" color="primary" @click="deploy"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -53,7 +52,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { generateString } from 'grid3_client'
-import { createWorker, type K8SWorker as K8sWorker } from '../components/k8s_worker.vue'
+import { createWorker } from '../components/k8s_worker.vue'
+import type { K8SWorker as K8sWorker } from '../types'
+import { useProfileManager } from '../stores'
+import { getGrid } from '../utils/grid'
+import { deployK8s } from '../utils/deploy_k8s'
+
+const profileManager = useProfileManager()
 
 const name = ref('K8S' + generateString(8))
 const clusterToken = ref(generateString(10))
@@ -62,6 +67,19 @@ const workers = ref<K8sWorker[]>([])
 
 function addWorker() {
   workers.value.push(createWorker())
+}
+
+async function deploy() {
+  const grid = await getGrid(profileManager.profile!)
+  deployK8s(grid!, {
+    name: name.value,
+    clusterToken: clusterToken.value,
+    master: master.value!,
+    workers: workers.value!,
+    sshKey: profileManager.profile!.ssh
+  })
+    .then(console.log)
+    .catch(console.log)
 }
 </script>
 
