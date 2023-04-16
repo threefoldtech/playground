@@ -116,8 +116,7 @@ const farm = ref() as Ref<Farm>
 const envs = ref<Env[]>([
   {
     key: 'SSH_KEY',
-    value:
-      'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC+Cvvf4mEdeqvBRDTHwfTRbY22Zpf/SriOXQz2ffZ9C7agWjGI+jFYNlDU2crAcpoHp96sz5sgqWTP+2nlmlafC4bmGxcHR6MwoVdtrgLbtIf86ZbpJr2OA6gWL3/V9XWI8T++R50PuY8FEPKgA9dmMZzNCny3tuc+uWeyeCd4IIlIXUWQXVMY/nUUieJLmXgxLt3Gk6gNvFI+bL9LI3dLVI6GB9dUwuMr19eZ1eP/gnJC7sGvbHnJLOxFizKZLJB68LLFO4J7IHaoYZ7pmhul9/NLM74+OHbRzHVqIfnEQmkfiAlp+opf62zz6iyzesI32nNDcerL/hRU6JY4PmpWMC76bFOVJlWXdlO3p21xGFjGMoai6n1W7FMrOPqMRIKvDQxmgZNZTkeLqS15v7r7Skah95KGMPPbM7XSMuePyxySB7JLMEbvNMXyuMgIwzP2dH75dtXE670t7hZ7Em7XUzD1hgv25i+ruma4fC1kYr0eyEB/q1wZunJKpS4EuXDaynJwPgzVm1Uc+pDVTHFifAQYAZ3BY6DBTG+2uu/CD6QVbuvk9IvCTmP7r2rMdjiBh+OBoqmUTB8F+/5Yt9Box1QNsfNmVaWf5WL51cT3IkHSTO5y/Qwv2LEd7QfsEZm6/+v0L+iChZ7kU4fSC2d8da+cmG5q3WORChd5pMNURQ== Threefold'
+    value: profileManager.profile!.ssh
   }
 ])
 const disks = ref<Disk[]>([])
