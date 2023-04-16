@@ -1,10 +1,9 @@
 <template>
   <slot
     :props="{
-      onInput: touched ? onInput : undefined,
       onBlur: touched ? undefined : onBlur,
-      errorMessages: errorMessage,
-      error: !!errorMessage,
+      errorMessages: touched ? errorMessage : undefined,
+      error: touched && !!errorMessage,
       loading: inputStatus === ValidatorStatus.PENDING,
       hint: inputStatus === ValidatorStatus.PENDING ? 'Validating ...' : undefined,
       'persistent-hint': inputStatus === ValidatorStatus.PENDING
@@ -35,6 +34,10 @@ const props = defineProps({
     type: Array as PropType<AsyncRule[]>,
     required: false,
     default: [] as AsyncRule[]
+  },
+  value: {
+    type: String as PropType<string | number>,
+    required: true
   }
 })
 const emits = defineEmits<{
@@ -54,7 +57,8 @@ watch(inputStatus, (s) => {
   if (s) emits('update:status', s)
 })
 
-onMounted(() => {
+onMounted(async () => {
+  // Check if the input is required
   for (const rule of props.rules) {
     const error = rule('')
     if (error && error.required) {
@@ -62,16 +66,16 @@ onMounted(() => {
       break
     }
   }
-  inputStatus.value = required.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
 })
 onUnmounted(() => emits('unregister', uid!))
 
-function onBlur(event: Event) {
+function onBlur() {
   touched.value = true
-  validate(getValue(event))
+  validate(props.value?.toString())
 }
 
-const onInput = debounce((event: Event) => validate(getValue(event)), 250)
+const onInput = debounce((value: string | number) => validate(value?.toString()), 250)
+watch(() => props.value, onInput, { immediate: true })
 
 defineExpose({ reset })
 function reset() {
@@ -91,11 +95,6 @@ async function validate(value: string) {
     }
   }
   inputStatus.value = errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
-}
-
-function getValue(e: Event): string {
-  const input = e.target as HTMLInputElement
-  return input.value
 }
 </script>
 

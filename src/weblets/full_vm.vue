@@ -17,24 +17,64 @@
         ]"
       >
         <template #config>
-          <v-text-field label="Name" v-model="name" />
-          <SelectVmImage :images="images" v-model:flist="flist" v-model:entry-point="entryPoint" />
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" />
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" />
-          <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" />
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-          <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
-          <SelectFarmId
-            :filters="{
-              cpu,
-              memory,
-              publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, diskSize)
-            }"
-            v-model="farm"
-          />
+          <form-validator v-model="isConfigValid">
+            <template #default="{ form }">
+              <input-validator
+                v-bind="form"
+                :value="name"
+                :rules="[
+                  validators.required('Name is required.'),
+                  validators.minLength('Name minLength is 2 chars.', 2),
+                  validators.maxLength('Name maxLength is 15 chars.', 15)
+                ]"
+              >
+                <template #default="{ props }">
+                  <v-text-field label="Name" v-model="name" v-bind="props" />
+                </template>
+              </input-validator>
+
+              <SelectVmImage
+                :images="images"
+                v-model:flist="flist"
+                v-model:entry-point="entryPoint"
+              />
+
+              <input-validator
+                v-bind="form"
+                :value="cpu"
+                :rules="[
+                  validators.required('CPU is required.'),
+                  validators.min('CPU min is 2 cores.', 2),
+                  validators.max('CPU max is 32 cores.', 32)
+                ]"
+              >
+                <template #default="{ props }">
+                  <v-text-field
+                    label="CPU (vCores)"
+                    type="number"
+                    v-model.number="cpu"
+                    v-bind="props"
+                  />
+                </template>
+              </input-validator>
+
+              <v-text-field label="Memory (MB)" type="number" v-model.number="memory" />
+              <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" />
+              <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+              <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
+              <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
+              <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
+              <SelectFarmId
+                :filters="{
+                  cpu,
+                  memory,
+                  publicIp: ipv4,
+                  ssd: disks.reduce((total, disk) => total + disk.size, diskSize)
+                }"
+                v-model="farm"
+              />
+            </template>
+          </form-validator>
         </template>
 
         <template #disks>
@@ -63,8 +103,10 @@ import { generateString } from 'grid3_client'
 import { type Disk, deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
+import * as validators from '../utils/validators'
 
 const profileManager = useProfileManager()
+const isConfigValid = ref<boolean>()
 
 const images: VmImage[] = [
   {
