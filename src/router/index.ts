@@ -15,8 +15,13 @@ const router = createRouter({
     },
     {
       path: '/kubernetes',
-      component: () => import('../views/kubernetes_view.vue'),
+      component: () => import('../views/kubernetes.vue'),
       meta: { title: 'Kubernetes' }
+    },
+    {
+      path: '/presearch',
+      component: () => import('../views/presearch.vue'),
+      meta: { title: 'Presearch' }
     },
     {
       path: '/:pathMatch(.*)*',
