@@ -43,8 +43,8 @@
 
 
       <template #restore>
-        <v-textarea label="Private Presearch Restore Key" v-model="envs[1].value" no-resize :spellcheck="false" />
-        <v-textarea label="Public Presearch Restore Key" v-model="envs[2].value" no-resize :spellcheck="false" />
+        <v-textarea label="Private Presearch Restore Key" v-model="privateRestoreKey" no-resize :spellcheck="false" />
+        <v-textarea label="Public Presearch Restore Key" v-model="publicRestoreKey" no-resize :spellcheck="false" />
       </template>
 
     </d-tabs>
@@ -60,7 +60,7 @@
 import { ref, type Ref } from 'vue'
 import { generateString } from 'grid3_client'
 import type { Farm } from '../types'
-import { deployVM, type Env } from '../utils/deploy_vm'
+import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import rootFs from "../utils/root_fs"
@@ -76,26 +76,8 @@ const memory = 8192
 const rootFsSize = rootFs(cpu, memory)
 const farm = ref() as Ref<Farm>
 const loading = ref(false)
-const privateRestoreKey = ref() as Ref<string>
-const publicRestoreKey = ref() as Ref<string>
-const envs = ref<Env[]>([
-  {
-    key: "SSH_KEY",
-    value: profileManager.profile!.ssh
-  },
-  {
-    key: "PRESEARCH_REGISTRATION_CODE",
-    value: code.value
-  },
-  {
-    key: "PRESEARCH_BACKUP_PRI_KEY",
-    value: privateRestoreKey.value
-  },
-  {
-    key: "PRESEARCH_BACKUP_PUB_KEY",
-    value: publicRestoreKey.value
-  },
-])
+const privateRestoreKey = ref("") as Ref<string>
+const publicRestoreKey = ref("") as Ref<string>
 
 
 async function deploy() {
@@ -115,7 +97,24 @@ async function deploy() {
         farmName: farm.value.name,
         planetary: planetary.value,
         publicIpv4: ipv4.value,
-        envs: envs.value,
+        envs: [
+              {
+                key: "SSH_KEY",
+                value: profileManager.profile!.ssh
+              },
+              {
+                key: "PRESEARCH_REGISTRATION_CODE",
+                value: code.value
+              },
+              {
+                key: "PRESEARCH_BACKUP_PRI_KEY",
+                value: privateRestoreKey.value
+              },
+              {
+                key: "PRESEARCH_BACKUP_PUB_KEY",
+                value: publicRestoreKey.value
+              },
+            ]
       }
     ]
   })
