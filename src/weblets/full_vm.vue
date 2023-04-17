@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout>
+  <weblet-layout ref="layout">
     <template #title>Deploy a Full Virtual Machine</template>
     <template #subtitle
       >Deploy a new full virtual machine on the Threefold Grid
@@ -105,6 +105,7 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
 
+const layout = ref()
 const profileManager = useProfileManager()
 const isConfigValid = ref<boolean>()
 
@@ -159,6 +160,8 @@ const loading = ref(false)
 async function deploy() {
   loading.value = true
   const grid = await getGrid(profileManager.profile!)
+
+  layout.value.setStatus('deploy')
   deployVM(grid!, {
     name: name.value,
     machines: [
@@ -181,9 +184,13 @@ async function deploy() {
     network: { addAccess: wireguard.value }
   })
     .then((vm) => {
+      layout.value.setStatus('success', 'Successfully deployed a full virtual machine instance.')
       console.log(vm)
     })
-    .catch(console.log)
+    .catch((error) => {
+      const e = typeof error === 'string' ? error : error.message
+      layout.value.setStatus('failed', e)
+    })
     .finally(() => (loading.value = false))
 }
 </script>
