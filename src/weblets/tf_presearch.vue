@@ -43,8 +43,8 @@
 
 
       <template #restore>
-        <v-textarea label="Private Presearch Restore Key" v-model="privateRestoreKey" no-resize :spellcheck="false" />
-        <v-textarea label="Public Presearch Restore Key" v-model="publicRestoreKey" no-resize :spellcheck="false" />
+        <v-textarea label="Private Presearch Restore Key" v-model="envs[1].value" no-resize :spellcheck="false" />
+        <v-textarea label="Public Presearch Restore Key" v-model="envs[2].value" no-resize :spellcheck="false" />
       </template>
 
     </d-tabs>
@@ -63,7 +63,7 @@ import type { Farm } from '../types'
 import { deployVM, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import rootFs from "../utils/rootFs"
+import rootFs from "../utils/root_fs"
 
 
 const profileManager = useProfileManager()
@@ -128,7 +128,7 @@ async function deploy() {
   import SelectFarm from '../components/select_farm.vue'
 
   export default {
-    name: 'Presearch',
+    name: 'TFPresearch',
     components: {
       SelectFarm,
     }
