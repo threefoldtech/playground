@@ -71,9 +71,9 @@ const name = ref('PS' + generateString(8))
 const code = ref() as Ref<string>
 const ipv4 = ref(false)
 const planetary = ref(true)
-const cpu = ref(4)
-const memory = ref(8192)
-const rootFsSize = ref(rootFs(cpu.value, memory.value)) as Ref<number>
+const cpu = 4
+const memory = 8192
+const rootFsSize = rootFs(cpu, memory)
 const farm = ref() as Ref<Farm>
 const loading = ref(false)
 const privateRestoreKey = ref() as Ref<string>
@@ -106,8 +106,8 @@ async function deploy() {
     machines: [
       {
         name: name.value,
-        cpu: cpu.value,
-        memory: memory.value,
+        cpu: cpu,
+        memory: memory,
         flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist",
         entryPoint: "/sbin/zinit init",
         farmId: farm.value.farmID,
