@@ -44,10 +44,6 @@
         </div>
         <router-view />
       </v-container>
-      <DeploymentDataDialog
-        :data="x"
-        :environments="{ SSH_KEY: 'Public SSH Key', K3S_URL: false }"
-      />
     </v-main>
   </v-app>
 </template>
@@ -96,63 +92,11 @@ const routes: AppRoute[] = [
 
 // eslint-disable-next-line no-undef
 const network = process.env.NETWORK as string
-
-const x = {
-  masters: [
-    {
-      version: 0,
-      contractId: 8782,
-      nodeId: 19,
-      name: 'MR27f7f2cc',
-      created: 1681832235,
-      status: 'ok',
-      message: '',
-      flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-k3s-latest.flist',
-      publicIP: null,
-      planetary: '300:3f07:4d4f:f726:4d54:8187:55ed:887c',
-      interfaces: [
-        {
-          network: 'NW45f93c45',
-          ip: '10.20.4.2'
-        }
-      ],
-      capacity: {
-        cpu: 2,
-        memory: 4096
-      },
-      mounts: [
-        {
-          name: 'MR27f7f2cc_disk',
-          mountPoint: '/mnt/data',
-          size: 107374182400,
-          state: 'ok',
-          message: ''
-        }
-      ],
-      env: {
-        SSH_KEY:
-          'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJheWbxEEvk8vPUcLU1sbKa1Kny8aqaN+7uQ/hxXI4ZM engm5081@gmail.com',
-        K3S_TOKEN: '2aceb493',
-        K3S_DATA_DIR: '/mnt/data',
-        K3S_FLANNEL_IFACE: 'eth0',
-        K3S_NODE_NAME: 'MR27f7f2cc',
-        K3S_URL: ''
-      },
-      entrypoint: '/sbin/zinit init',
-      metadata: '{"type":"kubernetes","name":"K8Sdbac19fc","projectName":"Kubernetes"}',
-      description: '',
-      rootfs_size: 2147483648,
-      corex: false
-    }
-  ],
-  workers: []
-}
 </script>
 
 <script lang="ts">
 import DisclaimerToolbar from './components/disclaimer_toolbar.vue'
 import ProfileManager from './weblets/profile_manager.vue'
-import DeploymentDataDialog from './components/deployment_data_dialog.vue'
 
 interface AppRoute {
   title: string
@@ -168,8 +112,7 @@ export default {
   name: 'App',
   components: {
     DisclaimerToolbar,
-    ProfileManager,
-    DeploymentDataDialog
+    ProfileManager
   }
 }
 </script>
