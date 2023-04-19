@@ -106,8 +106,6 @@ const props = defineProps({
 })
 defineEmits<{ (event: 'close'): void }>()
 
-console.log(props.data)
-
 const showType = ref(0)
 const activeTab = ref(0)
 const contracts = computed(() => {
