@@ -158,7 +158,7 @@
                       <v-text-field
                         label="Size (GB)"
                         type="number"
-                        v-model="disks[index].size"
+                        v-model.number="disks[index].size"
                         v-bind="props"
                       />
                     </template>
