@@ -84,9 +84,13 @@ watch(
 
 function isFlistExist(flist: string) {
   return fetch(flist + '.md5')
-    .then((res) => res.text())
-    .then(() => true)
-    .catch(() => `Couldn't find flist with the provided url.`)
+    .then((res) => res.status !== 200)
+    .then((invalid) => {
+      if (invalid) throw new Error()
+    })
+    .catch(() => {
+      return { message: `Couldn't find flist with the provided url.`, isExist: false }
+    })
 }
 </script>
 
