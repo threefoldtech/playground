@@ -4,15 +4,27 @@
 
     <SelectCountry v-model="country" />
 
-    <v-autocomplete
-      :disabled="loading"
-      label="Farm Name"
-      :items="farms"
-      :loading="loading"
-      item-title="name"
-      return-object
-      v-model="farm"
-    />
+    <input-validator
+      :rules="[validators.required('Farm is required.')]"
+      :value="farm"
+      v-bind="$props.form"
+    >
+      <v-autocomplete
+        :disabled="loading"
+        label="Farm Name"
+        :items="farms"
+        :loading="loading"
+        item-title="name"
+        return-object
+        :model-value="shouldBeUpdated ? undefined : farm"
+        @update:model-value="farm = $event"
+        :error-messages="
+          !loading && !farms.length
+            ? 'No farms where found with the specified resources.'
+            : undefined
+        "
+      />
+    </input-validator>
   </section>
 </template>
 
@@ -21,8 +33,8 @@ import { ref, watch, onMounted, type PropType } from 'vue'
 import { useProfileManager } from '../stores/profile_manager'
 import { getGrid } from '../utils/grid'
 import { getFarms } from '../utils/get_farms'
-import debounce from 'lodash/debounce.js'
 import type { Farm } from '../types'
+import * as validators from '../utils/validators'
 
 export interface Filters {
   publicIp?: boolean
@@ -34,9 +46,14 @@ export interface Filters {
 
 const props = defineProps({
   modelValue: { type: Object as PropType<Farm> },
-  filters: { default: () => ({} as Filters), type: Object as PropType<Filters> }
+  country: String,
+  filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
+  form: { type: Object, default: () => ({}) }
 })
-const emits = defineEmits<{ (event: 'update:modelValue', value?: Farm): void }>()
+const emits = defineEmits<{
+  (event: 'update:modelValue', value?: Farm): void
+  (event: 'update:country', value?: string): void
+}>()
 
 const profileManager = useProfileManager()
 const country = ref<string>()
@@ -79,7 +96,7 @@ onMounted(loadFarms)
 const shouldBeUpdated = ref(false)
 watch(
   () => ({ ...props.filters, country: country.value }),
-  debounce((value, oldValue) => {
+  (value, oldValue) => {
     if (
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
@@ -91,7 +108,7 @@ watch(
       return
 
     shouldBeUpdated.value = true
-  }, 1000)
+  }
 )
 
 watch([loading, shouldBeUpdated], async ([l, s]) => {

@@ -1,7 +1,7 @@
 <template>
   <v-tabs v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
     <v-tab v-for="tab in tabs" :key="tab.value">
-      {{ tab.title }}
+      {{ tab.title }} <v-chip color="error" v-if="tab.invalid" class="ml-1">invalid</v-chip>
     </v-tab>
   </v-tabs>
 
@@ -16,6 +16,7 @@ import { ref, watch } from 'vue'
 export interface Tab {
   title: string
   value: string
+  invalid?: boolean
 }
 
 defineProps<{ modelValue?: number; tabs: Tab[] }>()
