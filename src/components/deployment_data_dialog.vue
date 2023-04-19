@@ -6,7 +6,7 @@
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
               <v-btn variant="outlined"> details </v-btn>
-              <v-btn variant="outlined"> json {{ $vuetify.theme.name }}</v-btn>
+              <v-btn variant="outlined"> json </v-btn>
             </v-btn-toggle>
           </div>
 
@@ -71,19 +71,18 @@
               </template>
             </v-form>
           </template>
-          <pre
-            v-else
-            :class="{
-              dark: $vuetify.theme.name === 'dark',
-              light: $vuetify.theme.name === 'light'
-            }"
-          >
+          <template v-else>
+            <HighlightDark v-if="$vuetify.theme.name === 'dark'" />
+            <HighlightLight v-else />
+            <pre>
             <code class="hljs json dark-bg" v-html="html"></code>
           </pre>
+          </template>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="secondary" variant="text" @click="copy">Copy</v-btn>
+          <v-btn color="secondary" variant="tonal" @click="copy">Copy</v-btn>
+          <v-btn color="error" variant="tonal" @click="$emit('close')">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -93,9 +92,6 @@
 <script lang="ts" setup>
 import { ref, computed, type PropType } from 'vue'
 import hljs from 'highlight.js'
-import { useTheme } from 'vuetify'
-
-console.log(useTheme())
 
 const props = defineProps({
   data: {
@@ -108,6 +104,7 @@ const props = defineProps({
     default: () => ({})
   }
 })
+defineEmits<{ (event: 'close'): void }>()
 
 const showType = ref(0)
 const activeTab = ref(0)
@@ -134,25 +131,14 @@ function getLabel(key: string): string {
 
 <script lang="ts">
 import CopyReadonlyInput from './copy_readonly_input.vue'
+import { HighlightDark, HighlightLight } from './highlight_themes'
 
 export default {
   name: 'DeploymentDataDialog',
   components: {
-    CopyReadonlyInput
+    CopyReadonlyInput,
+    HighlightDark,
+    HighlightLight
   }
 }
 </script>
-
-<style lang="scss">
-.dark {
-  @import 'highlight.js/styles/atom-one-dark.css';
-
-  .dark-bg {
-    background-color: var(--v-theme-background-overlay-multiplier);
-  }
-}
-
-.light {
-  @import 'highlight.js/styles/atom-one-light.css';
-}
-</style>
