@@ -29,7 +29,7 @@
         </v-alert>
 
         <div v-show="profileManager.profile && !status">
-          <slot />
+          <slot v-if="profileManager.profile" />
         </div>
       </template>
     </v-card-text>
