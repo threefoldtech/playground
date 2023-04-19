@@ -36,11 +36,26 @@
       <v-divider class="mt-5" />
       <v-card-actions>
         <v-spacer />
-        <slot name="footer-actions" v-if="status !== 'failed' && status !== 'success'" />
-        <v-btn v-else color="secondary" variant="text" @click="reset">Back</v-btn>
+        <slot name="footer-actions" v-if="!status" />
+        <v-btn
+          v-else
+          color="secondary"
+          variant="text"
+          :loading="status === 'deploy'"
+          @click="reset"
+        >
+          Back
+        </v-btn>
       </v-card-actions>
     </template>
   </v-card>
+
+  <DeploymentDataDialog
+    :data="dialogData"
+    :environments="environments"
+    v-if="dialogData"
+    @close="dialogData = environments = undefined"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -78,13 +93,26 @@ const alertType = computed(() => {
   return 'success'
 })
 
+const dialogData = ref()
+const environments = ref()
 defineExpose({
-  setStatus(s: WebletStatus, m?: string) {
+  setStatus(
+    s: WebletStatus,
+    m?: string,
+    data?: any,
+    envs?: { [key: string]: string | boolean } | false
+  ) {
     if (s !== 'deploy' && !m) {
       throw new Error('Message need to be passed while settingStatus.')
     }
 
-    message.value = m ? m : 'Deploying...'
+    if (s === 'success' && !data) {
+      throw new Error('Success statement requires a 3rd parameter (data) to show model.')
+    }
+
+    dialogData.value = data
+    environments.value = envs
+    message.value = m ? m : 'Preparing to deploy...'
     status.value = s
   }
 })
@@ -96,7 +124,12 @@ function reset() {
 </script>
 
 <script lang="ts">
+import DeploymentDataDialog from './deployment_data_dialog.vue'
+
 export default {
-  name: 'WebletLayout'
+  name: 'WebletLayout',
+  components: {
+    DeploymentDataDialog
+  }
 }
 </script>
