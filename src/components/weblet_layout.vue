@@ -20,15 +20,17 @@
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert type="info" v-if="!profileManager.profile">
+        <v-alert type="info" v-show="!profileManager.profile">
           Please activate a profile from the profile manager
         </v-alert>
 
-        <v-alert v-else-if="status" :type="alertType">
+        <v-alert v-show="profileManager.profile && status" :type="alertType">
           {{ message }}
         </v-alert>
 
-        <slot v-else />
+        <div v-show="profileManager.profile && !status">
+          <slot />
+        </div>
       </template>
     </v-card-text>
 
@@ -96,24 +98,18 @@ const alertType = computed(() => {
 const dialogData = ref()
 const environments = ref()
 defineExpose({
-  setStatus(
-    s: WebletStatus,
-    m?: string,
-    data?: any,
-    envs?: { [key: string]: string | boolean } | false
-  ) {
+  setStatus(s: WebletStatus, m?: string) {
     if (s !== 'deploy' && !m) {
       throw new Error('Message need to be passed while settingStatus.')
     }
 
-    if (s === 'success' && !data) {
-      throw new Error('Success statement requires a 3rd parameter (data) to show model.')
-    }
-
-    dialogData.value = data
-    environments.value = envs
     message.value = m ? m : 'Preparing to deploy...'
     status.value = s
+  },
+
+  openDialog(data?: any, envs?: { [key: string]: string | boolean } | false) {
+    dialogData.value = data
+    environments.value = envs
   }
 })
 
