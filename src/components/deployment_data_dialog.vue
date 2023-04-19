@@ -111,7 +111,7 @@ const activeTab = ref(0)
 const contracts = computed(() => {
   if (!props.data) return []
   if ('masters' in props.data) return [...props.data.masters, ...props.data.workers]
-  return [props.data]
+  return Array.isArray(props.data) ? props.data : [props.data]
 })
 const contract = computed(() => contracts.value?.[activeTab.value] ?? {})
 const code = computed(() => JSON.stringify(props.data || {}, undefined, 2))
