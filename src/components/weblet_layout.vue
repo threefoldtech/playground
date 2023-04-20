@@ -55,6 +55,7 @@
   <DeploymentDataDialog
     :data="dialogData"
     :environments="environments"
+    :onlyJson="onlyJson"
     v-if="dialogData"
     @close="dialogData = environments = undefined"
   />
@@ -67,13 +68,14 @@ import { events } from 'grid3_client'
 
 export type WebletStatus = 'deploy' | 'success' | 'failed'
 
-defineProps({
+const props = defineProps({
   disableAlerts: {
     type: Boolean,
     required: false,
     default: false
   }
 })
+const emits = defineEmits<{ (event: 'mount'): void }>()
 
 const profileManager = useProfileManager()
 
@@ -97,6 +99,7 @@ const alertType = computed(() => {
 
 const dialogData = ref()
 const environments = ref()
+const onlyJson = ref()
 defineExpose({
   setStatus(s: WebletStatus, m?: string) {
     if (s !== 'deploy' && !m) {
@@ -107,9 +110,10 @@ defineExpose({
     status.value = s
   },
 
-  openDialog(data?: any, envs?: { [key: string]: string | boolean } | false) {
+  openDialog(data?: any, envs?: { [key: string]: string | boolean } | false, json?: boolean) {
     dialogData.value = data
     environments.value = envs
+    onlyJson.value = json
   }
 })
 
@@ -117,6 +121,16 @@ function reset() {
   status.value = undefined
   message.value = undefined
 }
+
+watch(
+  () => !!profileManager.profile || props.disableAlerts,
+  (value, oldValue) => {
+    if (value && value !== oldValue) {
+      emits('mount')
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <script lang="ts">

@@ -2,7 +2,7 @@
   <v-row justify="center">
     <v-dialog model-value scrollable width="70%" persistent>
       <v-card>
-        <v-card-title class="d-flex flex-column">
+        <v-card-title class="d-flex flex-column" v-if="!onlyJson">
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
               <v-btn variant="outlined"> details </v-btn>
@@ -102,11 +102,16 @@ const props = defineProps({
     type: Object as PropType<{ [key: string]: string | boolean } | false>,
     required: false,
     default: () => ({})
+  },
+  onlyJson: {
+    type: Boolean,
+    required: false,
+    default: () => false
   }
 })
 defineEmits<{ (event: 'close'): void }>()
 
-const showType = ref(0)
+const showType = ref(props.onlyJson ? 1 : 0)
 const activeTab = ref(0)
 const contracts = computed(() => {
   if (!props.data) return []
