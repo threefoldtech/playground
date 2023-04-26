@@ -17,7 +17,7 @@
       <d-tabs 
         :tabs="[
           { title: 'Base', value: 'base', invalid: !isBaseValid },
-          { title: 'Restore', value: 'restore', invalid: !isRestoreValid  }
+          { title: 'Restore', value: 'restore'  }
         ]"
       >
         <template #base>
@@ -43,15 +43,15 @@
               v-bind="form"
               :value="code"
               :rules="[
-                validators.required('Name is required.'),
+                validators.required('Presearch registration code is required.'),
                 validators.equal('Presearch registration code must be 32 characters long.', 32)
               ]"
               >
-                <password-input-wrapper>
-                  <template #default="{ props }">
+                <template #default="{ props }">
+                  <password-input-wrapper>
                     <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
-                  </template>
-                </password-input-wrapper>
+                  </password-input-wrapper>
+                </template>
               </input-validator>
       
       
@@ -114,8 +114,7 @@ const loading = ref(false)
 const privateRestoreKey = ref("") as Ref<string>
 const publicRestoreKey = ref("") as Ref<string>
 const isBaseValid = ref(false)
-const isRestoreValid = ref(true)
-const isInvalid = computed(() => !isBaseValid.value || !isRestoreValid.value)
+const isInvalid = computed(() => !isBaseValid.value)
 const country = ref<string>()
 
 async function deploy() {
