@@ -48,6 +48,9 @@
         <v-progress-circular indeterminate color="secondary" />
         <v-spacer />
       </v-row>
+      <p v-else-if="!loading && items.length === 0 && noDataText" class="text-center mt-8">
+        {{ noDataText }}
+      </p>
     </template>
   </v-data-table>
 </template>
@@ -62,6 +65,7 @@ const props = defineProps<{
   loading: boolean
   deleting: boolean
   modelValue: any[]
+  noDataText?: string
 }>()
 const emits = defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
 

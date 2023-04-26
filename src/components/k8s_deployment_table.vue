@@ -16,6 +16,7 @@
     :deleting="deleting"
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
+    :no-data-text="`No Kubernetes deployments found on this account.`"
   >
     <template #[`item.index`]="{ item }">
       {{ items.indexOf(item?.value) + 1 }}
