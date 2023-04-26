@@ -6,22 +6,24 @@
   </v-tabs>
 
   <v-tab-item v-for="(tab, index) in tabs" :key="tab.value" v-show="index === activeTab">
-    <slot
-      :name="tab.value"
-      :index="index"
-      :tab="tab"
-      :activeTab="activeTab"
-      :tabs="tabs"
-      v-if="$slots[tab.value]"
-    ></slot>
-    <slot
-      :index="index"
-      :tab="tab"
-      :activeTab="activeTab"
-      :tabs="tabs"
-      v-else-if="$slots.default"
-    ></slot>
-    <template v-else> Please add content for this tab! </template>
+    <template v-if="destroy ? index === activeTab : true">
+      <slot
+        :name="tab.value"
+        :index="index"
+        :tab="tab"
+        :activeTab="activeTab"
+        :tabs="tabs"
+        v-if="$slots[tab.value]"
+      ></slot>
+      <slot
+        :index="index"
+        :tab="tab"
+        :activeTab="activeTab"
+        :tabs="tabs"
+        v-else-if="$slots.default"
+      ></slot>
+      <template v-else> Please add content for this tab! </template>
+    </template>
   </v-tab-item>
 </template>
 
@@ -34,7 +36,7 @@ export interface Tab {
   invalid?: boolean
 }
 
-defineProps<{ modelValue?: number; tabs: Tab[]; disabled?: boolean }>()
+defineProps<{ modelValue?: number; tabs: Tab[]; disabled?: boolean; destroy?: boolean }>()
 const emits = defineEmits<{ (event: 'update:modelValue', value?: number): void }>()
 
 const activeTab = ref<number>(0)
