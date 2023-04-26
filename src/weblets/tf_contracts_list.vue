@@ -10,6 +10,18 @@
       >
     </template>
 
+    <template #header-actions>
+      <v-btn
+        prepend-icon="mdi-refresh"
+        color="primary"
+        variant="tonal"
+        :disabled="loading || deleting"
+        @click="onMount"
+      >
+        refresh
+      </v-btn>
+    </template>
+
     <template #default>
       <v-data-table
         :headers="headers"
@@ -20,7 +32,21 @@
         v-model="selectedContracts"
         hover
         :items-per-page="-1"
+        hide-default-footer
       >
+        <template #[`column.data-table-select`]>
+          <v-checkbox-btn
+            :model-value="
+              selectedContracts.length > 0 && selectedContracts.length === contracts.length
+            "
+            :indeterminate="
+              selectedContracts.length > 0 && contracts.length !== selectedContracts.length
+            "
+            :disabled="deleting || loading"
+            @change="onUpdateSelection"
+          />
+        </template>
+
         <template #[`item.data-table-select`]="{ item, toggleSelect }">
           <v-progress-circular
             v-if="deleting && selectedContracts.includes(item?.value)"
@@ -33,7 +59,7 @@
           <v-checkbox-btn
             v-else
             color="primary"
-            :disabled="deleting"
+            :disabled="deleting || loading"
             :model-value="selectedContracts.includes(item.value)"
             @update:model-value="toggleSelect(item)"
           />
@@ -56,6 +82,14 @@
             Show Details
           </v-btn>
         </template>
+
+        <template #bottom>
+          <v-row class="mt-5" v-if="loading && contracts.length === 0">
+            <v-spacer />
+            <v-progress-circular indeterminate color="secondary" />
+            <v-spacer />
+          </v-row>
+        </template>
       </v-data-table>
     </template>
 
@@ -65,21 +99,39 @@
         color="error"
         :disabled="!selectedContracts.length || loading || deleting"
         prepend-icon="mdi-trash-can-outline"
-        @click="onDelete"
+        @click="deletingDialog = true"
       >
         Delete
       </v-btn>
     </template>
   </weblet-layout>
+
+  <v-dialog width="70%" persistent v-model="deletingDialog">
+    <v-card>
+      <v-card-title class="text-h5">
+        Are you sure you want to delete the following contracts?
+      </v-card-title>
+      <v-card-text>
+        <v-chip
+          class="ma-1"
+          color="primary"
+          label
+          v-for="c in selectedContracts"
+          :key="c.contractId"
+        >
+          {{ c.contractId }}
+        </v-chip>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" variant="text" @click="onDelete"> Remove </v-btn>
+        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
-/* 
-TODO:
-1. in data-table select (can't be set to disabled)
-2. can't control pagination
-3. Add refresh btn
-*/
 import { ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
@@ -89,7 +141,7 @@ import { ContractStates } from 'grid3_client'
 
 const layout = ref()
 const profileManager = useProfileManager()
-const contracts = ref<NormalizedContract[]>()
+const contracts = ref<NormalizedContract[]>([])
 const loading = ref(false)
 const selectedContracts = ref<NormalizedContract[]>([])
 const headers: VDataTableHeader = [
@@ -101,14 +153,23 @@ const headers: VDataTableHeader = [
   { title: 'Solution Name', key: 'solutionName' },
   { title: 'Created At', key: 'createdAt' },
   { title: 'Expiration', key: 'expiration' },
-  { title: 'Actions', key: 'actions' }
+  { title: 'Actions', key: 'actions', sortable: false }
 ]
 
 async function onMount() {
   loading.value = true
+  contracts.value = []
   const grid = await getGrid(profileManager.profile!)
   contracts.value = await getUserContracts(grid!)
   loading.value = false
+}
+
+function onUpdateSelection() {
+  if (selectedContracts.value.length === contracts.value.length) {
+    selectedContracts.value = []
+  } else {
+    selectedContracts.value = contracts.value.slice()
+  }
 }
 
 const loadingContractId = ref<number>()
@@ -135,15 +196,25 @@ function getStateColor(state: ContractStates): string {
   }
 }
 
+const deletingDialog = ref(false)
 const deleting = ref(false)
 async function onDelete() {
+  deletingDialog.value = false
   deleting.value = true
-  const grid = await getGrid(profileManager.profile!)
-  await grid!.contracts.batchCancelContracts({
-    ids: selectedContracts.value.map((c) => c.contractId)
-  })
-  contracts.value = contracts.value!.filter((c) => !selectedContracts.value.includes(c))
-  selectedContracts.value = []
+  try {
+    const grid = await getGrid(profileManager.profile!)
+    if (selectedContracts.value.length === contracts.value.length) {
+      await grid!.contracts.cancelMyContracts()
+    } else {
+      await grid!.contracts.batchCancelContracts({
+        ids: selectedContracts.value.map((c) => c.contractId)
+      })
+    }
+    contracts.value = contracts.value!.filter((c) => !selectedContracts.value.includes(c))
+    selectedContracts.value = []
+  } catch (e) {
+    layout.value.setStatus('failed', (e as Error).message)
+  }
   deleting.value = false
 }
 </script>
