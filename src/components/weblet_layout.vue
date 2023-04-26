@@ -15,7 +15,7 @@
       </div>
     </section>
 
-    <v-divider class="mt-5 mb-2" />
+    <v-divider :class="{ 'mb-2': true, 'mt-5': !!$slots.subtitle, 'mt-2': !$slots.subtitle }" />
 
     <v-card-text>
       <slot v-if="disableAlerts" />

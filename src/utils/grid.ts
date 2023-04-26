@@ -3,12 +3,13 @@ import type { Profile } from '../stores/profile_manager'
 
 const NETWORK = process.env.NETWORK as NetworkEnv
 
-export async function getGrid(profile: Pick<Profile, 'mnemonics'>) {
+export async function getGrid(profile: Pick<Profile, 'mnemonics'>, projectName?: string) {
   if (!profile) return null
   const grid = new GridClient({
     mnemonic: profile.mnemonics,
     network: NETWORK,
-    backendStorageType: BackendStorageType.tfkvstore
+    backendStorageType: BackendStorageType.tfkvstore,
+    projectName
   })
   await grid.connect()
   return grid
