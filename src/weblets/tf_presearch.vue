@@ -83,7 +83,7 @@
       </d-tabs>
     </template>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :loading="loading" :disabled="isInvalid" @click="deploy">
+      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy">
         Deploy
       </v-btn>
     </template>
@@ -110,7 +110,6 @@ const cpu = 4
 const memory = 8192
 const rootFsSize = rootFs(cpu, memory)
 const farm = ref() as Ref<Farm>
-const loading = ref(false)
 const privateRestoreKey = ref("") as Ref<string>
 const publicRestoreKey = ref("") as Ref<string>
 const isBaseValid = ref(false)
@@ -118,7 +117,6 @@ const isInvalid = computed(() => !isBaseValid.value)
 const country = ref<string>()
 
 async function deploy() {
-  loading.value = true
   const grid = await getGrid(profileManager.profile!)
   
   layout.value.setStatus('deploy')
