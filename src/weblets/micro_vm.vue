@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout>
+  <weblet-layout ref="layout">
     <template #title>Deploy a Micro Virtual Machine </template>
     <template #subtitle
       >Deploy a new micro virtual machine on the Threefold Grid
@@ -14,9 +14,9 @@
 
     <d-tabs
       :tabs="[
-        { title: 'Config', value: 'config' },
-        { title: 'Environment Variables', value: 'env' },
-        { title: 'Disks', value: 'disks' }
+        { title: 'Config', value: 'config', invalid: !isConfigValid },
+        { title: 'Environment Variables', value: 'env', invalid: !isEnvsValid },
+        { title: 'Disks', value: 'disks', invalid: !isDisksValid }
       ]"
     >
       <template #config>
@@ -62,7 +62,7 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :loading="loading" :disabled="loading" @click="deploy"
+      <v-btn color="primary" variant="tonal" :loading="loading" :disabled="isInvalid" @click="deploy"
         >Deploy</v-btn
       >
     </template>
@@ -70,15 +70,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, type Ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { generateString } from 'grid3_client'
 import type { Farm } from '../types'
 import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 
+const layout = ref()
 const profileManager = useProfileManager()
-
 const images = [
   {
     name: 'Ubuntu-22.04',
@@ -101,6 +101,12 @@ const images = [
     entryPoint: '/entrypoint.sh'
   }
 ]
+
+const isConfigValid = ref(false)
+const isDisksValid = ref(true)
+const isEnvsValid = ref(true)
+const isInvalid = computed(() => !isConfigValid.value || !isDisksValid.value || !isEnvsValid.value)
+
 
 const name = ref('VM' + generateString(8))
 const flist = ref() as Ref<string>
