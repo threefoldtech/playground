@@ -11,7 +11,7 @@
       </div>
       <v-spacer />
       <div class="mr-4" v-if="$slots['header-actions']">
-        <slot name="header-actions" />
+        <slot name="header-actions" :hasProfile="!!profileManager.profile" />
       </div>
     </section>
 

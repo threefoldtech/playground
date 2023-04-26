@@ -10,12 +10,12 @@
       >
     </template>
 
-    <template #header-actions>
+    <template #header-actions="{ hasProfile }">
       <v-btn
         prepend-icon="mdi-refresh"
         color="primary"
         variant="tonal"
-        :disabled="loading || deleting"
+        :disabled="loading || deleting || !hasProfile"
         @click="onMount"
       >
         refresh
@@ -23,48 +23,13 @@
     </template>
 
     <template #default>
-      <v-data-table
+      <ListTable
         :headers="headers"
         :items="contracts"
-        item-title="title"
-        item-value="key"
-        show-select
+        :loading="loading"
+        :deleting="deleting"
         v-model="selectedContracts"
-        hover
-        :items-per-page="-1"
-        hide-default-footer
       >
-        <template #[`column.data-table-select`]>
-          <v-checkbox-btn
-            :model-value="
-              selectedContracts.length > 0 && selectedContracts.length === contracts.length
-            "
-            :indeterminate="
-              selectedContracts.length > 0 && contracts.length !== selectedContracts.length
-            "
-            :disabled="deleting || loading"
-            @change="onUpdateSelection"
-          />
-        </template>
-
-        <template #[`item.data-table-select`]="{ item, toggleSelect }">
-          <v-progress-circular
-            v-if="deleting && selectedContracts.includes(item?.value)"
-            class="ml-3"
-            indeterminate
-            color="red"
-            :width="2"
-            :size="20"
-          />
-          <v-checkbox-btn
-            v-else
-            color="primary"
-            :disabled="deleting || loading"
-            :model-value="selectedContracts.includes(item.value)"
-            @update:model-value="toggleSelect(item)"
-          />
-        </template>
-
         <template #[`item.state`]="{ item }">
           <v-chip :color="getStateColor(item.value.state)">
             {{ item.value.state }}
@@ -82,15 +47,7 @@
             Show Details
           </v-btn>
         </template>
-
-        <template #bottom>
-          <v-row class="mt-5" v-if="loading && contracts.length === 0">
-            <v-spacer />
-            <v-progress-circular indeterminate color="secondary" />
-            <v-spacer />
-          </v-row>
-        </template>
-      </v-data-table>
+      </ListTable>
     </template>
 
     <template #footer-actions>
@@ -164,14 +121,6 @@ async function onMount() {
   loading.value = false
 }
 
-function onUpdateSelection() {
-  if (selectedContracts.value.length === contracts.value.length) {
-    selectedContracts.value = []
-  } else {
-    selectedContracts.value = contracts.value.slice()
-  }
-}
-
 const loadingContractId = ref<number>()
 async function onShowDetails(contractId: number) {
   loading.value = true
@@ -220,7 +169,12 @@ async function onDelete() {
 </script>
 
 <script lang="ts">
+import ListTable from '../components/list_table.vue'
+
 export default {
-  name: 'TfContractsList'
+  name: 'TfContractsList',
+  components: {
+    ListTable
+  }
 }
 </script>
