@@ -28,6 +28,24 @@
           </template>
         </VmDeploymentTable>
       </template>
+
+      <template #Kubernetes>
+        <K8sDeploymentTable
+          :getLayout="() => layout"
+          :projectName="tabs[activeTab].value"
+          v-model="selectedItems"
+          :deleting="false"
+        >
+          <template #actions="{ item }">
+            <IconActionBtn
+              icon="mdi-cog"
+              tooltip="Manage Workers"
+              color="secondary"
+              @click="onManageWorkers(item.value)"
+            />
+          </template>
+        </K8sDeploymentTable>
+      </template>
     </d-tabs>
 
     <template #footer-actions>
@@ -69,17 +87,23 @@ const selectedItems = ref<any[]>([])
 const loading = ref(false)
 
 const activeTab = ref() as Ref<number>
+
+function onManageWorkers(item: any) {
+  console.log(item)
+}
 </script>
 
 <script lang="ts">
-import VmDeploymentTable from '../components/vm_deployment_table.vue'
 import IconActionBtn from '../components/icon_action_btn.vue'
+import VmDeploymentTable from '../components/vm_deployment_table.vue'
+import K8sDeploymentTable from '../components/k8s_deployment_table.vue'
 
 export default {
   name: 'TfDeploymentList',
   components: {
     VmDeploymentTable,
-    IconActionBtn
+    IconActionBtn,
+    K8sDeploymentTable
   }
 }
 </script>
