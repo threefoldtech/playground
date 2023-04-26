@@ -28,6 +28,14 @@ export function maxLength(msg: string, max: number) {
   }
 }
 
+export function equal(msg: string, length: number) {
+  return (value: string) => {
+    if (value.length !== length) {
+      return { message: msg, equal: length }
+    }
+  }
+}
+
 export function isEmail(msg: string, options?: IsEmailOptions) {
   return (value: string) => {
     if (!validator.isEmail(value, options)) {
