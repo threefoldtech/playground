@@ -1,3 +1,5 @@
+import type { VDataTable } from 'vuetify/lib/labs/components'
+
 export interface K8SWorker {
   name: string
   cpu: number
@@ -14,3 +16,5 @@ export interface Farm {
   name: string
   farmID: number
 }
+
+export type VDataTableHeader = VDataTable['headers']

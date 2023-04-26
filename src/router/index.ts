@@ -24,6 +24,11 @@ const router = createRouter({
       meta: { title: 'Presearch' }
     },
     {
+      path: '/contractslist',
+      component: () => import('../views/contracts_list.vue'),
+      meta: { title: 'Contracts List' }
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: () => import('../views/not_yet_implemented.vue'),
       meta: { title: 'Not Yet Implemented' }
