@@ -4,7 +4,29 @@
 
     <d-tabs :tabs="tabs" v-model="activeTab" :disabled="loading" destroy>
       <template #default>
-        <VmDeploymentTable :getLayout="() => layout" :projectName="tabs[activeTab].value" />
+        <VmDeploymentTable
+          :getLayout="() => layout"
+          :projectName="tabs[activeTab].value"
+          v-model="selectedItems"
+          :deleting="false"
+        >
+          <template #CapRover-actions> caprover </template>
+
+          <template #Wordpress-actions="{ item }">
+            <IconActionBtn
+              tooltip="Preview"
+              color="info"
+              icon="mdi-web"
+              :href="item.value[0].env.WP_URL"
+            />
+            <IconActionBtn
+              tooltip="Admin Panel"
+              color="secondary"
+              icon="mdi-view-dashboard"
+              :href="item.value[0].env.WP_URL + '/wp-admin'"
+            />
+          </template>
+        </VmDeploymentTable>
       </template>
     </d-tabs>
 
@@ -43,33 +65,21 @@ const tabs = [
 
 const layout = ref()
 // const items = ref<any[]>([])
-// const selectedItems = ref<any[]>([])
+const selectedItems = ref<any[]>([])
 const loading = ref(false)
 
 const activeTab = ref() as Ref<number>
-// watch(
-//   () => tabs[activeTab.value]?.value,
-//   async (project) => {
-//     /* should load data here */
-//     loading.value = true
-//     selectedItems.value = []
-//     items.value = []
-//     const grid = await getGrid(profileManager.profile!, project)
-//     const names = await grid!.machines.list()
-//     items.value = await Promise.all(names.map((name) => grid!.machines.getObj(name)))
-//     loading.value = false
-//   }
-// )
 </script>
 
 <script lang="ts">
-// import ListTable from '../components/list_table.vue'
 import VmDeploymentTable from '../components/vm_deployment_table.vue'
+import IconActionBtn from '../components/icon_action_btn.vue'
 
 export default {
   name: 'TfDeploymentList',
   components: {
-    VmDeploymentTable
+    VmDeploymentTable,
+    IconActionBtn
   }
 }
 </script>

@@ -60,17 +60,14 @@
       {{ item.value[0].billing }}
     </template>
     <template #[`item.actions`]="{ item }">
-      <v-tooltip text="Show Details" location="bottom">
-        <template #activator="{ props }">
-          <v-btn
-            variant="tonal"
-            color="primary"
-            @click="getLayout().openDialog(item?.value)"
-            icon="mdi-information-outline"
-            v-bind="props"
-          />
-        </template>
-      </v-tooltip>
+      <v-btn-group variant="tonal">
+        <IconActionBtn
+          tooltip="Show Details"
+          icon="mdi-information-outline"
+          @click="getLayout().openDialog(item?.value)"
+        />
+        <slot :name="projectName + '-actions'" :item="item"></slot>
+      </v-btn-group>
     </template>
   </ListTable>
 </template>
@@ -104,11 +101,13 @@ onMounted(async () => {
 
 <script lang="ts">
 import ListTable from './list_table.vue'
+import IconActionBtn from './icon_action_btn.vue'
 
 export default {
   name: 'VmDeploymentTable',
   components: {
-    ListTable
+    ListTable,
+    IconActionBtn
   }
 }
 </script>
