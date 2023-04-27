@@ -24,6 +24,11 @@ const router = createRouter({
       meta: { title: 'Presearch' }
     },
     {
+      path: '/nodepilot',
+      component: () => import('../views/node_pilot.vue'),
+      meta: { title: 'Node Pilot' }
+    },
+    {
       path: '/contractslist',
       component: () => import('../views/contracts_list.vue'),
       meta: { title: 'Contracts List' }
