@@ -3,7 +3,8 @@ import {
   type FilterOptions,
   KubernetesNodeModel,
   randomChoice,
-  K8SModel
+  K8SModel,
+  AddWorkerModel,
 } from 'grid3_client'
 import type { K8SWorker } from '../types'
 import { createNetwork } from './deploy_helpers'
@@ -26,15 +27,16 @@ export function loadK8S(grid: GridClient, name: string) {
   return grid.k8s.getObj(name)
 }
 
-async function createWorker(grid: GridClient, data: K8SWorker) {
+async function createWorker(grid: GridClient, data: K8SWorker & { country?: string }) {
   const filters: FilterOptions = {
     cru: data.cpu,
     mru: Math.round(data.memory / 1024),
     farmId: data.farm!.farmID,
     farmName: data.farm!.name,
+    country: data.country,
     sru: data.diskSize + data.rootFsSize,
     publicIPs: data.ipv4,
-    availableFor: grid.twinId
+    availableFor: grid.twinId,
   }
 
   const worker = new KubernetesNodeModel()
@@ -59,4 +61,36 @@ export interface DeployK8SOptions {
   sshKey: string
   metadata?: string
   description?: string
+}
+
+export async function deployWorker(
+  grid: GridClient,
+  options: K8SWorker & { deploymentName: string; country?: string }
+) {
+  const filters: FilterOptions = {
+    cru: options.cpu,
+    mru: Math.round(options.memory / 1024),
+    farmId: options.farm!.farmID,
+    farmName: options.farm!.name,
+    sru: options.diskSize + options.rootFsSize,
+    publicIPs: options.ipv4,
+    availableFor: grid.twinId,
+    country: options.country,
+  }
+
+  const worker = new AddWorkerModel()
+  worker.deployment_name = options.deploymentName
+  worker.name = options.name
+  worker.cpu = options.cpu
+  worker.memory = options.memory
+  worker.disk_size = options.diskSize
+  worker.public_ip = options.ipv4
+  worker.public_ip6 = options.ipv6
+  worker.planetary = options.planetary
+  worker.rootfs_size = options.rootFsSize
+  worker.node_id = worker.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId
+  worker.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!
+
+  await grid.k8s.add_worker(worker)
+  return loadK8S(grid, options.deploymentName)
 }

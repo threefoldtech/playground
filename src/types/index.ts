@@ -18,3 +18,7 @@ export interface Farm {
 }
 
 export type VDataTableHeader = VDataTable['headers']
+
+export enum ProjectName {
+  Kubernetes = 'Kubernetes',
+}

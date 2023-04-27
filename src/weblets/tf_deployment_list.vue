@@ -59,7 +59,7 @@
               icon="mdi-cog"
               tooltip="Manage Workers"
               color="secondary"
-              @click="onManageWorkers(item.value)"
+              @click="dialog = true"
             />
           </template>
 
@@ -285,7 +285,7 @@
               "
             />
             <IconActionBtn
-              tooltip="Preview"
+              tooltip="PreviewK8SWorker"
               color="info"
               icon="mdi-web"
               :href="'https://' + item.value[0].publicIP.ip.slice(0, -3)"
@@ -374,7 +374,14 @@
               icon="mdi-cog"
               tooltip="Manage Workers"
               color="secondary"
-              @click="onManageWorkers(item.value)"
+              @click="dialog = true"
+            />
+
+            <ManageK8SWorkerDialog
+              v-if="dialog"
+              :data="item.value"
+              @close="dialog = false"
+              @update:k8s="item.value.workers = $event.workers"
             />
           </template>
         </K8sDeploymentTable>
@@ -385,6 +392,13 @@
       <v-btn color="error" variant="outlined">Delete</v-btn>
     </template>
   </weblet-layout>
+
+  <!-- <ManageK8SWorkerDialog
+    v-if="dialog && tabs[activeTab].value === 'Kubernetes'"
+    name="VM62bb35e3"
+    @close=""
+    :data="{ masters: [], workers: [{}] }"
+  /> -->
 </template>
 
 <script lang="ts" setup>
@@ -415,21 +429,19 @@ const tabs = [
 // const profileManager = useProfileManager()
 
 const layout = ref()
+const dialog = ref(false)
 // const items = ref<any[]>([])
 const selectedItems = ref<any[]>([])
 const loading = ref(false)
 
 const activeTab = ref() as Ref<number>
-
-function onManageWorkers(item: any) {
-  console.log(item)
-}
 </script>
 
 <script lang="ts">
 import IconActionBtn from '../components/icon_action_btn.vue'
 import VmDeploymentTable from '../components/vm_deployment_table.vue'
 import K8sDeploymentTable from '../components/k8s_deployment_table.vue'
+import ManageK8SWorkerDialog from '../components/manage_k8s_worker_dialog.vue'
 
 export default {
   name: 'TfDeploymentList',
@@ -437,6 +449,7 @@ export default {
     VmDeploymentTable,
     IconActionBtn,
     K8sDeploymentTable,
+    ManageK8SWorkerDialog,
   },
 }
 </script>
