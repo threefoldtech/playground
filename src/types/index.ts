@@ -21,4 +21,5 @@ export type VDataTableHeader = VDataTable['headers']
 
 export enum ProjectName {
   Kubernetes = 'Kubernetes',
+  Caprover = 'CapRover',
 }

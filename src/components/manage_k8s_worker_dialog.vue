@@ -58,7 +58,6 @@ const profileManager = useProfileManager()
 const worker = ref(createWorker())
 const selectedWorkers = ref<any[]>([])
 const deleting = ref(false)
-const deletingDialog = ref(false)
 
 function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3
@@ -86,7 +85,6 @@ async function deploy(layout: any) {
 }
 
 async function onDelete(cb: (workers: any[]) => void) {
-  deletingDialog.value = false
   deleting.value = true
   const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
 
