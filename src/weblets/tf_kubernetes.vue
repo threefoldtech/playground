@@ -60,18 +60,22 @@
 
         <template #master>
           <form-validator v-model="isValidMaster">
-            <!-- <template #default='{ form }'> -->
-              <K8SWorker v-model="master" />
-            <!-- </template> -->
+            <template #default='{ form }'>
+              <K8SWorker v-model="master" :form='form'/>
+            </template>
           </form-validator>
         </template>
 
         <template #workers>
-          <ExpandableLayout v-model="workers" @add="addWorker">
-            <template #default="{ index }">
-              <K8SWorker v-model="workers[index]" />
+          <form-validator v-model="isValidWorkers">
+            <template #default='{ form }'>
+              <ExpandableLayout v-model="workers" @add="addWorker">
+                <template #default="{ index }">
+                  <K8SWorker v-model="workers[index]" :form='form'/>
+                </template>
+              </ExpandableLayout>
             </template>
-          </ExpandableLayout>
+          </form-validator>
         </template>
       </d-tabs>
     </template>
