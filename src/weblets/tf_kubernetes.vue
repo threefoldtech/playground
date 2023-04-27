@@ -15,73 +15,63 @@
     <template #default>
       <d-tabs
         :tabs="[
-          { title: 'Config', value: 'config', invalid: !isValidConfig },
-          { title: 'Master', value: 'master', invalid: !isValidMaster },
-          { title: 'Workers', value: 'workers', invalid: !isValidWorkers }
+          { title: 'Config', value: 'config' },
+          { title: 'Master', value: 'master' },
+          { title: 'Workers', value: 'workers' }
         ]"
+        ref="tabs"
       >
-        <template #config>
-          <form-validator v-model="isValidConfig">
-            <template #default='{form}'>
-              <input-validator
-                v-bind="form"
-                :value="name"
-                :rules="[
-                  validators.required('Name is required.'),
-                  validators.minLength('Name minimum length is 2 chars.', 2),
-                  validators.maxLength('Name max length is 15 chars.', 15)
-                ]"
-              >
-                <template #default="{ props }">
-                  <v-text-field label="Name" v-model="name" v-bind="props" />
-                </template>
-              </input-validator>
-
-              <input-validator
-                v-bind="form"
-                :value="clusterToken"
-                :rules="[
-                  validators.required('Token is required.'),
-                  // validators.pattern('Token cannot contain any characters other than alphabets and numbers.', {pattern: /^\w+$/}),
-                  validators.minLength('Token minimum length is 6 chars.', 6),
-                  validators.maxLength('Token max length is 15 chars.', 15),
-                  validators.isAlphanumeric('Token cannot contain any characters other than alphabets and numbers.'),
-                ]"
-                >
-                <template #default="{ props }">
-                  <password-input-wrapper>
-                    <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
-                  </password-input-wrapper>
-                </template>
-              </input-validator>
+        <template #config="{ form }">
+          <input-validator
+            v-bind="form"
+            :value="name"
+            :rules="[
+              validators.required('Name is required.'),
+              validators.minLength('Name minimum length is 2 chars.', 2),
+              validators.maxLength('Name max length is 15 chars.', 15)
+            ]"
+          >
+            <template #default="{ props }">
+              <v-text-field label="Name" v-model="name" v-bind="props" />
             </template>
-          </form-validator>
+          </input-validator>
+
+          <input-validator
+            v-bind="form"
+            :value="clusterToken"
+            :rules="[
+              validators.required('Token is required.'),
+              validators.minLength('Token minimum length is 6 chars.', 6),
+              validators.maxLength('Token max length is 15 chars.', 15),
+              validators.isAlphanumeric(
+                'Token cannot contain any characters other than alphabets and numbers.'
+              )
+            ]"
+          >
+            <template #default="{ props }">
+              <password-input-wrapper>
+                <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
+              </password-input-wrapper>
+            </template>
+          </input-validator>
         </template>
 
-        <template #master>
-          <form-validator v-model="isValidMaster">
-            <template #default='{ form }'>
-              <K8SWorker v-model="master" :form='form'/>
-            </template>
-          </form-validator>
+        <template #master="{ form }">
+          <K8SWorker v-model="master" :form="form" />
         </template>
 
-        <template #workers>
-          <form-validator v-model="isValidWorkers">
-            <template #default='{ form }'>
-              <ExpandableLayout v-model="workers" @add="addWorker">
-                <template #default="{ index }">
-                  <K8SWorker v-model="workers[index]" :form='form'/>
-                </template>
-              </ExpandableLayout>
+        <template #workers="{ form }">
+          <ExpandableLayout v-model="workers" @add="addWorker">
+            <template #default="{ index }">
+              <K8SWorker v-model="workers[index]" :form="form" />
             </template>
-          </form-validator>
+          </ExpandableLayout>
         </template>
       </d-tabs>
     </template>
 
     <template #footer-actions>
-      <v-btn variant="tonal" color="primary" @click="deploy" :disabled="isInvalid">
+      <v-btn variant="tonal" color="primary" @click="deploy" :disabled="tabs?.invalid">
         Deploy
       </v-btn>
     </template>
@@ -89,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { generateString } from 'grid3_client'
 import { createWorker } from '../components/k8s_worker.vue'
 import type { K8SWorker as K8sWorker } from '../types'
@@ -98,16 +88,10 @@ import { getGrid } from '../utils/grid'
 import { deployK8s } from '../utils/deploy_k8s'
 import * as validators from '../utils/validators'
 
-
 const profileManager = useProfileManager()
 
 const layout = ref()
-
-const isValidConfig = ref(false)
-const isValidMaster = ref(true)
-const isValidWorkers = ref(true)
-const isInvalid = computed(() => !isValidConfig.value || !isValidMaster.value || !isValidMaster.value)
-
+const tabs = ref()
 
 const name = ref('K8S' + generateString(8))
 const clusterToken = ref(generateString(10))
@@ -129,7 +113,7 @@ async function deploy() {
     workers: workers.value!,
     sshKey: profileManager.profile!.ssh
   })
-  .then((vm) => {
+    .then((vm) => {
       layout.value.setStatus('success', 'Successfully deployed a Kubernetes cluster.')
       layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
     })

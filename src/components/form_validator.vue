@@ -8,9 +8,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-defineProps<{ modelValue: boolean }>()
+defineProps<{ modelValue?: boolean }>()
 const emits = defineEmits<{ (events: 'update:modelValue', value: boolean): void }>()
 
 const inputsValidation = ref<{ [uid: number]: boolean }>({})
@@ -34,11 +34,16 @@ function onUnregister(uid: number): void {
   delete inputsReset[uid]
 }
 
+const valid = computed(() => !Object.values(inputsValidation.value).some((v) => v === false))
+const invalid = computed(() => !valid.value)
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 defineExpose({
   reset() {
     Object.values(inputsReset).forEach((fn) => fn())
-  }
+  },
+  valid,
+  invalid
 })
 </script>
 
