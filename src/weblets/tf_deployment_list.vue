@@ -61,6 +61,13 @@
               color="secondary"
               @click="dialog = true"
             />
+
+            <ManageCaproverWorkerDialog
+              v-if="dialog"
+              :data="item.value"
+              @close="dialog = false"
+              @update:caprover="item.value.workers = $event.workers"
+            />
           </template>
 
           <template #Peertube-actions="{ item }">
@@ -442,6 +449,7 @@ import IconActionBtn from '../components/icon_action_btn.vue'
 import VmDeploymentTable from '../components/vm_deployment_table.vue'
 import K8sDeploymentTable from '../components/k8s_deployment_table.vue'
 import ManageK8SWorkerDialog from '../components/manage_k8s_worker_dialog.vue'
+import ManageCaproverWorkerDialog from '../components/manage_caprover_worker_dialog.vue'
 
 export default {
   name: 'TfDeploymentList',
@@ -450,6 +458,7 @@ export default {
     IconActionBtn,
     K8sDeploymentTable,
     ManageK8SWorkerDialog,
+    ManageCaproverWorkerDialog,
   },
 }
 </script>

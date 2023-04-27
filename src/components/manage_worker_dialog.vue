@@ -21,7 +21,11 @@
         <slot name="list"></slot>
       </template>
 
-      <slot name="deploy" v-else></slot>
+      <form-validator v-model="valid" v-else>
+        <template #default="{ form }">
+          <slot name="deploy" :form="form"></slot>
+        </template>
+      </form-validator>
 
       <template #footer-actions>
         <v-btn
@@ -38,7 +42,7 @@
           color="primary"
           variant="tonal"
           :disabled="!valid"
-          @click="deploy"
+          @click="$emit('deploy', layout)"
           v-if="showType === 1"
         >
           Deploy
@@ -72,26 +76,25 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-const props = defineProps<{ workers: any[] }>()
+const props = defineProps<{ workers: any[]; selectedWorkers: any[]; deleting: boolean }>()
 const emits = defineEmits<{
   (event: 'close'): void
-  (event: 'delete', workers: any[]): void
+  (event: 'delete', cb: (workers: any[]) => void): void
   (event: 'deploy', layout: any): void
 }>()
 
 const layout = ref()
 const showType = ref(props.workers.length === 0 ? 1 : 0)
 const valid = ref(true)
-const selectedWorkers = ref<any[]>([])
-const deleting = ref(false)
 const deletingDialog = ref(false)
 
-async function deploy() {
-  emits('deploy', layout.value)
-}
-
-async function onDelete() {
-  emits('delete', selectedWorkers.value)
+function onDelete() {
+  deletingDialog.value = false
+  emits('delete', (workers) => {
+    if (workers.length === 0) {
+      showType.value = 1
+    }
+  })
 }
 </script>
 
