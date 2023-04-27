@@ -81,7 +81,7 @@
   <v-switch label="Public IPv6" inset color="primary" v-model="$props.modelValue.ipv6" />
   <v-switch label="Planetary Network" inset color="primary" v-model="$props.modelValue.planetary" />
 
-  <RootFsSize v-model="$props.modelValue.rootFsSize" />
+  <RootFsSize v-model="$props.modelValue.rootFsSize" :form="form" />
 
   <SelectFarm
     :filters="{
@@ -96,6 +96,9 @@
 </template>
 
 <script lang="ts" setup>
+import * as validators from '../utils/validators'
+
+
 defineProps<{ modelValue: K8SWorker, form?: any }>()
 </script>
 
@@ -104,7 +107,6 @@ import SelectFarm from './select_farm.vue'
 import { generateString } from 'grid3_client'
 import RootFsSize from './root_fs_size.vue'
 import type { K8SWorker, Farm } from '../types'
-import * as validators from '../utils/validators'
 
 
 
