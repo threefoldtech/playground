@@ -5,6 +5,7 @@ import {
   randomChoice,
   K8SModel,
   AddWorkerModel,
+  DeleteWorkerModel,
 } from 'grid3_client'
 import type { K8SWorker } from '../types'
 import { createNetwork } from './deploy_helpers'
@@ -93,4 +94,22 @@ export async function deployWorker(
 
   await grid.k8s.add_worker(worker)
   return loadK8S(grid, options.deploymentName)
+}
+
+export interface DeleteWorkerOptions {
+  deploymentName: string
+  name: string
+}
+export async function deleteWorker(grid: GridClient, options: DeleteWorkerOptions) {
+  const worker = new DeleteWorkerModel()
+  worker.deployment_name = options.deploymentName
+  worker.name = options.name
+
+  const deletedWorker = await grid.k8s.delete_worker(worker)
+
+  if (!deletedWorker.deleted && !deletedWorker.updated) {
+    throw new Error('Failed to delete worker')
+  }
+
+  return deletedWorker
 }

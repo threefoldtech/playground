@@ -5,7 +5,13 @@
       <template #subtitle>Managing {{ data.deploymentName }} cluster</template>
 
       <div class="d-flex justify-center mb-6">
-        <v-btn-toggle divided v-model="showType" mandatory v-if="data.workers.length > 0">
+        <v-btn-toggle
+          divided
+          v-model="showType"
+          mandatory
+          v-if="data.workers.length > 0"
+          :disabled="deleting"
+        >
           <v-btn variant="outlined"> List </v-btn>
           <v-btn variant="outlined"> Deploy </v-btn>
         </v-btn-toggle>
@@ -25,7 +31,7 @@
           ]"
           :items="data.workers"
           :loading="false"
-          :deleting="false"
+          :deleting="deleting"
           v-model="selectedWorkers"
         >
           <template #[`item.index`]="{ item }">
@@ -49,8 +55,9 @@
           color="error"
           variant="outlined"
           prepend-icon="mdi-delete"
-          :disabled="selectedWorkers.length === 0"
+          :disabled="selectedWorkers.length === 0 || deleting"
           v-if="showType === 0"
+          @click="deletingDialog = true"
         >
           Delete
         </v-btn>
@@ -63,9 +70,29 @@
         >
           Deploy
         </v-btn>
-        <v-btn color="error" variant="tonal" @click="$emit('close')"> Close </v-btn>
+        <v-btn color="error" variant="tonal" v-if="!deleting" @click="$emit('close')">
+          Close
+        </v-btn>
       </template>
     </weblet-layout>
+  </v-dialog>
+
+  <v-dialog width="50%" persistent v-model="deletingDialog">
+    <v-card>
+      <v-card-title class="text-h5">
+        Are you sure you want to delete the following workers?
+      </v-card-title>
+      <v-card-text>
+        <v-chip class="ma-1" color="primary" label v-for="w in selectedWorkers" :key="w.name">
+          {{ w.name }}
+        </v-chip>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" variant="text" @click="onDelete"> Remove </v-btn>
+        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 </template>
 
@@ -73,7 +100,7 @@
 import { ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import { deployWorker } from '../utils/deploy_k8s'
+import { deployWorker, deleteWorker, loadK8S } from '../utils/deploy_k8s'
 import { ProjectName } from '../types'
 
 const props = defineProps<{ data: K8S }>()
@@ -86,6 +113,8 @@ const showType = ref(props.data.workers.length === 0 ? 1 : 0)
 const valid = ref(true)
 const worker = ref(createWorker())
 const selectedWorkers = ref<any[]>([])
+const deleting = ref(false)
+const deletingDialog = ref(false)
 
 function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3
@@ -110,6 +139,31 @@ async function deploy() {
       const e = typeof error === 'string' ? error : error.message
       layout.value.setStatus('failed', e)
     })
+}
+
+async function onDelete() {
+  deletingDialog.value = false
+  deleting.value = true
+  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
+
+  for (const worker of selectedWorkers.value) {
+    try {
+      await deleteWorker(grid!, {
+        deploymentName: props.data.deploymentName,
+        name: worker.name,
+      })
+    } catch (e) {
+      console.log('Error while deleting worker', e)
+    }
+  }
+
+  selectedWorkers.value = []
+  const data = await loadK8S(grid!, props.data.deploymentName)
+  emits('update:k8s', data)
+  if (data.workers.length === 0) {
+    showType.value = 1
+  }
+  deleting.value = false
 }
 </script>
 
