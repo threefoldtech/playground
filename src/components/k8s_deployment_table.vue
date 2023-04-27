@@ -9,7 +9,7 @@
       { title: 'Planetary Network IP', key: 'planetary' },
       { title: 'Workers', key: 'workers' },
       { title: 'Billing Rate', key: 'billing' },
-      { title: 'Actions', key: 'actions' }
+      { title: 'Actions', key: 'actions' },
     ]"
     :items="items"
     :loading="loading"
@@ -57,11 +57,6 @@
 
     <template #[`item.actions`]="{ item }">
       <v-btn-group variant="tonal">
-        <IconActionBtn
-          tooltip="Show Details"
-          icon="mdi-information-outline"
-          @click="getLayout().openDialog(item?.value)"
-        />
         <slot name="actions" :item="item"></slot>
       </v-btn-group>
     </template>
@@ -78,7 +73,6 @@ const profileManager = useProfileManager()
 
 const props = defineProps<{
   projectName: string
-  getLayout: () => any
   modelValue: any[]
   deleting: boolean
 }>()
@@ -99,13 +93,11 @@ onMounted(async () => {
 
 <script lang="ts">
 import ListTable from './list_table.vue'
-import IconActionBtn from './icon_action_btn.vue'
 
 export default {
   name: 'K8sDeploymentTable',
   components: {
     ListTable,
-    IconActionBtn
-  }
+  },
 }
 </script>

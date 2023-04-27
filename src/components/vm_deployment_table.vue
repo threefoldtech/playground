@@ -62,11 +62,6 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn-group variant="tonal">
-        <IconActionBtn
-          tooltip="Show Details"
-          icon="mdi-information-outline"
-          @click="getLayout().openDialog(item?.value)"
-        />
         <slot :name="projectName + '-actions'" :item="item"></slot>
       </v-btn-group>
     </template>
@@ -83,7 +78,6 @@ const profileManager = useProfileManager()
 
 const props = defineProps<{
   projectName: string
-  getLayout: () => any
   modelValue: any[]
   deleting: boolean
 }>()
@@ -102,13 +96,11 @@ onMounted(async () => {
 
 <script lang="ts">
 import ListTable from './list_table.vue'
-import IconActionBtn from './icon_action_btn.vue'
 
 export default {
   name: 'VmDeploymentTable',
   components: {
-    ListTable,
-    IconActionBtn
+    ListTable
   }
 }
 </script>
