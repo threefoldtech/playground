@@ -13,11 +13,11 @@ import { ref, watch } from 'vue'
 defineProps<{ modelValue: boolean }>()
 const emits = defineEmits<{ (events: 'update:modelValue', value: boolean): void }>()
 
-const inputsValiadtion = ref<{ [uid: number]: boolean }>({})
+const inputsValidation = ref<{ [uid: number]: boolean }>({})
 const inputsReset = {} as { [uid: number]: () => void }
 
 watch(
-  inputsValiadtion,
+  inputsValidation,
   (inps) => {
     emits('update:modelValue', !Object.values(inps).some((v) => v === false))
   },
@@ -25,12 +25,12 @@ watch(
 )
 
 function onValid(uid: number, value: boolean, reset: () => void): void {
-  inputsValiadtion.value[uid] = value
+  inputsValidation.value[uid] = value
   inputsReset[uid] = reset
 }
 
 function onUnregister(uid: number): void {
-  delete inputsValiadtion.value[uid]
+  delete inputsValidation.value[uid]
   delete inputsReset[uid]
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout>
+  <weblet-layout ref="layout">
     <template #title>Deploy a Kubernetes</template>
     <template #subtitle
       >Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters
@@ -15,22 +15,55 @@
     <template #default>
       <d-tabs
         :tabs="[
-          { title: 'Config', value: 'config' },
-          { title: 'Master', value: 'master' },
-          { title: 'Workers', value: 'workers' }
+          { title: 'Config', value: 'config', invalid: !isValidConfig },
+          { title: 'Master', value: 'master', invalid: !isValidMaster },
+          { title: 'Workers', value: 'workers', invalid: !isValidWorkers }
         ]"
       >
         <template #config>
-          <v-text-field label="Name" v-model="name" />
-          <password-input-wrapper>
-            <template #default="{ props }">
-              <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
+          <form-validator v-model="isValidConfig">
+            <template #default='{form}'>
+              <input-validator
+                v-bind="form"
+                :value="name"
+                :rules="[
+                  validators.required('Name is required.'),
+                  validators.minLength('Name minimum length is 2 chars.', 2),
+                  validators.maxLength('Name max length is 15 chars.', 15)
+                ]"
+              >
+                <template #default="{ props }">
+                  <v-text-field label="Name" v-model="name" v-bind="props" />
+                </template>
+              </input-validator>
+
+              <input-validator
+                v-bind="form"
+                :value="clusterToken"
+                :rules="[
+                  validators.required('Token is required.'),
+                  // validators.pattern('Token cannot contain any characters other than alphabets and numbers.', {pattern: /^\w+$/}),
+                  validators.minLength('Token minimum length is 6 chars.', 6),
+                  validators.maxLength('Token max length is 15 chars.', 15),
+                  validators.isAlphanumeric('Token cannot contain any characters other than alphabets and numbers.'),
+                ]"
+                >
+                <template #default="{ props }">
+                  <password-input-wrapper>
+                    <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
+                  </password-input-wrapper>
+                </template>
+              </input-validator>
             </template>
-          </password-input-wrapper>
+          </form-validator>
         </template>
 
         <template #master>
-          <K8SWorker v-model="master" />
+          <form-validator v-model="isValidMaster">
+            <!-- <template #default='{ form }'> -->
+              <K8SWorker v-model="master" />
+            <!-- </template> -->
+          </form-validator>
         </template>
 
         <template #workers>
@@ -44,7 +77,7 @@
     </template>
 
     <template #footer-actions>
-      <v-btn variant="tonal" color="primary" @click="deploy" :loading="loading" :disabled="loading">
+      <v-btn variant="tonal" color="primary" @click="deploy" :disabled="isInvalid">
         Deploy
       </v-btn>
     </template>
@@ -52,15 +85,25 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { generateString } from 'grid3_client'
 import { createWorker } from '../components/k8s_worker.vue'
 import type { K8SWorker as K8sWorker } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { deployK8s } from '../utils/deploy_k8s'
+import * as validators from '../utils/validators'
+
 
 const profileManager = useProfileManager()
+
+const layout = ref()
+
+const isValidConfig = ref(false)
+const isValidMaster = ref(true)
+const isValidWorkers = ref(true)
+const isInvalid = computed(() => !isValidConfig.value || !isValidMaster.value || !isValidMaster.value)
+
 
 const name = ref('K8S' + generateString(8))
 const clusterToken = ref(generateString(10))
@@ -82,9 +125,14 @@ async function deploy() {
     workers: workers.value!,
     sshKey: profileManager.profile!.ssh
   })
-    .then(console.log)
-    .catch(console.log)
-    .finally(() => (loading.value = false))
+  .then((vm) => {
+      layout.value.setStatus('success', 'Successfully deployed a Kubernetes cluster.')
+      layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+    })
+    .catch((error) => {
+      const e = typeof error === 'string' ? error : error.message
+      layout.value.setStatus('failed', e)
+    })
 }
 </script>
 
