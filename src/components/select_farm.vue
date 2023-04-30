@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4">Nodes Filter</h6>
+    <h6 class="text-h5 mb-4">Farm Filter</h6>
 
     <SelectCountry v-model="country" />
 
@@ -48,7 +48,7 @@ const props = defineProps({
   modelValue: { type: Object as PropType<Farm> },
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
-  form: { type: Object, default: () => ({}) }
+  form: { type: Object, default: () => ({}) },
 })
 const emits = defineEmits<{
   (event: 'update:modelValue', value?: Farm): void
@@ -78,7 +78,7 @@ async function loadFarms() {
     hru: filters.disk,
     sru: filters.ssd,
     publicIPs: filters.publicIp,
-    availableFor: grid!.twinId
+    availableFor: grid!.twinId,
   })
 
   if (oldFarm) {
@@ -124,7 +124,7 @@ import SelectCountry from './select_country.vue'
 export default {
   name: 'SelectFarm',
   components: {
-    SelectCountry
-  }
+    SelectCountry,
+  },
 }
 </script>

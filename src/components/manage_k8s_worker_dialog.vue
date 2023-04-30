@@ -7,8 +7,7 @@
     @deploy="deploy"
     @delete="onDelete"
   >
-    <template #title>Manage Kubernetes Cluster</template>
-    <template #subtitle>Managing {{ data.deploymentName }} cluster</template>
+    <template #title>Manage Kubernetes({{ data.deploymentName }}) Workers</template>
 
     <template #list>
       <ListTable

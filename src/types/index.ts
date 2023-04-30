@@ -23,3 +23,9 @@ export enum ProjectName {
   Kubernetes = 'Kubernetes',
   Caprover = 'CapRover',
 }
+
+export interface solutionFlavor {
+  cpu: number
+  memory: number
+  disk: number
+}

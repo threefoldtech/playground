@@ -7,8 +7,7 @@
     @deploy="deploy"
     @delete="onDelete"
   >
-    <template #title>Manage Caprover Instance</template>
-    <template #subtitle>Managing {{ name }} Workers</template>
+    <template #title>Manage Caprover({{ name }}) Workers</template>
 
     <template #list>
       <ListTable
@@ -37,21 +36,15 @@
       </ListTable>
     </template>
 
-    <template #deploy="{ form }">
-      <input-validator :rules="[]" v-bind="form">
+    <template #deploy>
+      <input-validator :rules="[]">
         <template #default="{ props }">
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </template>
       </input-validator>
 
-      <SelectSolutionFlavor
-        v-model:cpu.number="cpu"
-        v-model:memory.number="memory"
-        v-model:disk.number="disk"
-        :form="form"
-      />
-
-      <SelectFarm :form="form" v-model="farm" v-model:country="country" />
+      <SelectSolutionFlavor v-model="solution" />
+      <SelectFarm v-model="farm" />
     </template>
   </ManageWorkerDialog>
 </template>
@@ -63,7 +56,7 @@ import { getGrid } from '../utils/grid'
 import { deployWorker, deleteWorker, loadK8S } from '../utils/deploy_k8s'
 import { ProjectName } from '../types'
 import { generateString } from 'grid3_client'
-import type { Farm } from '../types'
+import type { Farm, solutionFlavor } from '../types'
 
 const props = defineProps<{ name: string; data: any[] }>()
 const emits = defineEmits<{ (event: 'close'): void; (event: 'update:caprover', data: any): void }>()
@@ -74,11 +67,8 @@ const selectedWorkers = ref<any[]>([])
 const deleting = ref(false)
 
 const name = ref('CR' + generateString(8))
-const cpu = ref() as Ref<number>
-const memory = ref() as Ref<number>
-const disk = ref() as Ref<number>
+const solution = ref<solutionFlavor>()
 const farm = ref<Farm>()
-const country = ref<string>()
 
 function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3

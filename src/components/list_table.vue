@@ -45,7 +45,7 @@
     <template #bottom>
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
-        <v-progress-circular indeterminate color="secondary" />
+        <v-progress-circular indeterminate color="primary" />
         <v-spacer />
       </v-row>
       <p v-else-if="!loading && items.length === 0 && noDataText" class="text-center mt-8">
@@ -83,6 +83,6 @@ function onUpdateSelection() {
 
 <script lang="ts">
 export default {
-  name: 'ListTable'
+  name: 'ListTable',
 }
 </script>

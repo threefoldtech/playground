@@ -1,21 +1,14 @@
 <template>
-  <v-dialog model-value width="70%" persistent>
+  <v-dialog model-value scrollable width="70%" persistent>
     <weblet-layout ref="layout">
       <template #title><slot name="title"></slot></template>
-      <template #subtitle><slot name="subtitle"></slot></template>
 
-      <div class="d-flex justify-center mb-6">
-        <v-btn-toggle
-          divided
-          v-model="showType"
-          mandatory
-          v-if="workers.length > 0"
-          :disabled="deleting"
-        >
-          <v-btn variant="outlined"> List </v-btn>
+      <template #header-actions>
+        <v-btn-toggle divided v-model="showType" mandatory :disabled="deleting" class="mt-2">
+          <v-btn variant="outlined" :disabled="workers.length === 0"> List </v-btn>
           <v-btn variant="outlined"> Deploy </v-btn>
         </v-btn-toggle>
-      </div>
+      </template>
 
       <template v-if="showType === 0">
         <slot name="list"></slot>

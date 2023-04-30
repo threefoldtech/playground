@@ -5,7 +5,6 @@
     <d-tabs :tabs="tabs" v-model="activeTab" :disabled="loading" destroy>
       <template #default>
         <VmDeploymentTable
-          :getLayout="() => layout"
           :projectName="tabs[activeTab].value"
           v-model="selectedItems"
           :deleting="false"
@@ -358,7 +357,6 @@
 
       <template #Kubernetes>
         <K8sDeploymentTable
-          :getLayout="() => layout"
           :projectName="tabs[activeTab].value"
           v-model="selectedItems"
           :deleting="false"

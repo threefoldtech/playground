@@ -3,8 +3,7 @@
 
   <div v-if="solution === 'custom'">
     <input-validator
-      v-bind="form"
-      :value="$props.cpu"
+      :value="cpu"
       :rules="[
         validators.required('CPU is required.'),
         validators.isInt('CPU must be a valid integer.'),
@@ -13,19 +12,12 @@
       ]"
     >
       <template #default="{ props }">
-        <v-text-field
-          type="number"
-          label="CPU (vCores)"
-          :modelValue="$props.cpu"
-          @input="$emit('update:cpu', $event.target.value)"
-          v-bind="props"
-        />
+        <v-text-field type="number" label="CPU (vCores)" v-model="cpu" v-bind="props" />
       </template>
     </input-validator>
 
     <input-validator
-      v-bind="form"
-      :value="$props.memory"
+      :value="memory"
       :rules="[
         validators.required('Memory is required.'),
         validators.isInt('Memory must be a valid integer.'),
@@ -34,19 +26,12 @@
       ]"
     >
       <template #default="{ props }">
-        <v-text-field
-          type="number"
-          label="Memory (MB)"
-          :modelValue="$props.memory"
-          @input="$emit('update:memory', $event.target.value)"
-          v-bind="props"
-        />
+        <v-text-field type="number" label="Memory (MB)" v-model="memory" v-bind="props" />
       </template>
     </input-validator>
 
     <input-validator
-      :value="$props.disk"
-      v-bind="form"
+      :value="disk"
       :rules="[
         validators.required('Disk size is required.'),
         validators.isInt('Disk size must be a valid integer.'),
@@ -55,13 +40,7 @@
       ]"
     >
       <template #default="{ props }">
-        <v-text-field
-          type="number"
-          label="Disk (GB)"
-          :modelValue="$props.disk"
-          @input="$emit('update:disk', $event.target.value)"
-          v-bind="props"
-        />
+        <v-text-field type="number" label="Disk (GB)" v-model="disk" v-bind="props" />
       </template>
     </input-validator>
   </div>
@@ -71,13 +50,11 @@
 import type { PropType } from 'vue'
 import { ref, watch, computed } from 'vue'
 import * as validators from '../utils/validators'
+import type { solutionFlavor } from '../types'
 
-type Package = PropType<{ cpu: number; memory: number; disk: number }>
+type Package = PropType<solutionFlavor>
 
 const props = defineProps({
-  cpu: { required: true, type: Number },
-  memory: { required: true, type: Number },
-  disk: { required: true, type: Number },
   minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024, disk: 100 }) },
   standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 250 }) },
   recommended: {
@@ -86,12 +63,7 @@ const props = defineProps({
   },
   form: { type: Object, default: () => ({}) },
 })
-
-const $emit = defineEmits<{
-  (event: 'update:cpu', value?: number): void
-  (event: 'update:memory', value?: number): void
-  (event: 'update:disk', value?: number): void
-}>()
+const emits = defineEmits<{ (event: 'update:model-value', value?: solutionFlavor): void }>()
 
 const packages = computed(() => {
   const { minimum, standard, recommended } = props
@@ -113,17 +85,25 @@ const packages = computed(() => {
 })
 
 const solution = ref(packages.value[0].value)
+const cpu = ref<number>()
+const memory = ref<number>()
+const disk = ref<number>()
 
 watch(
   solution,
   (value) => {
     if (value === 'custom' || typeof value === 'string') return
-    $emit('update:cpu', value.cpu)
-    $emit('update:memory', value.memory)
-    $emit('update:disk', value.disk)
+    cpu.value = value.cpu
+    memory.value = value.memory
+    disk.value = value.disk
   },
   { immediate: true }
 )
+
+watch([cpu, memory, disk], ([cpu, memory, disk]) => {
+  const value = cpu && memory && disk ? { cpu, memory, disk } : undefined
+  emits('update:model-value', value)
+})
 </script>
 
 <script lang="ts">
