@@ -9,9 +9,18 @@ export async function getGrid(profile: Pick<Profile, 'mnemonics'>, projectName?:
     mnemonic: profile.mnemonics,
     network: NETWORK,
     backendStorageType: BackendStorageType.tfkvstore,
-    projectName
+    projectName,
   })
   await grid.connect()
+  return grid
+}
+
+interface UpdateGridOptions {
+  projectName: string
+}
+export function updateGrid(grid: GridClient, options: UpdateGridOptions) {
+  grid.clientOptions!.projectName = options.projectName
+  grid._connect()
   return grid
 }
 
@@ -19,7 +28,7 @@ export function createAccount() {
   const grid = new GridClient({
     network: NETWORK,
     mnemonic: '',
-    storeSecret: 'test'
+    storeSecret: 'test',
   })
   grid._connect()
   const relay = grid.getDefaultUrls(NETWORK).relay.slice(6)
@@ -30,7 +39,7 @@ export async function loadBalance(grid: GridClient): Promise<Profile['balance']>
   const balance = await grid.balance.getMyBalance()
   return {
     free: +balance.free,
-    locked: +balance.reserved
+    locked: +balance.reserved,
   }
 }
 
@@ -40,7 +49,7 @@ export async function loadProfile(mnemonics: string, grid: GridClient): Promise<
     ssh: await readSSH(grid),
     twinId: await grid.twins.get_my_twin_id(),
     address: grid.twins.client.client.address,
-    balance: await loadBalance(grid)
+    balance: await loadBalance(grid),
   }
 }
 
@@ -67,7 +76,7 @@ export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> 
     key: 'metadata',
     value: JSON.stringify({
       ...metadata,
-      sshkey: newSSH
-    })
+      sshkey: newSSH,
+    }),
   })
 }

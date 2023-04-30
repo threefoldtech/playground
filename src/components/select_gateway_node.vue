@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
-import { loadGateWayNodes } from '../utils/gateway'
+import { loadGateways } from '../utils/gateway'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import type { GridClient, NodeInfo } from 'grid3_client'
@@ -37,7 +37,7 @@ let loadMoreNodes = 1
 
 //methods
 const handleGetGetWayNodes = async (grid: GridClient) => {
-  loadGateWayNodes(grid, loadMoreNodes)
+  loadGateways(grid, { page: loadMoreNodes })
     .then((res) => {
       loading.value = false
       items.value = [...res]
@@ -76,6 +76,6 @@ watch(selectedNode, (selectedNode) => {
 </script>
 <script lang="ts">
 export default {
-  name: 'SelectGateWayNode'
+  name: 'SelectGateWayNode',
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-tabs v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
-    <v-tab v-for="tab in tabs" :key="tab.value">
+    <v-tab v-for="tab in tabs" :key="tab.value" :disabled="disabled">
       {{ tab.title }}
       <v-chip color="error" v-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
     </v-tab>

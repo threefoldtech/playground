@@ -1,6 +1,18 @@
-import type { GridClient } from 'grid3_client'
+import type { ProjectName } from '@/types'
+import { SolutionCode } from '@/types'
+import type { GridClient, FilterOptions } from 'grid3_client'
 
-export const loadGateWayNodes = (grid: GridClient, pageIndx: number) => {
-  const nodes = grid.capacity
-  return nodes.filterNodes({ gateway: true, page: pageIndx })
+export function loadGateways(grid: GridClient, options: Omit<FilterOptions, 'gateway'>) {
+  return grid.capacity.filterNodes({
+    gateway: true,
+    ...options,
+  })
+}
+
+export interface GetHostnameOptions {
+  deploymentName: string
+  projectName: ProjectName
+}
+export function getHostname(grid: GridClient, options: GetHostnameOptions) {
+  return SolutionCode[options.projectName] + grid.twinId + options.deploymentName.toLowerCase()
 }

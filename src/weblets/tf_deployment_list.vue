@@ -1,13 +1,12 @@
 <template>
   <weblet-layout ref="layout">
     <template #title>Deployment List</template>
-
-    <d-tabs :tabs="tabs" v-model="activeTab" :disabled="loading" destroy>
+    <d-tabs :tabs="tabs" v-model="activeTab" :disabled="deleting" destroy>
       <template #default>
         <VmDeploymentTable
           :projectName="tabs[activeTab].value"
           v-model="selectedItems"
-          :deleting="false"
+          :deleting="deleting"
         >
           <template #Fullvm-actions="{ item }">
             <IconActionBtn
@@ -359,7 +358,7 @@
         <K8sDeploymentTable
           :projectName="tabs[activeTab].value"
           v-model="selectedItems"
-          :deleting="false"
+          :deleting="deleting"
         >
           <template #actions="{ item }">
             <IconActionBtn
@@ -395,22 +394,23 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="error" variant="outlined">Delete</v-btn>
+      <v-btn
+        color="error"
+        variant="outlined"
+        :disabled="selectedItems.length === 0 || deleting"
+        prepend-icon="mdi-delete"
+        @click="onDelete"
+      >
+        Delete
+      </v-btn>
     </template>
   </weblet-layout>
-
-  <!-- <ManageK8SWorkerDialog
-    v-if="dialog && tabs[activeTab].value === 'Kubernetes'"
-    name="VM62bb35e3"
-    @close=""
-    :data="{ masters: [], workers: [{}] }"
-  /> -->
 </template>
 
 <script lang="ts" setup>
 import { ref, watch, type Ref } from 'vue'
-// import { useProfileManager } from '../stores'
-// import { getGrid } from '../utils/grid'
+import { useProfileManager } from '../stores'
+import { getGrid } from '../utils/grid'
 
 const tabs = [
   { title: 'Full Virtual Machine', value: 'Fullvm' },
@@ -432,15 +432,22 @@ const tabs = [
   { title: 'Wordpress', value: 'Wordpress' },
 ]
 
-// const profileManager = useProfileManager()
+const profileManager = useProfileManager()
 
 const layout = ref()
 const dialog = ref(false)
-// const items = ref<any[]>([])
 const selectedItems = ref<any[]>([])
-const loading = ref(false)
+const deleting = ref(false)
 
 const activeTab = ref() as Ref<number>
+watch(activeTab, () => (selectedItems.value = []))
+
+function onDelete() {
+  deleting.value = true
+  // console.log(tabs[activeTab.value].value)
+  // for (const)
+  deleting.value = false
+}
 </script>
 
 <script lang="ts">

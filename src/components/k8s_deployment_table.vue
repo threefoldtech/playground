@@ -56,7 +56,8 @@
     </template>
 
     <template #[`item.actions`]="{ item }">
-      <v-btn-group variant="tonal">
+      <v-chip color="error" variant="tonal" v-if="deleting">Deleting...</v-chip>
+      <v-btn-group variant="tonal" v-else>
         <slot name="actions" :item="item"></slot>
       </v-btn-group>
     </template>
