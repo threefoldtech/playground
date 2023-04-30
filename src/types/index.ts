@@ -15,6 +15,17 @@ export interface K8SWorker {
 export interface Farm {
   name: string
   farmID: number
+  country?: string
+}
+
+export interface Flist {
+  value: string
+  entryPoint: string
 }
 
 export type VDataTableHeader = VDataTable['headers']
+
+export interface FormValidatorService {
+  setValid(uid: number, value: boolean, reset: () => void): void
+  unregister(uid: number): void
+}

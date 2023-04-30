@@ -8,16 +8,7 @@
 
   <v-tab-item v-for="(tab, index) in tabs" :key="tab.value" v-show="index === activeTab">
     <form-validator ref="forms">
-      <template #default="{ form }">
-        <slot
-          :name="tab.value"
-          :index="index"
-          :tab="tab"
-          :activeTab="activeTab"
-          :tabs="tabs"
-          :form="form"
-        ></slot>
-      </template>
+      <slot :name="tab.value" :index="index" :tab="tab" :activeTab="activeTab" :tabs="tabs"></slot>
     </form-validator>
   </v-tab-item>
 </template>

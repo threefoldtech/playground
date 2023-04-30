@@ -2,7 +2,6 @@
   <div class="d-flex">
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
-        v-bind="form"
         :value="$props.modelValue"
         :rules="[
           validators.required('Root File System is required.'),
@@ -34,8 +33,7 @@
 import { ref } from 'vue'
 import * as validators from '../utils/validators'
 
-
-defineProps<{ modelValue: number, form?: any }>()
+defineProps<{ modelValue: number }>()
 
 const edit = ref(false)
 </script>

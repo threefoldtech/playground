@@ -1,6 +1,5 @@
 <template>
   <input-validator
-    v-bind="form"
     :value="$props.modelValue.name"
     :rules="[
       validators.required('Name is required.'),
@@ -13,9 +12,7 @@
     </template>
   </input-validator>
 
-
   <input-validator
-    v-bind="form"
     :value="$props.modelValue.cpu"
     :rules="[
       validators.required('CPU is required.'),
@@ -34,9 +31,7 @@
     </template>
   </input-validator>
 
-
   <input-validator
-    v-bind="form"
     :value="$props.modelValue.memory"
     :rules="[
       validators.required('Memory is required.'),
@@ -55,10 +50,8 @@
     </template>
   </input-validator>
 
-
   <input-validator
     :value="$props.modelValue.diskSize"
-    v-bind="form"
     :rules="[
       validators.required('Disk size is required.'),
       validators.isInt('Disk size must be a valid integer.'),
@@ -76,12 +69,11 @@
     </template>
   </input-validator>
 
-
   <v-switch label="Public IPv4" inset color="primary" v-model="$props.modelValue.ipv4" />
   <v-switch label="Public IPv6" inset color="primary" v-model="$props.modelValue.ipv6" />
   <v-switch label="Planetary Network" inset color="primary" v-model="$props.modelValue.planetary" />
 
-  <RootFsSize v-model="$props.modelValue.rootFsSize" :form="form" />
+  <RootFsSize v-model="$props.modelValue.rootFsSize" />
 
   <SelectFarm
     :filters="{
@@ -91,15 +83,13 @@
       ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize
     }"
     v-model="$props.modelValue.farm"
-    :form="form"
   />
 </template>
 
 <script lang="ts" setup>
 import * as validators from '../utils/validators'
 
-
-defineProps<{ modelValue: K8SWorker, form?: any }>()
+defineProps<{ modelValue: K8SWorker }>()
 </script>
 
 <script lang="ts">
@@ -107,8 +97,6 @@ import SelectFarm from './select_farm.vue'
 import { generateString } from 'grid3_client'
 import RootFsSize from './root_fs_size.vue'
 import type { K8SWorker, Farm } from '../types'
-
-
 
 export function createWorker(name: string = 'WR' + generateString(9)): K8SWorker {
   return {
