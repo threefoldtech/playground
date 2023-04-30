@@ -4,10 +4,7 @@
 
     <SelectCountry v-model="country" />
 
-    <input-validator
-      :rules="[validators.required('Farm is required.')]"
-      :value="farm?.farmID ?? ''"
-    >
+    <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID">
       <v-autocomplete
         :disabled="loading"
         label="Farm Name"
@@ -48,16 +45,18 @@ const props = defineProps({
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> }
 })
-const emits = defineEmits<{
-  (event: 'update:modelValue', value?: Farm): void
-  (event: 'update:country', value?: string): void
-}>()
+const emits = defineEmits<{ (event: 'update:modelValue', value?: Farm): void }>()
 
 const profileManager = useProfileManager()
 const country = ref<string>()
 
 const farm = ref<Farm>()
-watch(farm, (f) => emits('update:modelValue', f))
+watch([farm, country], ([f, c]) =>
+  emits(
+    'update:modelValue',
+    f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined
+  )
+)
 
 const loading = ref(false)
 const farms = ref<Farm[]>([])

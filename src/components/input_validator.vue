@@ -37,7 +37,7 @@ const props = defineProps({
     default: [] as AsyncRule[]
   },
   value: {
-    type: String as PropType<string | number>,
+    type: String as PropType<string | number | undefined>,
     required: true
   }
 })
@@ -72,10 +72,10 @@ onUnmounted(() => form?.unregister(uid!))
 
 function onBlur() {
   touched.value = true
-  validate(props.value?.toString())
+  validate(props.value?.toString() ?? '')
 }
 
-const onInput = debounce((value: string | number) => validate(value?.toString()), 250)
+const onInput = debounce((value?: string | number) => validate(value?.toString() ?? ''), 250)
 watch(() => props.value, onInput, { immediate: true })
 
 defineExpose({ reset })
