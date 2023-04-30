@@ -34,7 +34,8 @@ async function createWorker(grid: GridClient, data: K8SWorker) {
     farmName: data.farm!.name,
     sru: data.diskSize + data.rootFsSize,
     publicIPs: data.ipv4,
-    availableFor: grid.twinId
+    availableFor: grid.twinId,
+    country: data.farm!.country
   }
 
   const worker = new KubernetesNodeModel()

@@ -21,9 +21,8 @@
         ]"
         ref="tabs"
       >
-        <template #config="{ form }">
+        <template #config>
           <input-validator
-            v-bind="form"
             :value="name"
             :rules="[
               validators.required('Name is required.'),
@@ -37,7 +36,6 @@
           </input-validator>
 
           <input-validator
-            v-bind="form"
             :value="clusterToken"
             :rules="[
               validators.required('Token is required.'),
@@ -56,14 +54,14 @@
           </input-validator>
         </template>
 
-        <template #master="{ form }">
-          <K8SWorker v-model="master" :form="form" />
+        <template #master>
+          <K8SWorker v-model="master" />
         </template>
 
-        <template #workers="{ form }">
+        <template #workers>
           <ExpandableLayout v-model="workers" @add="addWorker">
             <template #default="{ index }">
-              <K8SWorker v-model="workers[index]" :form="form" />
+              <K8SWorker v-model="workers[index]" />
             </template>
           </ExpandableLayout>
         </template>
