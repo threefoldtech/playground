@@ -90,7 +90,7 @@
             <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
             <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
 
-            <SelectFarmId
+            <SelectFarm
               :filters="{
                 cpu,
                 memory,
@@ -106,24 +106,78 @@
       </template>
 
       <template #env>
-        <ExpandableLayout v-model="envs" @add="envs.push({ key: '', value: '' })">
-          <template #default="{ index }">
-            {{ envs[index].key }}
-            <v-text-field label="Key" v-model="envs[index].key" />
-            <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
+        <form-validator v-model='isEnvsValid'>
+          <template #default=' { form }'>
+            <ExpandableLayout v-model="envs" @add="envs.push({ key: '', value: '' })">
+              <template #default="{ index }">
+                <input-validator
+                    v-bind="form"
+                    :value="envs[index].key"
+                    :rules="[
+                      validators.required('Key name is required.'),
+                      validators.validateKey('Key can\'t start with a number, a non-alphanumeric character or a whitespace'),
+                      validators.maxLength('Key max length is 128 chars.', 128)
+                    ]"
+                  >
+                  <template #default="{ props }">
+                    <v-text-field label="Name" v-model="envs[index].key" v-bind="props" />
+                  </template>
+                </input-validator>
+
+                <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
+              </template>
+            </ExpandableLayout>
           </template>
-        </ExpandableLayout>
+        </form-validator>
       </template>
 
       <template #disks>
-        <ExpandableLayout v-model="disks" @add="addDisk">
-          <template #default="{ index }">
-            {{ disks[index].name }}
-            <v-text-field label="Name" v-model="disks[index].name" />
-            <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" />
-            <v-text-field label="Mount Point" v-model="disks[index].mountPoint" />
+        <form-validator v-model="isDisksValid">
+          <template #default=' { form }'>
+            <ExpandableLayout v-model="disks" @add="addDisk">
+                <template #default="{ index }">
+                  <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
+                  <input-validator
+                    v-bind="form"
+                    :value="disks[index].name"
+                    :rules="[
+                      validators.required('Disk name is required.'),
+                      validators.pattern(
+                        'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
+                        { pattern: /^[A-Za-z]/ }
+                      ),
+                      validators.minLength('Disk minLength is 2 chars.', 2),
+                      validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
+                      validators.maxLength('Disk maxLength is 15 chars.', 15)
+                    ]"
+                  >
+                    <template #default="{ props }">
+                      <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+                    </template>
+                  </input-validator>
+                  <input-validator
+                    v-bind="form"
+                    :value="disks[index].size"
+                    :rules="[
+                      validators.required('Disk size is required.'),
+                      validators.isInt('Disk size must be a valid integer.'),
+                      validators.min('Minimum allowed disk size is 1 GB.', 1),
+                      validators.max('Maximum allowed disk size is 10000 GB.', 10000)
+                    ]"
+                  >
+                    <template #default="{ props }">
+                      <v-text-field
+                        label="Size (GB)"
+                        type="number"
+                        v-model.number="disks[index].size"
+                        v-bind="props"
+                      />
+                    </template>
+                  </input-validator>
+                </template>
+              </ExpandableLayout>
           </template>
-        </ExpandableLayout>
+        </form-validator>
       </template>
     </d-tabs>
 
@@ -244,7 +298,7 @@ async function deploy() {
 <script lang="ts">
 import SelectVmImage from '../components/select_vm_image.vue'
 import RootFsSize from '../components/root_fs_size.vue'
-import SelectFarmId from '../components/select_farm.vue'
+import SelectFarm from '../components/select_farm.vue'
 import ExpandableLayout from '../components/expandable_layout.vue'
 
 export default {
@@ -252,7 +306,7 @@ export default {
   components: {
     SelectVmImage,
     RootFsSize,
-    SelectFarmId,
+    SelectFarm,
     ExpandableLayout
   }
 }

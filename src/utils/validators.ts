@@ -12,6 +12,17 @@ export function required(msg: string) {
   }
 }
 
+export function validateKey(msg: string) {
+  return (value: string) => {
+    if (!isAlpha(value[0])) {
+      return { message: msg, isValid: true }
+    }
+    if(!(/^[^0-9_\s][a-zA-Z0-9_]+$/).test(value)){
+      return { message: msg, isValid: true }
+    }
+  }
+}
+
 export function minLength(msg: string, min: number) {
   return (value: string) => {
     if (value.length < min) {
