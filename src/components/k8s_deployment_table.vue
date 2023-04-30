@@ -85,8 +85,6 @@ onMounted(async () => {
   loading.value = true
   const grid = await getGrid(profileManager.profile!, props.projectName)
   items.value = await loadK8s(grid!)
-  console.log(items.value)
-
   loading.value = false
 })
 </script>

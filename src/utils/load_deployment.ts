@@ -7,7 +7,7 @@ export async function loadVms(grid: GridClient) {
     return grid.machines.getObj(name).catch(() => null)
   })
   const items = await Promise.all(promises)
-  const vms = items.filter((item) => !!item) as any[][]
+  const vms = items.filter((item) => item && item.length > 0) as any[][]
   const consumptions = await Promise.all(
     vms.map((vm) => {
       return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined)
@@ -31,7 +31,7 @@ export async function loadK8s(grid: GridClient): Promise<K8S[]> {
       if (item) item.deploymentName = clusters[index]
       return item
     })
-    .filter((item) => !!item) as { masters: any[] }[]
+    .filter((item) => item && item.masters.length > 0) as { masters: any[] }[]
   const consumptions = await Promise.all(
     k8s.map((cluster) => {
       return grid.contracts
