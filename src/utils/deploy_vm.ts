@@ -8,6 +8,7 @@ import {
   QSFSDiskModel,
   generateString,
   AddMachineModel,
+  DeleteMachineModel,
 } from 'grid3_client'
 import { createNetwork, type Network } from './deploy_helpers'
 
@@ -169,4 +170,22 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
 
   await grid.machines.add_machine(machine)
   return loadVM(grid, options.deploymentName)
+}
+
+export interface DeleteMachineOptions {
+  deploymentName: string
+  name: string
+}
+export async function deleteMachine(grid: GridClient, options: DeleteMachineOptions) {
+  const machine = new DeleteMachineModel()
+  machine.deployment_name = options.deploymentName
+  machine.name = options.name
+
+  const deletedMachine = await grid.machines.delete_machine(machine)
+
+  if (!deletedMachine.deleted && !deletedMachine.updated) {
+    throw new Error('Failed to delete machine')
+  }
+
+  return deletedMachine
 }

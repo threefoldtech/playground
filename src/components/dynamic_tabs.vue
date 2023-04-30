@@ -44,7 +44,7 @@ const emits = defineEmits<{ (event: 'update:modelValue', value?: number): void }
 const forms = ref<any[]>([])
 
 const activeTab = ref<number>(0)
-watch(activeTab, (t) => emits('update:modelValue', t))
+watch(activeTab, (t) => emits('update:modelValue', t), { immediate: true })
 
 const valid = computed(() => forms.value.reduce((r, f) => r && f.valid, true))
 const invalid = computed(() => !valid.value)

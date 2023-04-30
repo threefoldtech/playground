@@ -38,7 +38,7 @@
     </template>
 
     <template #deploy>
-      <input-validator :rules="[]">
+      <input-validator :rules="[]" :value="name">
         <template #default="{ props }">
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </template>
@@ -101,10 +101,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, type Ref } from 'vue'
+import { ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import { addMachine } from '../utils/deploy_vm'
+import { addMachine, deleteMachine, loadVM } from '../utils/deploy_vm'
 import { generateString } from 'grid3_client'
 import { type Farm, ProjectName, type solutionFlavor } from '../types'
 import rootFs from '../utils/root_fs'
@@ -176,24 +176,25 @@ async function deploy(layout: any) {
 }
 
 async function onDelete(cb: (workers: any[]) => void) {
-  //   deletingDialog.value = false
-  //   deleting.value = true
-  //   const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
-  //   for (const worker of selectedWorkers.value) {
-  //     try {
-  //       await deleteWorker(grid!, {
-  //         deploymentName: props.data.deploymentName,
-  //         name: worker.name,
-  //       })
-  //     } catch (e) {
-  //       console.log('Error while deleting worker', e)
-  //     }
-  //   }
-  //   selectedWorkers.value = []
-  //   const data = await loadK8S(grid!, props.data.deploymentName)
-  //   emits('update:k8s', data)
-  //   cb(data.workers)
-  //   deleting.value = false
+  deleting.value = true
+  const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
+  for (const worker of selectedWorkers.value) {
+    console.log(props.master.name, worker.name)
+
+    try {
+      await deleteMachine(grid!, {
+        deploymentName: props.master.name,
+        name: worker.name,
+      })
+    } catch (e) {
+      console.log('Error while deleting worker', e)
+    }
+  }
+  selectedWorkers.value = []
+  const data = await loadVM(grid!, props.master.name)
+  cb(data.slice(1))
+  emits('update:caprover', data)
+  deleting.value = false
 }
 </script>
 
