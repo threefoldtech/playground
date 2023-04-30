@@ -1,6 +1,6 @@
 <template>
   <v-dialog model-value scrollable width="70%" persistent>
-    <weblet-layout ref="layout">
+    <weblet-layout ref="layout" @back="$emit('back')">
       <template #title><slot name="title"></slot></template>
 
       <template #header-actions>
@@ -80,6 +80,7 @@ const emits = defineEmits<{
   (event: 'close'): void
   (event: 'delete', cb: (workers: any[]) => void): void
   (event: 'deploy', layout: any): void
+  (event: 'back'): void
 }>()
 
 const layout = ref()

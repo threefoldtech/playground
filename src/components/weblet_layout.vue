@@ -75,7 +75,7 @@ const props = defineProps({
     default: false,
   },
 })
-const emits = defineEmits<{ (event: 'mount'): void }>()
+const emits = defineEmits<{ (event: 'mount'): void; (event: 'back'): void }>()
 
 const profileManager = useProfileManager()
 
@@ -122,6 +122,7 @@ defineExpose({
 function reset() {
   status.value = undefined
   message.value = undefined
+  emits('back')
 }
 
 watch(

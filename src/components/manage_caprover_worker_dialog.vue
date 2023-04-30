@@ -6,8 +6,9 @@
     @close="$emit('close')"
     @deploy="deploy"
     @delete="onDelete"
+    @back="updateCaprover"
   >
-    <template #title>Manage Caprover({{ $props.master.deploymentName }}) Workers</template>
+    <template #title>Manage Caprover({{ $props.master.name }}) Workers</template>
 
     <template #list>
       <ListTable
@@ -56,6 +57,47 @@
       />
     </template>
   </ManageWorkerDialog>
+
+  <v-dialog v-if="caproverData" v-model="deployedDialog" persistent scrollable width="500px">
+    <v-card>
+      <v-card-title> <strong>Add your worker</strong> </v-card-title>
+
+      <v-divider />
+
+      <v-card-text>
+        <ol class="px-4">
+          <li>
+            Go to
+            <a
+              :href="'http://captain.' + master.env.CAPROVER_ROOT_DOMAIN"
+              target="_blank"
+              class="app-link"
+            >
+              Admin Panel </a
+            >.
+          </li>
+          <li>Go to the <strong>cluster</strong> tab.</li>
+          <li>
+            Click <strong>Add Self-Hosted Registry</strong> button then
+            <strong>Enable Self-Hosted Registry</strong>.
+          </li>
+          <li>
+            Insert worker node public IP
+            <strong>{{ caproverData[caproverData.length - 1].publicIP.ip }}</strong> and add your
+            private SSH Key.
+          </li>
+          <li>Click <strong>Join cluster</strong> button.</li>
+        </ol>
+      </v-card-text>
+
+      <v-divider />
+
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="error" variant="tonal" @click="deployedDialog = false">Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -74,6 +116,7 @@ const profileManager = useProfileManager()
 
 const selectedWorkers = ref<any[]>([])
 const deleting = ref(false)
+const deployedDialog = ref(false)
 
 const name = ref('CR' + generateString(8))
 const solution = ref<solutionFlavor>()
@@ -83,13 +126,20 @@ function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3
 }
 
+const caproverData = ref<any>()
+function updateCaprover() {
+  if (!caproverData.value) return
+  emits('update:caprover', caproverData.value)
+  caproverData.value = undefined
+}
+
 async function deploy(layout: any) {
   layout.setStatus('deploy')
 
   const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
   addMachine(grid!, {
     name: name.value,
-    deploymentName: props.master.deploymentName,
+    deploymentName: props.master.name,
     cpu: solution.value!.cpu,
     memory: solution.value!.memory,
     disks: [
@@ -112,11 +162,12 @@ async function deploy(layout: any) {
     rootFilesystemSize: rootFs(solution.value!.cpu, solution.value!.memory),
   })
     .then((data) => {
+      caproverData.value = data
+      deployedDialog.value = true
       layout.setStatus(
         'success',
-        `Successfully add a new worker to Caprover('${props.master.deploymentName}') Instance.`
+        `Successfully add a new worker to Caprover('${props.master.name}') Instance.`
       )
-      emits('update:caprover', data)
     })
     .catch((error) => {
       const e = typeof error === 'string' ? error : error.message
