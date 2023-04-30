@@ -28,16 +28,16 @@ export function loadK8S(grid: GridClient, name: string) {
   return grid.k8s.getObj(name)
 }
 
-async function createWorker(grid: GridClient, data: K8SWorker & { country?: string }) {
+async function createWorker(grid: GridClient, data: K8SWorker) {
   const filters: FilterOptions = {
     cru: data.cpu,
     mru: Math.round(data.memory / 1024),
     farmId: data.farm!.farmID,
     farmName: data.farm!.name,
-    country: data.country,
     sru: data.diskSize + data.rootFsSize,
     publicIPs: data.ipv4,
     availableFor: grid.twinId,
+    country: data.farm!.country,
   }
 
   const worker = new KubernetesNodeModel()
@@ -66,7 +66,7 @@ export interface DeployK8SOptions {
 
 export async function deployWorker(
   grid: GridClient,
-  options: K8SWorker & { deploymentName: string; country?: string }
+  options: K8SWorker & { deploymentName: string }
 ) {
   const filters: FilterOptions = {
     cru: options.cpu,
@@ -76,7 +76,7 @@ export async function deployWorker(
     sru: options.diskSize + options.rootFsSize,
     publicIPs: options.ipv4,
     availableFor: grid.twinId,
-    country: options.country,
+    country: options.farm!.country,
   }
 
   const worker = new AddWorkerModel()
