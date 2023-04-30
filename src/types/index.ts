@@ -18,3 +18,8 @@ export interface Farm {
 }
 
 export type VDataTableHeader = VDataTable['headers']
+
+export interface FormValidatorService {
+  setValid(uid: number, value: boolean, reset: () => void): void
+  unregister(uid: number): void
+}

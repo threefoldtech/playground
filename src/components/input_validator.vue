@@ -12,8 +12,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, getCurrentInstance, onUnmounted, type PropType } from 'vue'
+import { ref, watch, onMounted, getCurrentInstance, onUnmounted, inject, type PropType } from 'vue'
 import debounce from 'lodash/debounce.js'
+import type { FormValidatorService } from '../types'
 
 export type RuleReturn = { message: string; [key: string]: any } | undefined | void
 export type SyncRule = (value: string) => RuleReturn
@@ -43,9 +44,9 @@ const props = defineProps({
 const emits = defineEmits<{
   (events: 'update:status', value: ValidatorStatus): void
   (events: 'update:valid', value: boolean): void
-  (events: 'unregister', value: number): void
-  (events: 'valid', uid: number, boolean: boolean, reset: () => void): void
 }>()
+
+const form = inject('form:validator', null) as FormValidatorService | null
 
 const touched = ref(false)
 const errorMessage = ref<string>()
@@ -53,7 +54,7 @@ const required = ref(false)
 const inputStatus = ref<ValidatorStatus>()
 watch(inputStatus, (s) => {
   emits('update:valid', s === ValidatorStatus.VALID)
-  emits('valid', uid!, s === ValidatorStatus.VALID, reset)
+  form?.setValid(uid!, s === ValidatorStatus.VALID, reset)
   if (s) emits('update:status', s)
 })
 
@@ -67,7 +68,7 @@ onMounted(async () => {
     }
   }
 })
-onUnmounted(() => emits('unregister', uid!))
+onUnmounted(() => form?.unregister(uid!))
 
 function onBlur() {
   touched.value = true
