@@ -12,7 +12,7 @@
       ]"
     >
       <template #default="{ props }">
-        <v-text-field type="number" label="CPU (vCores)" v-model="cpu" v-bind="props" />
+        <v-text-field type="number" label="CPU (vCores)" v-model.number="cpu" v-bind="props" />
       </template>
     </input-validator>
 
@@ -26,7 +26,7 @@
       ]"
     >
       <template #default="{ props }">
-        <v-text-field type="number" label="Memory (MB)" v-model="memory" v-bind="props" />
+        <v-text-field type="number" label="Memory (MB)" v-model.number="memory" v-bind="props" />
       </template>
     </input-validator>
 
@@ -40,7 +40,7 @@
       ]"
     >
       <template #default="{ props }">
-        <v-text-field type="number" label="Disk (GB)" v-model="disk" v-bind="props" />
+        <v-text-field type="number" label="Disk (GB)" v-model.number="disk" v-bind="props" />
       </template>
     </input-validator>
   </div>
@@ -100,10 +100,14 @@ watch(
   { immediate: true }
 )
 
-watch([cpu, memory, disk], ([cpu, memory, disk]) => {
-  const value = cpu && memory && disk ? { cpu, memory, disk } : undefined
-  emits('update:model-value', value)
-})
+watch(
+  [cpu, memory, disk],
+  ([cpu, memory, disk]) => {
+    const value = cpu && memory && disk ? { cpu, memory, disk } : undefined
+    emits('update:model-value', value)
+  },
+  { immediate: true }
+)
 </script>
 
 <script lang="ts">

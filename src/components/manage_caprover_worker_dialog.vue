@@ -7,7 +7,7 @@
     @deploy="deploy"
     @delete="onDelete"
   >
-    <template #title>Manage Caprover({{ name }}) Workers</template>
+    <template #title>Manage Caprover({{ $props.master.deploymentName }}) Workers</template>
 
     <template #list>
       <ListTable
@@ -44,7 +44,16 @@
       </input-validator>
 
       <SelectSolutionFlavor v-model="solution" />
-      <SelectFarm v-model="farm" />
+
+      <SelectFarm
+        :filters="{
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          publicIp: true,
+          ssd: solution?.disk ?? 0 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+        }"
+        v-model="farm"
+      />
     </template>
   </ManageWorkerDialog>
 </template>
@@ -53,12 +62,12 @@
 import { ref, type Ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import { deployWorker, deleteWorker, loadK8S } from '../utils/deploy_k8s'
-import { ProjectName } from '../types'
+import { addMachine } from '../utils/deploy_vm'
 import { generateString } from 'grid3_client'
-import type { Farm, solutionFlavor } from '../types'
+import { type Farm, ProjectName, type solutionFlavor } from '../types'
+import rootFs from '../utils/root_fs'
 
-const props = defineProps<{ name: string; data: any[] }>()
+const props = defineProps<{ master: any; data: any[] }>()
 const emits = defineEmits<{ (event: 'close'): void; (event: 'update:caprover', data: any): void }>()
 
 const profileManager = useProfileManager()
@@ -75,23 +84,44 @@ function calcDiskSize(disks: { size: number }[]) {
 }
 
 async function deploy(layout: any) {
-  //   layout.setStatus('deploy')
-  //   const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
-  //   deployWorker(grid!, {
-  //     ...worker.value,
-  //     deploymentName: props.data.deploymentName,
-  //   })
-  //     .then((data) => {
-  //       layout.setStatus(
-  //         'success',
-  //         `Successfully add a new worker to '${props.data.deploymentName}' Cluster.`
-  //       )
-  //       emits('update:k8s', data)
-  //     })
-  //     .catch((error) => {
-  //       const e = typeof error === 'string' ? error : error.message
-  //       layout.setStatus('failed', e)
-  //     })
+  layout.setStatus('deploy')
+
+  const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
+  addMachine(grid!, {
+    name: name.value,
+    deploymentName: props.master.deploymentName,
+    cpu: solution.value!.cpu,
+    memory: solution.value!.memory,
+    disks: [
+      {
+        name: 'data0',
+        size: solution.value!.disk,
+        mountPoint: '/var/lib/docker',
+      },
+    ],
+    flist: 'https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist',
+    entryPoint: '/sbin/zinit init',
+    farmId: farm.value!.farmID,
+    farmName: farm.value!.name,
+    planetary: false,
+    publicIpv4: true,
+    envs: [
+      { key: 'SWM_NODE_MODE', value: 'worker' },
+      { key: 'PUBLIC_KEY', value: props.master.env.PUBLIC_KEY },
+    ],
+    rootFilesystemSize: rootFs(solution.value!.cpu, solution.value!.memory),
+  })
+    .then((data) => {
+      layout.setStatus(
+        'success',
+        `Successfully add a new worker to Caprover('${props.master.deploymentName}') Instance.`
+      )
+      emits('update:caprover', data)
+    })
+    .catch((error) => {
+      const e = typeof error === 'string' ? error : error.message
+      layout.setStatus('failed', e)
+    })
 }
 
 async function onDelete(cb: (workers: any[]) => void) {

@@ -63,7 +63,7 @@
 
             <ManageCaproverWorkerDialog
               v-if="dialog"
-              :name="item.value[0].name"
+              :master="item.value[0]"
               :data="item.value.slice(1)"
               @close="dialog = false"
               @update:caprover="item.value = $event"

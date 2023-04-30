@@ -1,13 +1,22 @@
 import type { GridClient } from 'grid3_client'
 import { formatConsumption } from './contracts'
 
-export async function loadVms(grid: GridClient) {
+export type VM = any & { deploymentName: string }
+export async function loadVms(grid: GridClient): Promise<VM[]> {
   const machines = await grid.machines.list()
   const promises = machines.map((name) => {
     return grid.machines.getObj(name).catch(() => null)
   })
   const items = await Promise.all(promises)
-  const vms = items.filter((item) => item && item.length > 0) as any[][]
+  const vms = items
+    .map((vm: any, index) => {
+      if (!vm) return vm
+      return vm.map((item: VM) => {
+        item.deploymentName = machines[index]
+        return item
+      })
+    })
+    .filter((item) => item && item.length > 0) as any[][]
   const consumptions = await Promise.all(
     vms.map((vm) => {
       return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined)

@@ -4,7 +4,13 @@
       <template #title><slot name="title"></slot></template>
 
       <template #header-actions>
-        <v-btn-toggle divided v-model="showType" mandatory :disabled="deleting" class="mt-2">
+        <v-btn-toggle
+          divided
+          v-model="showType"
+          mandatory
+          :disabled="layout?.status || deleting"
+          class="mt-2"
+        >
           <v-btn variant="outlined" :disabled="workers.length === 0"> List </v-btn>
           <v-btn variant="outlined"> Deploy </v-btn>
         </v-btn-toggle>

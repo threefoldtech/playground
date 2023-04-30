@@ -72,8 +72,8 @@ const props = defineProps({
   disableAlerts: {
     type: Boolean,
     required: false,
-    default: false
-  }
+    default: false,
+  },
 })
 const emits = defineEmits<{ (event: 'mount'): void }>()
 
@@ -114,7 +114,9 @@ defineExpose({
     dialogData.value = data
     environments.value = envs
     onlyJson.value = json
-  }
+  },
+
+  status: computed(() => status.value),
 })
 
 function reset() {
@@ -139,7 +141,7 @@ import DeploymentDataDialog from './deployment_data_dialog.vue'
 export default {
   name: 'WebletLayout',
   components: {
-    DeploymentDataDialog
-  }
+    DeploymentDataDialog,
+  },
 }
 </script>
