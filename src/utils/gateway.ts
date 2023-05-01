@@ -14,5 +14,9 @@ export interface GetHostnameOptions {
   projectName: ProjectName
 }
 export function getHostname(grid: GridClient, options: GetHostnameOptions) {
-  return SolutionCode[options.projectName] + grid.twinId + options.deploymentName.toLowerCase()
+  return (
+    SolutionCode[options.projectName as keyof typeof SolutionCode] +
+    grid.twinId +
+    options.deploymentName.toLowerCase()
+  )
 }

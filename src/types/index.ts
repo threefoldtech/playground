@@ -41,7 +41,7 @@ export enum ProjectName {
 }
 
 export enum SolutionCode {
-  Peertube = 'pt',
+  ProjectName = 'pt',
   Funkwhale = 'fw',
   Taiga = 'tg',
   Discourse = 'dc',
