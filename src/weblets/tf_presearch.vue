@@ -16,63 +16,54 @@
     <template #default>
       <d-tabs 
         :tabs="[
-          { title: 'Base', value: 'base', invalid: !isBaseValid },
+          { title: 'Base', value: 'base' },
           { title: 'Restore', value: 'restore'  }
         ]"
+        ref="tabs"
       >
         <template #base>
-          <form-validator v-model="isBaseValid">
-            <template #default="{ form }">
-              <input-validator
-                v-bind="form"
-                :value="name"
-                :rules="[
-                  validators.required('Name is required.'),
-                  validators.minLength('Name minLength is 2 chars.', 2),
-                  validators.maxLength('Name maxLength is 15 chars.', 15)
-                ]"
-              >
-                <template #default="{ props }">
-                  <v-text-field label="Name" v-model="name" v-bind="props" />
-                </template>
-              </input-validator>
-
-              
-              
-              <input-validator
-              v-bind="form"
-              :value="code"
-              :rules="[
-                validators.required('Presearch registration code is required.'),
-                validators.equal('Presearch registration code must be 32 characters long.', 32)
-              ]"
-              >
-                <template #default="{ props }">
-                  <password-input-wrapper>
-                    <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
-                  </password-input-wrapper>
-                </template>
-              </input-validator>
-      
-      
-              <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-              <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-
-              <SelectFarm
-                :filters="{
-                  cpu,
-                  memory,
-                  ssd: rootFsSize,
-                  publicIp: ipv4,
-                }"
-                v-model="farm"
-                v-model:country="country"
-                :form="form"
-              />
+          <input-validator
+            :value="name"
+            :rules="[
+              validators.required('Name is required.'),
+              validators.minLength('Name minLength is 2 chars.', 2),
+              validators.maxLength('Name maxLength is 15 chars.', 15)
+            ]"
+          >
+            <template #default="{ props }">
+              <v-text-field label="Name" v-model="name" v-bind="props" />
             </template>
-          </form-validator>
-  
+          </input-validator>
+          
+          <input-validator
+          :value="code"
+          :rules="[
+            validators.required('Presearch registration code is required.'),
+            validators.equal('Presearch registration code must be 32 characters long.', 32)
+          ]"
+          >
+            <template #default="{ props }">
+              <password-input-wrapper>
+                <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
+              </password-input-wrapper>
+            </template>
+          </input-validator>
+
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
+
+          <SelectFarm
+            :filters="{
+              cpu,
+              memory,
+              ssd: rootFsSize,
+              publicIp: ipv4,
+            }"
+            v-model="farm"
+            v-model:country="country"
+          />
         </template>
+
   
   
         <template #restore>
@@ -83,7 +74,7 @@
       </d-tabs>
     </template>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy">
+      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid" @click="deploy">
         Deploy
       </v-btn>
     </template>
@@ -91,7 +82,7 @@
 </template>
 
 <script lang='ts' setup>
-import { computed, ref, type Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { generateString } from 'grid3_client'
 import type { Farm } from '../types'
 import { deployVM } from '../utils/deploy_vm'
@@ -112,9 +103,8 @@ const rootFsSize = rootFs(cpu, memory)
 const farm = ref() as Ref<Farm>
 const privateRestoreKey = ref("") as Ref<string>
 const publicRestoreKey = ref("") as Ref<string>
-const isBaseValid = ref(false)
-const isInvalid = computed(() => !isBaseValid.value)
 const country = ref<string>()
+  const tabs = ref()
 
 async function deploy() {
   const grid = await getGrid(profileManager.profile!)
