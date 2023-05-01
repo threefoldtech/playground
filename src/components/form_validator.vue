@@ -1,44 +1,52 @@
 <template>
-  <slot
-    :form="{
-      onValid,
-      onUnregister
-    }"
-  ></slot>
+  <slot></slot>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch, provide } from 'vue'
 
-defineProps<{ modelValue: boolean }>()
+defineProps<{ modelValue?: boolean }>()
 const emits = defineEmits<{ (events: 'update:modelValue', value: boolean): void }>()
 
-const inputsValiadtion = ref<{ [uid: number]: boolean }>({})
+const inputsValidation = ref<{ [uid: number]: boolean }>({})
 const inputsReset = {} as { [uid: number]: () => void }
+const valid = computed(() => {
+  return Object.values(inputsValidation.value).reduce((v, c) => {
+    return v && c
+  }, true)
+})
+const invalid = computed(() => !valid.value)
 
 watch(
-  inputsValiadtion,
-  (inps) => {
-    emits('update:modelValue', !Object.values(inps).some((v) => v === false))
+  valid,
+  (v) => {
+    emits('update:modelValue', v)
   },
-  { deep: true }
+  { immediate: true }
 )
 
-function onValid(uid: number, value: boolean, reset: () => void): void {
-  inputsValiadtion.value[uid] = value
+function setValid(uid: number, value: boolean, reset: () => void): void {
+  inputsValidation.value[uid] = value
   inputsReset[uid] = reset
 }
 
-function onUnregister(uid: number): void {
-  delete inputsValiadtion.value[uid]
+function unregister(uid: number): void {
+  delete inputsValidation.value[uid]
   delete inputsReset[uid]
 }
+
+provide('form:validator', {
+  setValid,
+  unregister
+})
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 defineExpose({
   reset() {
     Object.values(inputsReset).forEach((fn) => fn())
-  }
+  },
+  valid,
+  invalid
 })
 </script>
 

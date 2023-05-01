@@ -16,29 +16,16 @@
         })
       ]"
       :async-rules="image.name === 'Other' ? [isFlistExist] : []"
-      :value="$props.flist"
+      :value="flist"
     >
       <template #default="{ props }">
-        <v-text-field
-          label="Flist"
-          :model-value="$props.flist"
-          @update:model-value="$emit('update:flist', $event)"
-          v-bind="{ ...props, ...$props.form }"
-        />
+        <v-text-field label="Flist" v-model="flist" v-bind="props" />
       </template>
     </input-validator>
 
-    <input-validator
-      :rules="[validators.required('Entry point is required.')]"
-      :value="$props.entryPoint"
-    >
+    <input-validator :rules="[validators.required('Entry point is required.')]" :value="entryPoint">
       <template #default="{ props }">
-        <v-text-field
-          label="Entry Point"
-          :model-value="$props.entryPoint"
-          @update:model-value="$emit('update:entryPoint', $event)"
-          v-bind="{ ...props, ...$props.form }"
-        />
+        <v-text-field label="Entry Point" v-model="entryPoint" v-bind="props" />
       </template>
     </input-validator>
   </template>
@@ -47,6 +34,7 @@
 <script lang="ts" setup>
 import { type PropType, ref, watch } from 'vue'
 import * as validators from '../utils/validators'
+import type { Flist } from '../types'
 
 export interface VmImage {
   name: string
@@ -59,27 +47,30 @@ const props = defineProps({
   images: {
     type: Array as PropType<VmImage[]>,
     required: true
-  },
-  form: {
-    type: Object,
-    default: () => ({})
   }
 })
-const emits = defineEmits<{
-  (event: 'update:flist', value?: string): void
-  (event: 'update:entryPoint', value?: string): void
-}>()
+const emits = defineEmits<{ (event: 'update:model-value', value?: Flist): void }>()
+const flist = ref<string>()
+const entryPoint = ref<string>()
 
 const image = ref<VmImage>(props.images[0])
 watch(
   image,
   (vm) => {
     if (vm.name !== 'Other') {
-      emits('update:flist', vm.flist)
-      emits('update:entryPoint', vm.entryPoint)
+      flist.value = vm.flist
+      entryPoint.value = vm.entryPoint
     }
   },
   { immediate: true }
+)
+
+watch(
+  [flist, entryPoint],
+  ([value, entryPoint]) => {
+    emits('update:model-value', value && entryPoint ? { value, entryPoint } : undefined)
+  },
+  { immediate: true, deep: true }
 )
 
 function isFlistExist(flist: string) {
