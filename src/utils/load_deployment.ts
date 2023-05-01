@@ -9,7 +9,7 @@ export async function loadVms(grid: GridClient) {
   const items = await Promise.all(promises)
   const vms = items
     .map((item: any, index) => {
-      item.deploymentName = machines[index]
+      if (item) item.deploymentName = machines[index]
       return item
     })
     .filter((item) => item && item.length > 0) as any[][]
