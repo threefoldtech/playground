@@ -78,14 +78,20 @@ function onBlur() {
 const onInput = debounce((value?: string | number) => validate(value?.toString() ?? ''), 250)
 watch(() => props.value, onInput, { immediate: true })
 
-defineExpose({ reset })
+defineExpose({
+  reset,
+  validate,
+  touch() {
+    touched.value = true
+  }
+})
 function reset() {
   touched.value = false
   errorMessage.value = undefined
   inputStatus.value = undefined
 }
 
-async function validate(value: string) {
+async function validate(value: string): Promise<boolean> {
   errorMessage.value = undefined
   inputStatus.value = ValidatorStatus.PENDING
   for (const rule of [...props.rules, ...props.asyncRules]) {
@@ -96,6 +102,7 @@ async function validate(value: string) {
     }
   }
   inputStatus.value = errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
+  return inputStatus.value === ValidatorStatus.VALID
 }
 </script>
 

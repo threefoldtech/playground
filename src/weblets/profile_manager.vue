@@ -1,289 +1,349 @@
 <template>
-  <section>
-    <v-dialog v-model="openDialog" scrollable width="80%">
-      <template v-slot:activator="{ props }">
-        <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
-          <v-icon icon="mdi-account" size="x-large" class="mr-2" />
-          <div>
-            <p v-if="!profileManager.profile"><strong> Profile Manager</strong></p>
-            <template v-else>
-              <p>
-                Balance: <strong>{{ profileManager.profile.balance.free }} TFT</strong>
-              </p>
-              <p>
-                Locked: <strong>{{ profileManager.profile.balance.locked }} TFT</strong>
-              </p>
-            </template>
-          </div>
-        </v-card>
+  <v-dialog scrollable width="80%" v-model="openManager" persistent>
+    <template #activator="{ props }">
+      <!-- <v-btn @click="openManager = true">Open Profile Manager</v-btn> -->
+      <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
+        <v-progress-circular
+          v-if="activating"
+          class="mr-2"
+          indeterminate
+          color="primary"
+          size="25"
+        />
+        <v-icon icon="mdi-account" size="x-large" class="mr-2" v-else />
+        <div>
+          <p v-if="!profileManager.profile">
+            <strong> Profile Manager</strong>
+          </p>
+          <p v-else-if="loadingBalance">
+            <strong>Loading...</strong>
+          </p>
+          <template v-else-if="balance">
+            <p>
+              Balance: <strong>{{ balance.free }} TFT</strong>
+            </p>
+            <p>
+              Locked: <strong>{{ balance.locked }} TFT</strong>
+            </p>
+          </template>
+        </div>
+      </v-card>
+    </template>
+
+    <weblet-layout disable-alerts>
+      <template #title> Profile Manager </template>
+      <template #subtitle>
+        Please visit
+        <a
+          class="app-link"
+          href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
+          target="_blank"
+        >
+          the manual
+        </a>
+        get started.
+      </template>
+      <template #header-actions>
+        <v-btn color="error" variant="outlined" @click="openManager = false"> Close </v-btn>
       </template>
 
-      <weblet-layout disable-alerts>
-        <template #title> Profile Manager </template>
-        <template #subtitle>
-          Please visit
-          <a
-            class="app-link"
-            href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
-            target="_blank"
-          >
-            the manual
-          </a>
-          get started.
-        </template>
-        <template #header-actions>
-          <v-btn
-            color="error"
-            variant="outlined"
-            class="mr-2"
-            @click="profileManager.setProfile(null)"
-            v-if="profileManager.profile"
-          >
-            Logout
-          </v-btn>
-          <v-btn color="error" @click="openDialog = false"> Close </v-btn>
-        </template>
-
-        <template #default v-if="!profileManager.profile">
-          <v-tooltip
-            text="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
-            location="bottom"
-            max-width="700px"
-          >
-            <template #activator="{ props }">
-              <password-input-wrapper>
-                <template #default="{ props: passwordInputProps }">
-                  <v-text-field
-                    label="Mnemonics"
-                    placeholder="Please insert your mnemonics"
-                    v-bind="{ ...props, ...passwordInputProps }"
-                    v-model="profileManager.mnemonics"
-                    :error-messages="mnemonicsError"
-                    @input="mnemonicsError !== '' ? (mnemonicsError = '') : null"
-                    :loading="loading"
-                    :disabled="loading || createAccountLoading"
-                  />
-                </template>
-              </password-input-wrapper>
+      <v-tooltip
+        text="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
+        location="bottom"
+        max-width="700px"
+      >
+        <template #activator="{ props: tooltipProps }">
+          <password-input-wrapper>
+            <template #default="{ props: passwordInputProps }">
+              <form-validator v-model="isValidMnemonics">
+                <input-validator
+                  ref="mnemonicsInput"
+                  :value="mnemonics"
+                  :rules="[
+                    validators.required('Mnemonics is required.'),
+                    (v) =>
+                      validateMnemonic(v)
+                        ? undefined
+                        : { message: `Mnemonics doesn't seem to be valid.` }
+                  ]"
+                  :async-rules="[
+                    (mnemonics) =>
+                      getGrid({ mnemonics })
+                        .then(() => undefined)
+                        .catch(() => ({ message: 'Failed to load grid for this user.' }))
+                  ]"
+                >
+                  <template #default="{ props: validationProps }">
+                    <div v-bind="tooltipProps" v-show="!profileManager.profile">
+                      <v-text-field
+                        label="Mnemonics"
+                        placeholder="Please insert your mnemonics"
+                        autofocus
+                        v-model="mnemonics"
+                        v-bind="{ ...passwordInputProps, ...validationProps }"
+                      />
+                    </div>
+                  </template>
+                </input-validator>
+              </form-validator>
             </template>
-          </v-tooltip>
+          </password-input-wrapper>
         </template>
+      </v-tooltip>
 
-        <template #default v-else>
-          <copy-input-wrapper :data="profileManager.profile.mnemonics">
-            <template #default="{ props }">
-              <v-text-field
-                label="Mnemonics"
-                readonly
-                v-model="profileManager.profile.mnemonics"
-                v-bind="props"
-              />
-            </template>
-          </copy-input-wrapper>
-
-          <section class="d-flex flex-column align-center">
-            <p class="font-weight-bold mb-4">
-              Scan the QRcode using
-              <a
-                class="app-link"
-                href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
-                target="_blank"
-              >
-                ThreeFold Connect
-              </a>
-              to fund your account
-            </p>
-            <QrcodeGenerator
-              data="TFT:{{ bridge }}?message=twin_{{ profileManager.profile.twinId }}&sender=me&amount=100"
+      <template v-if="profileManager.profile">
+        <copy-input-wrapper :data="profileManager.profile.mnemonics">
+          <template #default="{ props }">
+            <v-text-field
+              label="Mnemonics"
+              readonly
+              v-model="profileManager.profile.mnemonics"
+              v-bind="props"
             />
-            <div class="d-flex justify-center my-4">
-              <a
-                v-for="(app, index) in apps"
-                :key="app.alt"
-                :style="{ cursor: 'pointer', width: '150px' }"
-                :class="{ 'mr-2': index === 0 }"
-                :title="app.alt"
-                v-html="app.src"
-                :href="app.url"
-                target="_blank"
-              />
-            </div>
-          </section>
+          </template>
+        </copy-input-wrapper>
 
-          <v-tooltip
-            text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-            location="bottom"
-            max-width="700px"
-          >
-            <template #activator="{ props }">
-              <copy-input-wrapper :data="profileManager.profile.ssh">
-                <template #default="{ props: copyInputProps }">
-                  <v-textarea
-                    no-resize
-                    :spellcheck="false"
-                    label="Public SSH Key"
-                    v-model="profileManager.profile.ssh"
-                    v-bind="{ ...props, ...copyInputProps }"
-                    :disabled="sshLoading || sshUpdating"
-                    :loading="sshLoading || sshUpdating"
-                    :hint="
-                      sshUpdating
-                        ? 'Updating your public ssh key.'
-                        : sshLoading
-                        ? 'Generating a new public ssh key.'
-                        : undefined
-                    "
-                    persistent-hint
-                  />
-                </template>
-              </copy-input-wrapper>
-            </template>
-          </v-tooltip>
-
-          <v-row class="mb-3">
-            <v-spacer />
-            <v-btn color="primary" variant="text" :loading="sshUpdating" @click="onUpdatePublicSSH">
-              Update Public SSH Key
-            </v-btn>
-            <v-btn
-              color="secondary"
-              variant="text"
-              :disabled="sshUpdating"
-              :loading="sshLoading"
-              @click="onGenerateSSH"
+        <section class="d-flex flex-column align-center">
+          <p class="font-weight-bold mb-4">
+            Scan the QRcode using
+            <a
+              class="app-link"
+              href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
+              target="_blank"
             >
-              Generate SSH Keys
-            </v-btn>
-          </v-row>
+              ThreeFold Connect
+            </a>
+            to fund your account
+          </p>
+          <QrcodeGenerator
+            :data="
+              'TFT:' +
+              bridge +
+              '?message=twin_' +
+              profileManager.profile.twinId +
+              '&sender=me&amount=100'
+            "
+          />
+          <div class="d-flex justify-center my-4">
+            <a
+              v-for="(app, index) in apps"
+              :key="app.alt"
+              :style="{ cursor: 'pointer', width: '150px' }"
+              :class="{ 'mr-2': index === 0 }"
+              :title="app.alt"
+              v-html="app.src"
+              :href="app.url"
+              target="_blank"
+            />
+          </div>
+        </section>
 
-          <copy-input-wrapper :data="profileManager.profile.twinId">
-            <template #default="{ props }">
-              <v-text-field
-                label="Twin ID"
-                readonly
-                v-model="profileManager.profile.twinId"
-                v-bind="props"
-              />
-            </template>
-          </copy-input-wrapper>
+        <v-tooltip
+          text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
+          location="bottom"
+          max-width="700px"
+        >
+          <template #activator="{ props }">
+            <copy-input-wrapper :data="profileManager.profile.ssh">
+              <template #default="{ props: copyInputProps }">
+                <v-textarea
+                  label="Public SSH Key"
+                  no-resize
+                  :spellcheck="false"
+                  v-model.trim="ssh"
+                  v-bind="{ ...props, ...copyInputProps }"
+                  :disabled="updatingSSH || generatingSSH"
+                  :hint="
+                    updatingSSH
+                      ? 'Updating your public ssh key.'
+                      : generatingSSH
+                      ? 'Generating a new public ssh key.'
+                      : undefined
+                  "
+                  :persistent-hint="updatingSSH || generatingSSH"
+                />
+              </template>
+            </copy-input-wrapper>
+          </template>
+        </v-tooltip>
 
-          <copy-input-wrapper :data="profileManager.profile.address">
-            <template #default="{ props }">
-              <v-text-field
-                label="Address"
-                readonly
-                v-model="profileManager.profile.address"
-                v-bind="props"
-              />
-            </template>
-          </copy-input-wrapper>
-        </template>
-
-        <template #footer-actions v-if="!profileManager.profile">
+        <v-row class="mb-3">
+          <v-spacer />
           <v-btn
             color="secondary"
-            @click="onCreateAccount"
-            :disabled="loading"
-            :loading="createAccountLoading"
+            variant="text"
+            :disabled="!!ssh || updatingSSH || generatingSSH"
+            :loading="generatingSSH"
+            @click="generateSSH"
           >
-            Don't have account? Create One
+            Generate SSH Keys
           </v-btn>
           <v-btn
             color="primary"
-            @click="activate"
-            :loading="loading"
-            :disabled="createAccountLoading"
+            variant="text"
+            @click="updateSSH"
+            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH"
+            :loading="updatingSSH"
           >
-            Activate
+            Update Public SSH Key
           </v-btn>
-        </template>
-      </weblet-layout>
-    </v-dialog>
-  </section>
+        </v-row>
+
+        <copy-input-wrapper :data="profileManager.profile.twinId.toString()">
+          <template #default="{ props }">
+            <v-text-field
+              label="Twin ID"
+              readonly
+              v-model="profileManager.profile.twinId"
+              v-bind="props"
+            />
+          </template>
+        </copy-input-wrapper>
+
+        <copy-input-wrapper :data="profileManager.profile.address">
+          <template #default="{ props }">
+            <v-text-field
+              label="Address"
+              readonly
+              v-model="profileManager.profile.address"
+              v-bind="props"
+            />
+          </template>
+        </copy-input-wrapper>
+      </template>
+
+      <template #footer-actions>
+        <v-btn
+          color="error"
+          variant="tonal"
+          @click="logout"
+          v-if="profileManager.profile"
+          :disabled="updatingSSH || generatingSSH || loadingBalance"
+        >
+          Logout
+        </v-btn>
+        <v-btn
+          color="primary"
+          variant="tonal"
+          @click="activate(mnemonics)"
+          :loading="activating"
+          :disabled="!isValidMnemonics"
+          v-else
+        >
+          Activate
+        </v-btn>
+      </template>
+    </weblet-layout>
+  </v-dialog>
 </template>
+
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch, type Ref } from 'vue'
+import * as validators from '../utils/validators'
 import { validateMnemonic } from 'bip39'
-import { generateKeyPair } from 'web-ssh-keygen'
+import { getGrid, loadProfile, storeSSH, loadBalance, type Balance } from '../utils/grid'
 import { useProfileManager } from '../stores'
-import { getGrid, createAccount, loadProfile, storeSSH } from '../utils/grid'
+import { generateKeyPair } from 'web-ssh-keygen'
 import { downloadAsFile } from '../utils/helpers'
 
-const openDialog = ref(false)
+const openManager = ref(true)
 const profileManager = useProfileManager()
-const loading = ref(false)
 
-/* Mnemonics */
-const mnemonicsError = ref('')
-async function activate() {
-  mnemonicsError.value = ''
-  loading.value = true
+const mnemonics = ref('')
+const isValidMnemonics = ref(false)
+const mnemonicsInput = ref() as Ref<{ validate(value: string): Promise<boolean>; touch(): void }>
 
-  const { mnemonics } = profileManager
+const ssh = ref('')
+const balance = ref<Balance>()
 
-  if (!validateMnemonic(mnemonics)) {
-    loading.value = false
-    return (mnemonicsError.value = `Mnemonics doesn't seem to be valid.`)
-  }
-
-  try {
-    let grid = await getGrid({ mnemonics })
-    if (!grid) {
-      throw new Error('Failed to load grid for this user.')
+let interval: any
+watch(
+  () => profileManager.profile,
+  (profile) => {
+    if (profile) {
+      __loadBalance(profile)
+      if (interval) clearInterval(interval)
+      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60)
+    } else {
+      if (interval) clearInterval(interval)
+      balance.value = undefined
     }
-    const profile = await loadProfile(mnemonics, grid)
-    profileManager.setProfile(profile)
-  } catch (e) {
-    mnemonicsError.value = (e as Error).message
+  },
+  { immediate: true, deep: true }
+)
+
+function logout() {
+  sessionStorage.removeItem('mnemonics')
+  profileManager.clear()
+}
+
+const activating = ref(false)
+async function activate(mnemonics: string) {
+  activating.value = true
+  sessionStorage.setItem('mnemonics', mnemonics)
+  const grid = await getGrid({ mnemonics })
+  const profile = await loadProfile(grid!)
+  ssh.value = profile.ssh
+  profileManager.set(profile)
+  activating.value = false
+}
+
+onMounted(async () => {
+  const maybeMnemonics = sessionStorage.getItem('mnemonics')
+  if (!maybeMnemonics) return
+  mnemonics.value = maybeMnemonics
+  mnemonicsInput.value?.touch()
+  if (await mnemonicsInput.value?.validate(maybeMnemonics)) {
+    activate(maybeMnemonics)
   }
+})
 
-  loading.value = false
+const updatingSSH = ref(false)
+async function updateSSH() {
+  updatingSSH.value = true
+  const grid = await getGrid(profileManager.profile!)
+  await storeSSH(grid!, ssh.value)
+  profileManager.updateSSH(ssh.value)
+  updatingSSH.value = false
 }
 
-/* Create Account */
-const createAccountLoading = ref(false)
-const isCreatedAccount = ref(false) /* should be used */
-async function onCreateAccount() {
-  createAccountLoading.value = true
-
-  const account = await createAccount()
-  createAccountLoading.value = false
-  isCreatedAccount.value = true
-
-  profileManager.mnemonics = account.mnemonic
-  activate()
-}
-
-/* SSH */
-const sshLoading = ref(false)
-const sshUpdating = ref(false)
-async function onGenerateSSH() {
-  sshLoading.value = true
-  profileManager.profile!.ssh = ''
-
+const generatingSSH = ref(false)
+async function generateSSH() {
+  generatingSSH.value = true
   const keys = await generateKeyPair({
     alg: 'RSASSA-PKCS1-v1_5',
     hash: 'SHA-256',
     name: 'Threefold',
     size: 4096
   })
-  const grid = await getGrid({ mnemonics: profileManager.profile!.mnemonics })
+  const grid = await getGrid(profileManager.profile!)
   await storeSSH(grid!, keys.publicKey)
-  profileManager.storeProfile()
+  profileManager.updateSSH(keys.publicKey)
   downloadAsFile('id_rsa', keys.privateKey)
-  profileManager.profile!.ssh = keys.publicKey
-  sshLoading.value = false
-}
-async function onUpdatePublicSSH() {
-  sshUpdating.value = true
-  const grid = await getGrid({ mnemonics: profileManager.profile!.mnemonics })
-  await storeSSH(grid!, profileManager.profile!.ssh)
-  profileManager.storeProfile()
-  sshUpdating.value = false
+  generatingSSH.value = false
 }
 
-/* qrcode */
-const bridge = 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
+const loadingBalance = ref(false)
+async function __loadBalance(profile: Profile) {
+  try {
+    loadingBalance.value = true
+    const grid = await getGrid(profile)
+    balance.value = await loadBalance(grid!)
+    loadingBalance.value = false
+  } catch {
+    __loadBalance(profile)
+  }
+}
+
+const bridge =
+  // eslint-disable-next-line no-undef
+  process.env.NETWORK === 'test'
+    ? 'GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4'
+    : // eslint-disable-next-line no-undef
+    process.env.NETWORK === 'main'
+    ? 'GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC'
+    : 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
+
 const apps = [
   {
     src: `<svg viewBox="0 0 135 40.5" id="Layer_1" xmlns="http://www.w3.org/2000/svg"><style>.st0{fill:#a6a6a6}.st1{stroke:#fff;stroke-width:.2;stroke-miterlimit:10}.st1,.st2{fill:#fff}.st3{fill:url(#SVGID_1_)}.st4{fill:url(#SVGID_2_)}.st5{fill:url(#SVGID_3_)}.st6{fill:url(#SVGID_4_)}.st7,.st8,.st9{opacity:.2;enable-background:new}.st8,.st9{opacity:.12}.st9{opacity:.25;fill:#fff}</style><path d="M130 40H5c-2.8 0-5-2.2-5-5V5c0-2.8 2.2-5 5-5h125c2.8 0 5 2.2 5 5v30c0 2.8-2.2 5-5 5z"/><path class="st0" d="M130 .8c2.3 0 4.2 1.9 4.2 4.2v30c0 2.3-1.9 4.2-4.2 4.2H5C2.7 39.2.8 37.3.8 35V5C.8 2.7 2.7.8 5 .8h125m0-.8H5C2.2 0 0 2.3 0 5v30c0 2.8 2.2 5 5 5h125c2.8 0 5-2.2 5-5V5c0-2.7-2.2-5-5-5z"/><path class="st1" d="M47.4 10.2c0 .8-.2 1.5-.7 2-.6.6-1.3.9-2.2.9-.9 0-1.6-.3-2.2-.9-.6-.6-.9-1.3-.9-2.2 0-.9.3-1.6.9-2.2.6-.6 1.3-.9 2.2-.9.4 0 .8.1 1.2.3.4.2.7.4.9.7l-.5.5c-.4-.5-.9-.7-1.6-.7-.6 0-1.2.2-1.6.7-.5.4-.7 1-.7 1.7s.2 1.3.7 1.7c.5.4 1 .7 1.6.7.7 0 1.2-.2 1.7-.7.3-.3.5-.7.5-1.2h-2.2v-.8h2.9v.4zM52 7.7h-2.7v1.9h2.5v.7h-2.5v1.9H52v.8h-3.5V7H52v.7zM55.3 13h-.8V7.7h-1.7V7H57v.7h-1.7V13zM59.9 13V7h.8v6h-.8zM64.1 13h-.8V7.7h-1.7V7h4.1v.7H64V13zM73.6 12.2c-.6.6-1.3.9-2.2.9-.9 0-1.6-.3-2.2-.9-.6-.6-.9-1.3-.9-2.2s.3-1.6.9-2.2c.6-.6 1.3-.9 2.2-.9.9 0 1.6.3 2.2.9.6.6.9 1.3.9 2.2 0 .9-.3 1.6-.9 2.2zm-3.8-.5c.4.4 1 .7 1.6.7.6 0 1.2-.2 1.6-.7.4-.4.7-1 .7-1.7s-.2-1.3-.7-1.7c-.4-.4-1-.7-1.6-.7-.6 0-1.2.2-1.6.7-.4.4-.7 1-.7 1.7s.2 1.3.7 1.7zM75.6 13V7h.9l2.9 4.7V7h.8v6h-.8l-3.1-4.9V13h-.7z"/><path class="st2" d="M68.1 21.8c-2.4 0-4.3 1.8-4.3 4.3 0 2.4 1.9 4.3 4.3 4.3s4.3-1.8 4.3-4.3c0-2.6-1.9-4.3-4.3-4.3zm0 6.8c-1.3 0-2.4-1.1-2.4-2.6s1.1-2.6 2.4-2.6c1.3 0 2.4 1 2.4 2.6 0 1.5-1.1 2.6-2.4 2.6zm-9.3-6.8c-2.4 0-4.3 1.8-4.3 4.3 0 2.4 1.9 4.3 4.3 4.3s4.3-1.8 4.3-4.3c0-2.6-1.9-4.3-4.3-4.3zm0 6.8c-1.3 0-2.4-1.1-2.4-2.6s1.1-2.6 2.4-2.6c1.3 0 2.4 1 2.4 2.6 0 1.5-1.1 2.6-2.4 2.6zm-11.1-5.5v1.8H52c-.1 1-.5 1.8-1 2.3-.6.6-1.6 1.3-3.3 1.3-2.7 0-4.7-2.1-4.7-4.8s2.1-4.8 4.7-4.8c1.4 0 2.5.6 3.3 1.3l1.3-1.3c-1.1-1-2.5-1.8-4.5-1.8-3.6 0-6.7 3-6.7 6.6 0 3.6 3.1 6.6 6.7 6.6 2 0 3.4-.6 4.6-1.9 1.2-1.2 1.6-2.9 1.6-4.2 0-.4 0-.8-.1-1.1h-6.2zm45.4 1.4c-.4-1-1.4-2.7-3.6-2.7s-4 1.7-4 4.3c0 2.4 1.8 4.3 4.2 4.3 1.9 0 3.1-1.2 3.5-1.9l-1.4-1c-.5.7-1.1 1.2-2.1 1.2s-1.6-.4-2.1-1.3l5.7-2.4-.2-.5zm-5.8 1.4c0-1.6 1.3-2.5 2.2-2.5.7 0 1.4.4 1.6.9l-3.8 1.6zM82.6 30h1.9V17.5h-1.9V30zm-3-7.3c-.5-.5-1.3-1-2.3-1-2.1 0-4.1 1.9-4.1 4.3s1.9 4.2 4.1 4.2c1 0 1.8-.5 2.2-1h.1v.6c0 1.6-.9 2.5-2.3 2.5-1.1 0-1.9-.8-2.1-1.5l-1.6.7c.5 1.1 1.7 2.5 3.8 2.5 2.2 0 4-1.3 4-4.4V22h-1.8v.7zm-2.2 5.9c-1.3 0-2.4-1.1-2.4-2.6s1.1-2.6 2.4-2.6c1.3 0 2.3 1.1 2.3 2.6s-1 2.6-2.3 2.6zm24.4-11.1h-4.5V30h1.9v-4.7h2.6c2.1 0 4.1-1.5 4.1-3.9s-2-3.9-4.1-3.9zm.1 6h-2.7v-4.3h2.7c1.4 0 2.2 1.2 2.2 2.1-.1 1.1-.9 2.2-2.2 2.2zm11.5-1.8c-1.4 0-2.8.6-3.3 1.9l1.7.7c.4-.7 1-.9 1.7-.9 1 0 1.9.6 2 1.6v.1c-.3-.2-1.1-.5-1.9-.5-1.8 0-3.6 1-3.6 2.8 0 1.7 1.5 2.8 3.1 2.8 1.3 0 1.9-.6 2.4-1.2h.1v1h1.8v-4.8c-.2-2.2-1.9-3.5-4-3.5zm-.2 6.9c-.6 0-1.5-.3-1.5-1.1 0-1 1.1-1.3 2-1.3.8 0 1.2.2 1.7.4-.2 1.2-1.2 2-2.2 2zm10.5-6.6l-2.1 5.4h-.1l-2.2-5.4h-2l3.3 7.6-1.9 4.2h1.9l5.1-11.8h-2zm-16.8 8h1.9V17.5h-1.9V30z"/><g><linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="21.8" y1="33.29" x2="5.017" y2="16.508" gradientTransform="matrix(1 0 0 -1 0 42)"><stop offset="0" stop-color="#00a0ff"/><stop offset=".007" stop-color="#00a1ff"/><stop offset=".26" stop-color="#00beff"/><stop offset=".512" stop-color="#00d2ff"/><stop offset=".76" stop-color="#00dfff"/><stop offset="1" stop-color="#00e3ff"/></linearGradient><path class="st3" d="M10.4 7.5c-.3.3-.4.8-.4 1.4V31c0 .6.2 1.1.5 1.4l.1.1L23 20.1v-.2L10.4 7.5z"/><linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="33.834" y1="21.999" x2="9.637" y2="21.999" gradientTransform="matrix(1 0 0 -1 0 42)"><stop offset="0" stop-color="#ffe000"/><stop offset=".409" stop-color="#ffbd00"/><stop offset=".775" stop-color="orange"/><stop offset="1" stop-color="#ff9c00"/></linearGradient><path class="st4" d="M27 24.3l-4.1-4.1V19.9l4.1-4.1.1.1 4.9 2.8c1.4.8 1.4 2.1 0 2.9l-5 2.7z"/><linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="24.827" y1="19.704" x2="2.069" y2="-3.054" gradientTransform="matrix(1 0 0 -1 0 42)"><stop offset="0" stop-color="#ff3a44"/><stop offset="1" stop-color="#c31162"/></linearGradient><path class="st5" d="M27.1 24.2L22.9 20 10.4 32.5c.5.5 1.2.5 2.1.1l14.6-8.4"/><linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="7.297" y1="41.824" x2="17.46" y2="31.661" gradientTransform="matrix(1 0 0 -1 0 42)"><stop offset="0" stop-color="#32a071"/><stop offset=".069" stop-color="#2da771"/><stop offset=".476" stop-color="#15cf74"/><stop offset=".801" stop-color="#06e775"/><stop offset="1" stop-color="#00f076"/></linearGradient><path class="st6" d="M27.1 15.8L12.5 7.5c-.9-.5-1.6-.4-2.1.1L22.9 20l4.2-4.2z"/><path class="st7" d="M27 24.1l-14.5 8.2c-.8.5-1.5.4-2 0l-.1.1.1.1c.5.4 1.2.5 2 0L27 24.1z"/><path class="st8" d="M10.4 32.3c-.3-.3-.4-.8-.4-1.4v.1c0 .6.2 1.1.5 1.4v-.1h-.1zM32 21.3l-5 2.8.1.1 4.9-2.8c.7-.4 1-.9 1-1.4 0 .5-.4.9-1 1.3z"/><path class="st9" d="M12.5 7.6L32 18.7c.6.4 1 .8 1 1.3 0-.5-.3-1-1-1.4L12.5 7.5c-1.4-.8-2.5-.2-2.5 1.4V9c0-1.5 1.1-2.2 2.5-1.4z"/></g></svg>`,
@@ -300,6 +360,7 @@ const apps = [
 
 <script lang="ts">
 import QrcodeGenerator from '../components/qrcode_generator.vue'
+import type { Profile } from '../stores/profile_manager'
 
 export default {
   name: 'ProfileManager',
