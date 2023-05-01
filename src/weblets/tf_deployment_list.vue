@@ -10,6 +10,9 @@
           : ''
       }}
     </template>
+    <template #subtitle v-if="!$props.projectName">
+      List your own deployments for different solutions
+    </template>
     <d-tabs
       :tabs="tabs"
       :model-value="activeTab"
@@ -453,27 +456,28 @@ import { ref, watch, type Ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { deleteDeployment } from '../utils/delete_deployment'
+import type { Tab } from '../components/dynamic_tabs.vue'
 
 const props = defineProps<{ projectName?: ProjectName }>()
 
-const tabs = [
-  { title: 'Full Virtual Machine', value: 'Fullvm' },
-  { title: 'Micro Virtual Machine', value: 'VM' },
-  { title: 'Kubernetes', value: 'Kubernetes' },
-  { title: 'CapRover', value: 'CapRover' },
-  { title: 'Peertube', value: 'Peertube' },
-  { title: 'Funkwhale', value: 'Funkwhale' },
-  { title: 'Mattermost', value: 'Mattermost' },
-  { title: 'Discourse', value: 'Discourse' },
-  { title: 'Taiga', value: 'Taiga' },
-  { title: 'Owncloud', value: 'Owncloud' },
-  { title: 'Presearch', value: 'Presearch' },
-  { title: 'Subsquid', value: 'Subsquid' },
-  { title: 'Casperlabs', value: 'Casperlabs' },
-  { title: 'Algorand', value: 'Algorand' },
-  { title: 'Node Pilot', value: 'NodePilot' },
-  { title: 'Umbrel', value: 'Umbrel' },
-  { title: 'Wordpress', value: 'Wordpress' },
+const tabs: Tab[] = [
+  { title: 'Full Virtual Machine', value: 'Fullvm', imgPath: 'images/icons/vm.png' },
+  { title: 'Micro Virtual Machine', value: 'VM', imgPath: 'images/icons/vm.png' },
+  { title: 'Kubernetes', value: 'Kubernetes', imgPath: 'images/icons/kubernetes.png' },
+  { title: 'CapRover', value: 'CapRover', imgPath: 'images/icons/caprover.png' },
+  { title: 'Peertube', value: 'Peertube', imgPath: 'images/icons/peertube.png' },
+  { title: 'Funkwhale', value: 'Funkwhale', imgPath: 'images/icons/funkwhale.png' },
+  { title: 'Mattermost', value: 'Mattermost', imgPath: 'images/icons/mattermost.png' },
+  { title: 'Discourse', value: 'Discourse', imgPath: 'images/icons/discourse.png' },
+  { title: 'Taiga', value: 'Taiga', imgPath: 'images/icons/taiga.png' },
+  { title: 'Owncloud', value: 'Owncloud', imgPath: 'images/icons/owncloud.png' },
+  { title: 'Presearch', value: 'Presearch', imgPath: 'images/icons/presearch.png' },
+  { title: 'Subsquid', value: 'Subsquid', imgPath: 'images/icons/subsquid.png' },
+  { title: 'Casperlabs', value: 'Casperlabs', imgPath: 'images/icons/casperlabs.png' },
+  { title: 'Algorand', value: 'Algorand', imgPath: 'images/icons/algorand.png' },
+  { title: 'Node Pilot', value: 'NodePilot', imgPath: 'images/icons/vm.png' },
+  { title: 'Umbrel', value: 'Umbrel', imgPath: 'images/icons/umbrel.png' },
+  { title: 'Wordpress', value: 'Wordpress', imgPath: 'images/icons/wordpress.png' },
 ]
 
 const profileManager = useProfileManager()
