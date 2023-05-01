@@ -13,7 +13,7 @@ export interface GetHostnameOptions {
   deploymentName: string
   projectName: ProjectName
 }
-export function getHostname(grid: GridClient, options: GetHostnameOptions) {
+export function getSubdomain(grid: GridClient, options: GetHostnameOptions) {
   return (
     SolutionCode[options.projectName as keyof typeof SolutionCode] +
     grid.twinId +

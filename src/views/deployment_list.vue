@@ -8,7 +8,7 @@ import TfDeploymentList from '../weblets/tf_deployment_list.vue'
 export default {
   name: 'DeploymentList',
   components: {
-    TfDeploymentList
-  }
+    TfDeploymentList,
+  },
 }
 </script>

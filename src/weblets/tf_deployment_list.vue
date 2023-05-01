@@ -1,12 +1,29 @@
 <template>
   <weblet-layout ref="layout">
-    <template #title>Deployment List</template>
-    <d-tabs :tabs="tabs" v-model="activeTab" :disabled="deleting" destroy>
+    <template #title>
+      Deployment List
+      {{
+        $props.projectName
+          ? '(' +
+            (tabs.find((tab) => tab.value === $props.projectName)?.title ?? $props.projectName) +
+            ')'
+          : ''
+      }}
+    </template>
+    <d-tabs
+      :tabs="tabs"
+      :model-value="activeTab"
+      @update:model-value="activeTab = $event"
+      :disabled="deleting"
+      destroy
+      :hide-tabs="!!$props.projectName"
+    >
       <template #default>
         <VmDeploymentTable
           :projectName="tabs[activeTab].value"
           v-model="selectedItems"
           :deleting="deleting"
+          ref="table"
         >
           <template #Fullvm-actions="{ item }">
             <IconActionBtn
@@ -359,6 +376,7 @@
           :projectName="tabs[activeTab].value"
           v-model="selectedItems"
           :deleting="deleting"
+          ref="table"
         >
           <template #actions="{ item }">
             <IconActionBtn
@@ -399,18 +417,44 @@
         variant="outlined"
         :disabled="selectedItems.length === 0 || deleting"
         prepend-icon="mdi-delete"
-        @click="onDelete"
+        @click="deletingDialog = true"
       >
         Delete
       </v-btn>
     </template>
   </weblet-layout>
+
+  <v-dialog v-model="deletingDialog" scrollable persistent width="50%">
+    <v-card>
+      <v-card-title>
+        <strong>Are you sure you want to delete the following deployments?</strong>
+      </v-card-title>
+      <v-card-text>
+        <v-chip
+          class="ma-1"
+          color="primary"
+          v-for="item in selectedItems"
+          :key="item.deploymentName"
+        >
+          {{ item.deploymentName }}
+        </v-chip>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="error" variant="outlined" @click="onDelete">Delete</v-btn>
+        <v-btn color="error" variant="tonal" @click="deletingDialog = false">Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch, type Ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
+import { deleteDeployment } from '../utils/delete_deployment'
+
+const props = defineProps<{ projectName?: ProjectName }>()
 
 const tabs = [
   { title: 'Full Virtual Machine', value: 'Fullvm' },
@@ -438,14 +482,30 @@ const layout = ref()
 const dialog = ref(false)
 const selectedItems = ref<any[]>([])
 const deleting = ref(false)
+const deletingDialog = ref(false)
+const table = ref() as Ref<{ loadDeployments(): void }>
 
-const activeTab = ref() as Ref<number>
+const _idx = tabs.findIndex((t) => t.value === props.projectName)
+const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>
 watch(activeTab, () => (selectedItems.value = []))
 
-function onDelete() {
+async function onDelete() {
+  deletingDialog.value = false
   deleting.value = true
-  // console.log(tabs[activeTab.value].value)
-  // for (const)
+  const projectName = tabs[activeTab.value].value as ProjectName
+  const grid = await getGrid(profileManager.profile!, projectName)
+  for (const item of selectedItems.value) {
+    try {
+      await deleteDeployment(grid!, {
+        name: item.deploymentName,
+        projectName,
+      })
+    } catch (e: any) {
+      console.log('Error while deleting deployment', e.message)
+    }
+  }
+  selectedItems.value = []
+  table.value?.loadDeployments()
   deleting.value = false
 }
 </script>
@@ -456,6 +516,7 @@ import VmDeploymentTable from '../components/vm_deployment_table.vue'
 import K8sDeploymentTable from '../components/k8s_deployment_table.vue'
 import ManageK8SWorkerDialog from '../components/manage_k8s_worker_dialog.vue'
 import ManageCaproverWorkerDialog from '../components/manage_caprover_worker_dialog.vue'
+import type { ProjectName } from '../types'
 
 export default {
   name: 'TfDeploymentList',

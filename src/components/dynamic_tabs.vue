@@ -1,5 +1,5 @@
 <template>
-  <v-tabs v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
+  <v-tabs v-show="!hideTabs" v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
     <v-tab v-for="tab in tabs" :key="tab.value" :disabled="disabled">
       {{ tab.title }}
       <v-chip color="error" v-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
@@ -38,13 +38,19 @@ export interface Tab {
   value: string
 }
 
-defineProps<{ modelValue?: number; tabs: Tab[]; disabled?: boolean; destroy?: boolean }>()
-const emits = defineEmits<{ (event: 'update:modelValue', value?: number): void }>()
+const props = defineProps<{
+  modelValue?: number
+  tabs: Tab[]
+  disabled?: boolean
+  destroy?: boolean
+  hideTabs?: boolean
+}>()
+const emits = defineEmits<{ (event: 'update:modelValue', value: number): void }>()
 
 const forms = ref<any[]>([])
 
-const activeTab = ref<number>(0)
-watch(activeTab, (t) => emits('update:modelValue', t), { immediate: true })
+const activeTab = ref<number>(props.modelValue ?? 0)
+watch(activeTab, (t) => emits('update:modelValue', t))
 
 const valid = computed(() => forms.value.reduce((r, f) => r && f.valid, true))
 const invalid = computed(() => !valid.value)

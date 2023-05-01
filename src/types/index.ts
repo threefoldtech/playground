@@ -38,6 +38,7 @@ export enum ProjectName {
   Taiga = 'Taiga',
   Wordpress = 'Wordpress',
   Gateway = 'GatewayName',
+  QVM = 'Qvm',
 }
 
 export enum SolutionCode {

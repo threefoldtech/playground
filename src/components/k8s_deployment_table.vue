@@ -67,7 +67,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useProfileManager } from '../stores'
-import { getGrid } from '../utils/grid'
+import { getGrid, updateGrid } from '../utils/grid'
 import { loadK8s } from '../utils/load_deployment'
 
 const profileManager = useProfileManager()
@@ -82,12 +82,18 @@ defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
 const items = ref<any[]>([])
 const loading = ref(false)
 
-onMounted(async () => {
+onMounted(loadDeployments)
+async function loadDeployments() {
+  items.value = []
   loading.value = true
   const grid = await getGrid(profileManager.profile!, props.projectName)
-  items.value = await loadK8s(grid!)
+  const chunk1 = await loadK8s(grid!)
+  const chunk2 = await loadK8s(updateGrid(grid!, { projectName: '' }))
+  items.value = chunk1.concat(chunk2)
   loading.value = false
-})
+}
+
+defineExpose({ loadDeployments })
 </script>
 
 <script lang="ts">

@@ -9,7 +9,7 @@
       { title: 'Planetary Network IP', key: 'planetary' },
       { title: 'Flist', key: 'flist' },
       { title: 'Billing Rate', key: 'billing' },
-      { title: 'Actions', key: 'actions' }
+      { title: 'Actions', key: 'actions' },
     ]"
     :items="items"
     :loading="loading"
@@ -61,7 +61,8 @@
       {{ item.value[0].billing }}
     </template>
     <template #[`item.actions`]="{ item }">
-      <v-btn-group variant="tonal">
+      <v-chip color="error" variant="tonal" v-if="deleting">Deleting...</v-chip>
+      <v-btn-group variant="tonal" v-else>
         <slot :name="projectName + '-actions'" :item="item"></slot>
       </v-btn-group>
     </template>
@@ -71,7 +72,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useProfileManager } from '../stores'
-import { getGrid } from '../utils/grid'
+import { getGrid, updateGrid } from '../utils/grid'
 import { loadVms } from '../utils/load_deployment'
 
 const profileManager = useProfileManager()
@@ -86,12 +87,18 @@ defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
 const items = ref<any[]>([])
 const loading = ref(false)
 
-onMounted(async () => {
+onMounted(loadDeployments)
+async function loadDeployments() {
+  items.value = []
   loading.value = true
   const grid = await getGrid(profileManager.profile!, props.projectName)
-  items.value = await loadVms(grid!)
+  const chunk1 = await loadVms(grid!)
+  const chunk2 = await loadVms(updateGrid(grid!, { projectName: '' }))
+  items.value = chunk1.concat(chunk2)
   loading.value = false
-})
+}
+
+defineExpose({ loadDeployments })
 </script>
 
 <script lang="ts">
@@ -100,7 +107,7 @@ import ListTable from './list_table.vue'
 export default {
   name: 'VmDeploymentTable',
   components: {
-    ListTable
-  }
+    ListTable,
+  },
 }
 </script>

@@ -7,7 +7,12 @@ export async function loadVms(grid: GridClient) {
     return grid.machines.getObj(name).catch(() => null)
   })
   const items = await Promise.all(promises)
-  const vms = items.filter((item) => item && item.length > 0) as any[][]
+  const vms = items
+    .map((item: any, index) => {
+      item.deploymentName = machines[index]
+      return item
+    })
+    .filter((item) => item && item.length > 0) as any[][]
   const consumptions = await Promise.all(
     vms.map((vm) => {
       return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined)
