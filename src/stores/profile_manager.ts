@@ -20,6 +20,11 @@ const useProfileManager = defineStore('profile-manager', {
     set(profile: Profile | null) {
       this.profile = profile
     },
+    updateSSH(ssh: string) {
+      if (this.profile) {
+        this.profile.ssh = ssh
+      }
+    },
     clear() {
       this.profile = null
     }

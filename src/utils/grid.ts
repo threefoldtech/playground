@@ -25,7 +25,11 @@ export function createAccount() {
   return grid.tfchain.createAccount(relay)
 }
 
-export async function loadBalance(grid: GridClient) {
+export interface Balance {
+  free: number
+  locked: number
+}
+export async function loadBalance(grid: GridClient): Promise<Balance> {
   const balance = await grid.balance.getMyBalance()
   return {
     free: +balance.free,
