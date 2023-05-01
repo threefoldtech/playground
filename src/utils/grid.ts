@@ -25,7 +25,7 @@ export function createAccount() {
   return grid.tfchain.createAccount(relay)
 }
 
-export async function loadBalance(grid: GridClient): Promise<Profile['balance']> {
+export async function loadBalance(grid: GridClient) {
   const balance = await grid.balance.getMyBalance()
   return {
     free: +balance.free,
@@ -33,13 +33,12 @@ export async function loadBalance(grid: GridClient): Promise<Profile['balance']>
   }
 }
 
-export async function loadProfile(mnemonics: string, grid: GridClient): Promise<Profile> {
+export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
-    mnemonics,
+    mnemonics: grid.clientOptions!.mnemonic,
     ssh: await readSSH(grid),
-    twinId: await grid.twins.get_my_twin_id(),
-    address: grid.twins.client.client.address,
-    balance: await loadBalance(grid)
+    twinId: grid!.twinId,
+    address: grid.twins.client.client.address
   }
 }
 
