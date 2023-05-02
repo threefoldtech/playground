@@ -21,7 +21,7 @@ import { onMounted, ref, watch } from 'vue'
 import { loadGateWayNodes } from '../utils/gateway'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import type { GridClient, NodeInfo } from 'grid3_client'
+import type { GridClient, NodeInfo } from '@threefold/grid_client'
 
 //states
 defineProps<{ modelValue?: number }>()

@@ -1,7 +1,6 @@
 <template>
   <v-dialog scrollable width="80%" v-model="openManager" persistent>
     <template #activator="{ props }">
-      <!-- <v-btn @click="openManager = true">Open Profile Manager</v-btn> -->
       <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
         <v-progress-circular
           v-if="activating"
@@ -99,6 +98,7 @@
               readonly
               v-model="profileManager.profile.mnemonics"
               v-bind="props"
+              :disabled="activating || creatingAccount"
             />
           </template>
         </copy-input-wrapper>
@@ -222,16 +222,26 @@
         >
           Logout
         </v-btn>
-        <v-btn
-          color="primary"
-          variant="tonal"
-          @click="activate(mnemonics)"
-          :loading="activating"
-          :disabled="!isValidMnemonics"
-          v-else
-        >
-          Activate
-        </v-btn>
+        <template v-else>
+          <v-btn
+            color="secondary"
+            variant="tonal"
+            :disabled="isValidMnemonics"
+            :loading="creatingAccount"
+            @click="createNewAccount"
+          >
+            Don't have account? Create One
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="tonal"
+            @click="activate(mnemonics)"
+            :loading="activating"
+            :disabled="!isValidMnemonics || creatingAccount"
+          >
+            Activate
+          </v-btn>
+        </template>
       </template>
     </weblet-layout>
   </v-dialog>
@@ -241,7 +251,14 @@
 import { ref, onMounted, watch, type Ref } from 'vue'
 import * as validators from '../utils/validators'
 import { validateMnemonic } from 'bip39'
-import { getGrid, loadProfile, storeSSH, loadBalance, type Balance } from '../utils/grid'
+import {
+  getGrid,
+  loadProfile,
+  storeSSH,
+  loadBalance,
+  createAccount,
+  type Balance
+} from '../utils/grid'
 import { useProfileManager } from '../stores'
 import { generateKeyPair } from 'web-ssh-keygen'
 import { downloadAsFile } from '../utils/helpers'
@@ -263,7 +280,7 @@ watch(
     if (profile) {
       __loadBalance(profile)
       if (interval) clearInterval(interval)
-      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60)
+      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 5)
     } else {
       if (interval) clearInterval(interval)
       balance.value = undefined
@@ -294,9 +311,20 @@ onMounted(async () => {
   mnemonics.value = maybeMnemonics
   mnemonicsInput.value?.touch()
   if (await mnemonicsInput.value?.validate(maybeMnemonics)) {
-    activate(maybeMnemonics)
+    await activate(maybeMnemonics)
+    openManager.value = false
   }
 })
+
+const creatingAccount = ref(false)
+async function createNewAccount() {
+  creatingAccount.value = true
+  const account = await createAccount()
+  mnemonics.value = account.mnemonic
+  creatingAccount.value = false
+
+  activate(account.mnemonic)
+}
 
 const updatingSSH = ref(false)
 async function updateSSH() {

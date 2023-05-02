@@ -7,7 +7,7 @@ import {
   MachineModel,
   QSFSDiskModel,
   generateString
-} from 'grid3_client'
+} from '@threefold/grid_client'
 import { createNetwork, type Network } from './deploy_helpers'
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {

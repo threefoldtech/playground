@@ -1,8 +1,11 @@
 <template>
- <weblet-layout ref='layout'>
-  <template #title>Deploy a Presearch Instance</template>
+  <weblet-layout ref="layout">
+    <template #title>Deploy a Presearch Instance</template>
     <template #subtitle
-      >Presearch is a community-powered, decentralized search engine that provides better results while protecting your privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network. 
+      >Presearch is a community-powered, decentralized search engine that provides better results
+      while protecting your privacy and rewarding you when you search. This weblet deploys a
+      Presearch node. Presearch Nodes are used to process user search requests, and node operators
+      earn Presearch PRE tokens for joining and supporting the network.
       <a
         class="app-link"
         href="https://manual.grid.tf/weblets/weblets_presearch.html"
@@ -12,12 +15,11 @@
       </a>
     </template>
 
-
     <template #default>
-      <d-tabs 
+      <d-tabs
         :tabs="[
           { title: 'Base', value: 'base', invalid: !isBaseValid },
-          { title: 'Restore', value: 'restore'  }
+          { title: 'Restore', value: 'restore' }
         ]"
       >
         <template #base>
@@ -37,24 +39,25 @@
                 </template>
               </input-validator>
 
-              
-              
               <input-validator
-              v-bind="form"
-              :value="code"
-              :rules="[
-                validators.required('Presearch registration code is required.'),
-                validators.equal('Presearch registration code must be 32 characters long.', 32)
-              ]"
+                v-bind="form"
+                :value="code"
+                :rules="[
+                  validators.required('Presearch registration code is required.'),
+                  validators.equal('Presearch registration code must be 32 characters long.', 32)
+                ]"
               >
                 <template #default="{ props }">
                   <password-input-wrapper>
-                    <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
+                    <v-text-field
+                      label="Presearch Registeration Code"
+                      v-bind="props"
+                      v-model="code"
+                    />
                   </password-input-wrapper>
                 </template>
               </input-validator>
-      
-      
+
               <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
               <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
 
@@ -63,7 +66,7 @@
                   cpu,
                   memory,
                   ssd: rootFsSize,
-                  publicIp: ipv4,
+                  publicIp: ipv4
                 }"
                 v-model="farm"
                 v-model:country="country"
@@ -71,33 +74,38 @@
               />
             </template>
           </form-validator>
-  
         </template>
-  
-  
+
         <template #restore>
-          <v-textarea label="Private Presearch Restore Key" v-model="privateRestoreKey" no-resize :spellcheck="false" />
-          <v-textarea label="Public Presearch Restore Key" v-model="publicRestoreKey" no-resize :spellcheck="false" />
+          <v-textarea
+            label="Private Presearch Restore Key"
+            v-model="privateRestoreKey"
+            no-resize
+            :spellcheck="false"
+          />
+          <v-textarea
+            label="Public Presearch Restore Key"
+            v-model="publicRestoreKey"
+            no-resize
+            :spellcheck="false"
+          />
         </template>
-  
       </d-tabs>
     </template>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy">
-        Deploy
-      </v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy"> Deploy </v-btn>
     </template>
- </weblet-layout>
+  </weblet-layout>
 </template>
 
-<script lang='ts' setup>
+<script lang="ts" setup>
 import { computed, ref, type Ref } from 'vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import type { Farm } from '../types'
 import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import rootFs from "../utils/root_fs"
+import rootFs from '../utils/root_fs'
 import * as validators from '../utils/validators'
 
 const layout = ref()
@@ -110,15 +118,15 @@ const cpu = 4
 const memory = 8192
 const rootFsSize = rootFs(cpu, memory)
 const farm = ref() as Ref<Farm>
-const privateRestoreKey = ref("") as Ref<string>
-const publicRestoreKey = ref("") as Ref<string>
+const privateRestoreKey = ref('') as Ref<string>
+const publicRestoreKey = ref('') as Ref<string>
 const isBaseValid = ref(false)
 const isInvalid = computed(() => !isBaseValid.value)
 const country = ref<string>()
 
 async function deploy() {
   const grid = await getGrid(profileManager.profile!)
-  
+
   layout.value.setStatus('deploy')
   deployVM(grid!, {
     name: name.value,
@@ -127,31 +135,31 @@ async function deploy() {
         name: name.value,
         cpu: cpu,
         memory: memory,
-        flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist",
-        entryPoint: "/sbin/zinit init",
+        flist: 'https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist',
+        entryPoint: '/sbin/zinit init',
         farmId: farm.value.farmID,
         farmName: farm.value.name,
         planetary: planetary.value,
         publicIpv4: ipv4.value,
         country: country.value,
         envs: [
-              {
-                key: "SSH_KEY",
-                value: profileManager.profile!.ssh
-              },
-              {
-                key: "PRESEARCH_REGISTRATION_CODE",
-                value: code.value
-              },
-              {
-                key: "PRESEARCH_BACKUP_PRI_KEY",
-                value: privateRestoreKey.value
-              },
-              {
-                key: "PRESEARCH_BACKUP_PUB_KEY",
-                value: publicRestoreKey.value
-              },
-            ]
+          {
+            key: 'SSH_KEY',
+            value: profileManager.profile!.ssh
+          },
+          {
+            key: 'PRESEARCH_REGISTRATION_CODE',
+            value: code.value
+          },
+          {
+            key: 'PRESEARCH_BACKUP_PRI_KEY',
+            value: privateRestoreKey.value
+          },
+          {
+            key: 'PRESEARCH_BACKUP_PUB_KEY',
+            value: publicRestoreKey.value
+          }
+        ]
       }
     ]
   })
@@ -166,13 +174,13 @@ async function deploy() {
 }
 </script>
 
-<script lang='ts'>
-  import SelectFarm from '../components/select_farm.vue'
+<script lang="ts">
+import SelectFarm from '../components/select_farm.vue'
 
-  export default {
-    name: 'TFPresearch',
-    components: {
-      SelectFarm,
-    }
+export default {
+  name: 'TFPresearch',
+  components: {
+    SelectFarm
   }
+}
 </script>

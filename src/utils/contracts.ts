@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { ContractStates, type GridClient } from 'grid3_client'
+import { ContractStates, type GridClient } from '@threefold/grid_client'
 
 const SOLUTION_TYPE: { [key: string]: string } = {
   vm: 'Micro Virtual Machine',
