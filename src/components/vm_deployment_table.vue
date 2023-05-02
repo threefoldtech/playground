@@ -27,11 +27,11 @@
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      {{ item.value[0].publicIP?.ip ?? 'None' }}
+      {{ item.value[0].publicIP?.ip || 'None' }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">
-      {{ item.value[0].publicIP?.ip6 ?? 'None' }}
+      {{ item.value[0].publicIP?.ip6 || 'None' }}
     </template>
 
     <template #[`item.planetary`]="{ item }">
@@ -85,7 +85,15 @@ async function loadDeployments() {
   const grid = await getGrid(profileManager.profile!, props.projectName)
   const chunk1 = await loadVms(grid!)
   const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }))
-  const chunk3 = await loadVms(updateGrid(grid!, { projectName: '' }))
+  const filter =
+    props.projectName === ProjectName.VM
+      ? undefined
+      : ([vm]: [{ flist: string }]) => vm.flist.includes(props.projectName.toLowerCase())
+
+  const chunk3 =
+    props.projectName === ProjectName.Fullvm
+      ? []
+      : await loadVms(updateGrid(grid!, { projectName: '' }), { filter })
   items.value = chunk1.concat(chunk2).concat(chunk3)
   loading.value = false
 }
@@ -95,6 +103,7 @@ defineExpose({ loadDeployments })
 
 <script lang="ts">
 import ListTable from './list_table.vue'
+import { ProjectName } from '../types'
 
 export default {
   name: 'VmDeploymentTable',

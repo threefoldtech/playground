@@ -1,7 +1,10 @@
 import type { GridClient } from 'grid3_client'
 import { formatConsumption } from './contracts'
 
-export async function loadVms(grid: GridClient) {
+export interface LoadVMsOptions {
+  filter?(vm: any): boolean
+}
+export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   const machines = await grid.machines.list()
   const promises = machines.map((name) => {
     return grid.machines.getObj(name).catch(() => null)
@@ -12,10 +15,15 @@ export async function loadVms(grid: GridClient) {
       if (item) {
         item.deploymentName = machines[index]
         item.projectName = grid.clientOptions!.projectName
+        item.forEach((i: any) => {
+          i.deploymentName = machines[index]
+          i.projectName = grid.clientOptions!.projectName
+        })
       }
       return item
     })
-    .filter((item) => item && item.length > 0) as any[][]
+    .filter((item) => item && item.length > 0)
+    .filter(options.filter || (() => true)) as any[][]
   const consumptions = await Promise.all(
     vms.map((vm) => {
       return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined)

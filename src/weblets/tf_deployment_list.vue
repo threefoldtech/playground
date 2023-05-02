@@ -77,14 +77,14 @@
               icon="mdi-cog"
               tooltip="Manage Workers"
               color="secondary"
-              @click="dialog = true"
+              @click="dialog = item.value.deploymentName"
             />
 
             <ManageCaproverWorkerDialog
-              v-if="dialog"
+              v-if="dialog === item.value.deploymentName"
               :master="item.value[0]"
               :data="item.value.slice(1)"
-              @close="dialog = false"
+              @close="dialog = undefined"
               @update:caprover="item.value = $event"
             />
           </template>
@@ -400,13 +400,13 @@
               icon="mdi-cog"
               tooltip="Manage Workers"
               color="secondary"
-              @click="dialog = true"
+              @click="dialog = item.value.deploymentName"
             />
 
             <ManageK8SWorkerDialog
-              v-if="dialog"
+              v-if="dialog === item.value.deploymentName"
               :data="item.value"
-              @close="dialog = false"
+              @close="dialog = undefined"
               @update:k8s="item.value.workers = $event.workers"
             />
           </template>
@@ -483,7 +483,7 @@ const tabs: Tab[] = [
 const profileManager = useProfileManager()
 
 const layout = ref()
-const dialog = ref(false)
+const dialog = ref<string>()
 const selectedItems = ref<any[]>([])
 const deleting = ref(false)
 const deletingDialog = ref(false)

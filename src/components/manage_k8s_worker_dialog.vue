@@ -65,6 +65,8 @@ function calcDiskSize(disks: { size: number }[]) {
 async function deploy(layout: any) {
   layout.setStatus('deploy')
   const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
+  console.log(props.data.deploymentName)
+
   deployWorker(grid!, {
     ...worker.value,
     deploymentName: props.data.deploymentName,
