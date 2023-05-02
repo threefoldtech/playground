@@ -5,40 +5,28 @@ export interface Profile {
   ssh: string
   twinId: number
   address: string
-  balance: { free: number; locked: number }
 }
 
 interface State {
-  mnemonics: string
   profile: Profile | null
 }
 
 const useProfileManager = defineStore('profile-manager', {
   state: (): State => {
-    let mnemonics = ''
-    let profile: Profile | null = null
-    try {
-      const p = JSON.parse(sessionStorage.getItem('profile')!)
-      profile = p
-      mnemonics = p.mnemonics
-    } catch {
-      /* Pass */
-    }
-
-    return { mnemonics, profile }
+    return { profile: null }
   },
 
   actions: {
-    setProfile(profile: Profile | null) {
+    set(profile: Profile | null) {
       this.profile = profile
-      this.storeProfile()
     },
-    storeProfile() {
+    updateSSH(ssh: string) {
       if (this.profile) {
-        sessionStorage.setItem('profile', JSON.stringify(this.profile))
-      } else {
-        sessionStorage.removeItem('profile')
+        this.profile.ssh = ssh
       }
+    },
+    clear() {
+      this.profile = null
     }
   }
 })
