@@ -27,24 +27,15 @@
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      <template v-if="item.value.masters[0].publicIP?.ip">
-        {{ item.value.masters[0].publicIP.ip }}
-      </template>
-      <v-checkbox-btn disabled v-else />
+      {{ item.value.masters[0].publicIP?.ip ?? 'None' }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">
-      <template v-if="item.value.masters[0].publicIP?.ip6">
-        {{ item.value.masters[0].publicIP.ip6 }}
-      </template>
-      <v-checkbox-btn disabled v-else />
+      {{ item.value.masters[0].publicIP?.ip6 ?? 'None' }}
     </template>
 
     <template #[`item.planetary`]="{ item }">
-      <template v-if="item.value.masters[0].planetary">
-        {{ item.value.masters[0].planetary }}
-      </template>
-      <v-checkbox-btn disabled v-else />
+      {{ item.value.masters[0].planetary || 'None' }}
     </template>
 
     <template #[`item.workers`]="{ item }">
