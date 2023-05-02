@@ -1,4 +1,4 @@
-import type { GridClient } from 'grid3_client'
+import type { GridClient } from '@threefold/grid_client'
 import { formatConsumption } from './contracts'
 
 export async function loadVms(grid: GridClient) {

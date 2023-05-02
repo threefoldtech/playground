@@ -94,7 +94,7 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { getUserContracts, type NormalizedContract } from '../utils/contracts'
 import type { VDataTableHeader } from '../types'
-import { ContractStates } from 'grid3_client'
+import { ContractStates } from '@threefold/grid_client'
 
 const layout = ref()
 const profileManager = useProfileManager()
@@ -110,7 +110,7 @@ const headers: VDataTableHeader = [
   { title: 'Solution Name', key: 'solutionName' },
   { title: 'Created At', key: 'createdAt' },
   { title: 'Expiration', key: 'expiration' },
-  { title: 'Actions', key: 'actions', sortable: false }
+  { title: 'Actions', key: 'actions', sortable: false },
 ]
 
 async function onMount() {
@@ -156,7 +156,7 @@ async function onDelete() {
       await grid!.contracts.cancelMyContracts()
     } else {
       await grid!.contracts.batchCancelContracts({
-        ids: selectedContracts.value.map((c) => c.contractId)
+        ids: selectedContracts.value.map((c) => c.contractId),
       })
     }
     contracts.value = contracts.value!.filter((c) => !selectedContracts.value.includes(c))
@@ -174,7 +174,7 @@ import ListTable from '../components/list_table.vue'
 export default {
   name: 'TfContractsList',
   components: {
-    ListTable
-  }
+    ListTable,
+  },
 }
 </script>
