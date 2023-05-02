@@ -13,7 +13,7 @@
       <d-tabs
         :tabs="[
           { title: 'Config', value: 'config' },
-          { title: 'Disks', value: 'disks' }
+          { title: 'Disks', value: 'disks' },
         ]"
       >
         <template #config>
@@ -22,7 +22,7 @@
             :rules="[
               validators.required('Name is required.'),
               validators.minLength('Name minLength is 2 chars.', 2),
-              validators.maxLength('Name maxLength is 15 chars.', 15)
+              validators.maxLength('Name maxLength is 15 chars.', 15),
             ]"
           >
             <template #default="{ props }">
@@ -38,7 +38,7 @@
               validators.required('CPU is required.'),
               validators.isInt('CPU must be a valid integer.'),
               validators.min('CPU min is 2 cores.', 2),
-              validators.max('CPU max is 32 cores.', 32)
+              validators.max('CPU max is 32 cores.', 32),
             ]"
           >
             <template #default="{ props }">
@@ -57,7 +57,7 @@
               validators.required('Memory is required.'),
               validators.isInt('Memory must be a valid integer.'),
               validators.min('Minimum allowed memory is 256 MB.', 256),
-              validators.max('Maximum allowed memory is 256 GB.', 256 * 1024)
+              validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
             ]"
           >
             <template #default="{ props }">
@@ -76,7 +76,7 @@
               validators.required('Disk size is required.'),
               validators.isInt('Disk size must be a valid integer.'),
               validators.min('Minimum allowed disk size is 1 GB.', 1),
-              validators.max('Maximum allowed disk size is 10000 GB.', 10000)
+              validators.max('Maximum allowed disk size is 10000 GB.', 10000),
             ]"
           >
             <template #default="{ props }">
@@ -99,7 +99,7 @@
               cpu,
               memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, diskSize)
+              ssd: disks.reduce((total, disk) => total + disk.size, diskSize),
             }"
             v-model="farm"
           />
@@ -119,7 +119,7 @@
                   ),
                   validators.minLength('Disk minLength is 2 chars.', 2),
                   validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-                  validators.maxLength('Disk maxLength is 15 chars.', 15)
+                  validators.maxLength('Disk maxLength is 15 chars.', 15),
                 ]"
               >
                 <template #default="{ props }">
@@ -132,7 +132,7 @@
                   validators.required('Disk size is required.'),
                   validators.isInt('Disk size must be a valid integer.'),
                   validators.min('Minimum allowed disk size is 1 GB.', 1),
-                  validators.max('Maximum allowed disk size is 10000 GB.', 10000)
+                  validators.max('Maximum allowed disk size is 10000 GB.', 10000),
                 ]"
               >
                 <template #default="{ props }">
@@ -160,7 +160,7 @@
 
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import { type Disk, deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
@@ -174,23 +174,23 @@ const images: VmImage[] = [
   {
     name: 'Ubuntu-22.04',
     flist: 'https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist',
-    entryPoint: '/init.sh'
+    entryPoint: '/init.sh',
   },
   {
     name: 'Ubuntu-20.04',
     flist: 'https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist',
-    entryPoint: '/init.sh'
+    entryPoint: '/init.sh',
   },
   {
     name: 'Ubuntu-18.04',
     flist: 'https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist',
-    entryPoint: '/init.sh'
+    entryPoint: '/init.sh',
   },
   {
     name: 'Nixos-22.11',
     flist: 'https://hub.grid.tf/tf-official-vms/nixos-22.11.flist',
-    entryPoint: '/init.sh'
-  }
+    entryPoint: '/init.sh',
+  },
 ]
 
 const name = ref('VM' + generateString(8))
@@ -210,7 +210,7 @@ function addDisk() {
   disks.value.push({
     name: 'DISK' + name,
     size: 50,
-    mountPoint: '/mnt/' + name
+    mountPoint: '/mnt/' + name,
   })
 }
 
@@ -235,10 +235,10 @@ async function deploy() {
         publicIpv6: ipv6.value,
         planetary: planetary.value,
         envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
-        rootFilesystemSize: 2
-      }
+        rootFilesystemSize: 2,
+      },
     ],
-    network: { addAccess: wireguard.value }
+    network: { addAccess: wireguard.value },
   })
     .then((vm) => {
       layout.value.setStatus('success', 'Successfully deployed a full virtual machine instance.')
@@ -262,7 +262,7 @@ export default {
   components: {
     SelectVmImage,
     SelectFarm,
-    ExpandableLayout
-  }
+    ExpandableLayout,
+  },
 }
 </script>

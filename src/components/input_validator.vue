@@ -12,7 +12,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, getCurrentInstance, onUnmounted, inject, type PropType } from 'vue'
+import {
+  ref,
+  watch,
+  onMounted,
+  getCurrentInstance,
+  onUnmounted,
+  inject,
+  computed,
+  type PropType
+} from 'vue'
 import debounce from 'lodash/debounce.js'
 import type { FormValidatorService } from '../types'
 
@@ -48,7 +57,10 @@ const emits = defineEmits<{
 
 const form = inject('form:validator', null) as FormValidatorService | null
 
-const touched = ref(false)
+const isTouched = ref(false)
+const initializedValidation = ref(false)
+const touched = computed(() => isTouched.value || initializedValidation.value)
+
 const errorMessage = ref<string>()
 const required = ref(false)
 const inputStatus = ref<ValidatorStatus>()
@@ -71,21 +83,28 @@ onMounted(async () => {
 onUnmounted(() => form?.unregister(uid!))
 
 function onBlur() {
-  touched.value = true
+  isTouched.value = true
   validate(props.value?.toString() ?? '')
 }
 
 const onInput = debounce((value?: string | number) => validate(value?.toString() ?? ''), 250)
 watch(() => props.value, onInput, { immediate: true })
 
-defineExpose({ reset })
+defineExpose({
+  reset,
+  validate,
+  touch() {
+    isTouched.value = true
+  }
+})
 function reset() {
-  touched.value = false
+  isTouched.value = false
+  initializedValidation.value = false
   errorMessage.value = undefined
   inputStatus.value = undefined
 }
 
-async function validate(value: string) {
+async function validate(value: string): Promise<boolean> {
   errorMessage.value = undefined
   inputStatus.value = ValidatorStatus.PENDING
   for (const rule of [...props.rules, ...props.asyncRules]) {
@@ -95,7 +114,11 @@ async function validate(value: string) {
       break
     }
   }
+  if (!initializedValidation.value && value) {
+    initializedValidation.value = true
+  }
   inputStatus.value = errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
+  return inputStatus.value === ValidatorStatus.VALID
 }
 </script>
 

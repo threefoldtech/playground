@@ -1,16 +1,26 @@
-import { GridClient, NetworkEnv, BackendStorageType } from 'grid3_client'
+import { GridClient, NetworkEnv, BackendStorageType } from '@threefold/grid_client'
 import type { Profile } from '../stores/profile_manager'
 
 const NETWORK = process.env.NETWORK as NetworkEnv
 
-export async function getGrid(profile: Pick<Profile, 'mnemonics'>) {
+export async function getGrid(profile: Pick<Profile, 'mnemonics'>, projectName?: string) {
   if (!profile) return null
   const grid = new GridClient({
     mnemonic: profile.mnemonics,
     network: NETWORK,
-    backendStorageType: BackendStorageType.tfkvstore
+    backendStorageType: BackendStorageType.tfkvstore,
+    projectName,
   })
   await grid.connect()
+  return grid
+}
+
+interface UpdateGridOptions {
+  projectName?: string
+}
+export function updateGrid(grid: GridClient, options: UpdateGridOptions) {
+  grid.clientOptions!.projectName = options.projectName
+  grid._connect()
   return grid
 }
 
@@ -18,28 +28,31 @@ export function createAccount() {
   const grid = new GridClient({
     network: NETWORK,
     mnemonic: '',
-    storeSecret: 'test'
+    storeSecret: 'test',
   })
   grid._connect()
   const relay = grid.getDefaultUrls(NETWORK).relay.slice(6)
   return grid.tfchain.createAccount(relay)
 }
 
-export async function loadBalance(grid: GridClient): Promise<Profile['balance']> {
+export interface Balance {
+  free: number
+  locked: number
+}
+export async function loadBalance(grid: GridClient): Promise<Balance> {
   const balance = await grid.balance.getMyBalance()
   return {
     free: +balance.free,
-    locked: +balance.reserved
+    locked: +balance.reserved,
   }
 }
 
-export async function loadProfile(mnemonics: string, grid: GridClient): Promise<Profile> {
+export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
-    mnemonics,
+    mnemonics: grid.clientOptions!.mnemonic,
     ssh: await readSSH(grid),
-    twinId: await grid.twins.get_my_twin_id(),
+    twinId: grid!.twinId,
     address: grid.twins.client.client.address,
-    balance: await loadBalance(grid)
   }
 }
 
@@ -66,7 +79,7 @@ export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> 
     key: 'metadata',
     value: JSON.stringify({
       ...metadata,
-      sshkey: newSSH
-    })
+      sshkey: newSSH,
+    }),
   })
 }

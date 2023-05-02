@@ -61,12 +61,21 @@
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
-                  <CopyReadonlyInput
-                    v-if="environments[key] || !(key in environments)"
-                    textarea
-                    :label="getLabel(key)"
-                    :data="contract.env[key]"
-                  />
+                  <template v-if="environments[key] || !(key in environments)">
+                    <CopyReadonlyInput
+                      v-if="contract.env[key] !== 'true' && contract.env[key] !== 'false'"
+                      textarea
+                      :label="getLabel(key)"
+                      :data="contract.env[key]"
+                    />
+                    <v-switch
+                      v-else
+                      inset
+                      color="primary"
+                      :model-value="Boolean(contract.env[key])"
+                      :label="getLabel(key)"
+                    />
+                  </template>
                 </template>
               </template>
             </v-form>
