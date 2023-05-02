@@ -78,7 +78,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import { createWorker } from '../components/k8s_worker.vue'
 import type { K8SWorker as K8sWorker } from '../types'
 import { useProfileManager } from '../stores'

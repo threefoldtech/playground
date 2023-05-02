@@ -1,6 +1,6 @@
 import type { ProjectName } from '@/types'
 import { SolutionCode } from '@/types'
-import type { GridClient, FilterOptions } from 'grid3_client'
+import type { GridClient, FilterOptions } from '@threefold/grid_client'
 
 export function loadGateways(grid: GridClient, options: Omit<FilterOptions, 'gateway'>) {
   return grid.capacity.filterNodes({

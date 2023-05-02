@@ -94,7 +94,7 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { getUserContracts, type NormalizedContract } from '../utils/contracts'
 import type { VDataTableHeader } from '../types'
-import { ContractStates } from 'grid3_client'
+import { ContractStates } from '@threefold/grid_client'
 
 const layout = ref()
 const profileManager = useProfileManager()
