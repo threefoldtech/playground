@@ -100,7 +100,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, type Ref } from 'vue'
-import { generateString } from '@threefold/grid_client'
+import { generateString } from 'grid3_client'
 import type { Farm } from '../types'
 import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'

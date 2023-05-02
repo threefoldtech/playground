@@ -1,5 +1,5 @@
 import { ProjectName } from '@/types'
-import type { GridClient } from '@threefold/grid_client'
+import type { GridClient } from 'grid3_client'
 import { getSubdomain } from './gateway'
 import { updateGrid } from './grid'
 import { loadVM } from './deploy_vm'

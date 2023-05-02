@@ -105,7 +105,7 @@ import { ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { addMachine, deleteMachine, loadVM } from '../utils/deploy_vm'
-import { generateString } from '@threefold/grid_client'
+import { generateString } from 'grid3_client'
 import { type Farm, ProjectName, type solutionFlavor } from '../types'
 import rootFs from '../utils/root_fs'
 

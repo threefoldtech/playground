@@ -1,4 +1,4 @@
-import { NetworkModel, generateString } from '@threefold/grid_client'
+import { NetworkModel, generateString } from 'grid3_client'
 
 export function createNetwork(network: Network = {}): NetworkModel {
   const nw = new NetworkModel()

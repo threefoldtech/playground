@@ -6,7 +6,7 @@ import {
   K8SModel,
   AddWorkerModel,
   DeleteWorkerModel,
-} from '@threefold/grid_client'
+} from 'grid3_client'
 import type { K8SWorker } from '../types'
 import { createNetwork } from './deploy_helpers'
 

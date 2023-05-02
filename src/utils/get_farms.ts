@@ -1,4 +1,4 @@
-import type { GridClient, FilterOptions, NodeInfo } from '@threefold/grid_client'
+import type { GridClient, FilterOptions, NodeInfo } from 'grid3_client'
 import { gqlClient } from '../clients'
 
 export async function getFarms(grid: GridClient, filters: FilterOptions) {

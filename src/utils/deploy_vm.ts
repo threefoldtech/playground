@@ -9,7 +9,7 @@ import {
   generateString,
   AddMachineModel,
   DeleteMachineModel,
-} from '@threefold/grid_client'
+} from 'grid3_client'
 import { createNetwork, type Network } from './deploy_helpers'
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
