@@ -165,6 +165,7 @@ import { type Disk, deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
+import { normalizeError } from '../utils/helpers'
 
 const layout = ref()
 const tabs = ref()
@@ -215,39 +216,44 @@ function addDisk() {
 }
 
 async function deploy() {
-  const grid = await getGrid(profileManager.profile!)
-
   layout.value.setStatus('deploy')
-  deployVM(grid!, {
-    name: name.value,
-    machines: [
-      {
-        name: name.value,
-        cpu: cpu.value,
-        memory: memory.value,
-        flist: flist.value!.value,
-        entryPoint: flist.value!.entryPoint,
-        farmId: farm.value.farmID,
-        farmName: farm.value.name,
-        country: farm.value.country,
-        disks: [{ size: diskSize.value, mountPoint: '/' }, ...disks.value],
-        publicIpv4: ipv4.value,
-        publicIpv6: ipv6.value,
-        planetary: planetary.value,
-        envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
-        rootFilesystemSize: 2,
-      },
-    ],
-    network: { addAccess: wireguard.value },
-  })
-    .then((vm) => {
-      layout.value.setStatus('success', 'Successfully deployed a full virtual machine instance.')
-      layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+
+  try {
+    const grid = await getGrid(profileManager.profile!, ProjectName.Fullvm)
+
+    await layout.value.validateBalance(grid)
+
+    const vm = await deployVM(grid!, {
+      name: name.value,
+      machines: [
+        {
+          name: name.value,
+          cpu: cpu.value,
+          memory: memory.value,
+          flist: flist.value!.value,
+          entryPoint: flist.value!.entryPoint,
+          farmId: farm.value.farmID,
+          farmName: farm.value.name,
+          country: farm.value.country,
+          disks: [{ size: diskSize.value, mountPoint: '/' }, ...disks.value],
+          publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
+          planetary: planetary.value,
+          envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
+          rootFilesystemSize: 2,
+        },
+      ],
+      network: { addAccess: wireguard.value },
     })
-    .catch((error) => {
-      const e = typeof error === 'string' ? error : error.message
-      layout.value.setStatus('failed', e)
-    })
+
+    layout.value.setStatus('success', 'Successfully deployed a full virtual machine instance.')
+    layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+  } catch (e) {
+    layout.value.setStatus(
+      'failed',
+      normalizeError(e, 'Failed to deploy a full virtual machine instance.')
+    )
+  }
 }
 </script>
 
@@ -255,7 +261,7 @@ async function deploy() {
 import SelectVmImage, { type VmImage } from '../components/select_vm_image.vue'
 import SelectFarm from '../components/select_farm.vue'
 import ExpandableLayout from '../components/expandable_layout.vue'
-import type { Farm, Flist } from '../types'
+import { type Farm, type Flist, ProjectName } from '../types'
 
 export default {
   name: 'FullVm',
