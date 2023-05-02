@@ -27,9 +27,7 @@
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      <template v-if="item.value[0].publicIP?.ip">
-        {{ item.value[0].publicIP?.ip ?? 'None' }}
-      </template>
+      {{ item.value[0].publicIP?.ip ?? 'None' }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">
