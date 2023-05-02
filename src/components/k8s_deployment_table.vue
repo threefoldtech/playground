@@ -88,8 +88,9 @@ async function loadDeployments() {
   loading.value = true
   const grid = await getGrid(profileManager.profile!, props.projectName)
   const chunk1 = await loadK8s(grid!)
-  const chunk2 = await loadK8s(updateGrid(grid!, { projectName: '' }))
-  items.value = chunk1.concat(chunk2)
+  const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }))
+  const chunk3 = await loadK8s(updateGrid(grid!, { projectName: '' }))
+  items.value = chunk1.concat(chunk2).concat(chunk3)
   loading.value = false
 }
 

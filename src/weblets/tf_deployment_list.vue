@@ -454,7 +454,7 @@
 <script lang="ts" setup>
 import { ref, watch, type Ref } from 'vue'
 import { useProfileManager } from '../stores'
-import { getGrid } from '../utils/grid'
+import { getGrid, updateGrid } from '../utils/grid'
 import { deleteDeployment } from '../utils/delete_deployment'
 import type { Tab } from '../components/dynamic_tabs.vue'
 
@@ -496,13 +496,12 @@ watch(activeTab, () => (selectedItems.value = []))
 async function onDelete() {
   deletingDialog.value = false
   deleting.value = true
-  const projectName = tabs[activeTab.value].value as ProjectName
-  const grid = await getGrid(profileManager.profile!, projectName)
+  const grid = await getGrid(profileManager.profile!)
   for (const item of selectedItems.value) {
     try {
-      await deleteDeployment(grid!, {
+      await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
         name: item.deploymentName,
-        projectName,
+        projectName: item.projectName,
       })
     } catch (e: any) {
       console.log('Error while deleting deployment', e.message)

@@ -39,10 +39,19 @@ export enum ProjectName {
   Wordpress = 'Wordpress',
   Gateway = 'GatewayName',
   QVM = 'Qvm',
+  TFhubValidator = 'TFhubValidator',
+  Casperlabs = 'Casperlabs',
+  Presearch = 'Presearch',
+  VM = 'VM',
+  NodePilot = 'NodePilot',
+  Fullvm = 'Fullvm',
+  Algorand = 'Algorand',
+  Qvm = 'Qvm',
+  Umbrel = 'Umbrel',
 }
 
 export enum SolutionCode {
-  ProjectName = 'pt',
+  Peertube = 'pt',
   Funkwhale = 'fw',
   Taiga = 'tg',
   Discourse = 'dc',

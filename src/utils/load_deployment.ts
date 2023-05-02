@@ -9,7 +9,10 @@ export async function loadVms(grid: GridClient) {
   const items = await Promise.all(promises)
   const vms = items
     .map((item: any, index) => {
-      if (item) item.deploymentName = machines[index]
+      if (item) {
+        item.deploymentName = machines[index]
+        item.projectName = grid.clientOptions!.projectName
+      }
       return item
     })
     .filter((item) => item && item.length > 0) as any[][]
@@ -33,7 +36,10 @@ export async function loadK8s(grid: GridClient): Promise<K8S[]> {
   const items = (await Promise.all(promises)) as any[]
   const k8s = items
     .map((item, index) => {
-      if (item) item.deploymentName = clusters[index]
+      if (item) {
+        item.deploymentName = clusters[index]
+        item.projectName = grid.clientOptions!.projectName
+      }
       return item
     })
     .filter((item) => item && item.masters.length > 0) as { masters: any[] }[]

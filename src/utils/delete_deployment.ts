@@ -12,12 +12,10 @@ export interface DeleteDeploymentOptions {
 export async function deleteDeployment(grid: GridClient, options: DeleteDeploymentOptions) {
   /* Delete qsfs_zdbs */
   if (options.projectName === ProjectName.QVM) {
-    let qvm = await loadVM(grid, options.name)
-    if (!qvm || qvm.length === 0) {
-      qvm = await loadVM(updateGrid(grid, { projectName: '' }), options.name)
+    const qvm = await loadVM(grid, options.name)
+    if ((<any>qvm)[0].mounts.length) {
+      await grid.qsfs_zdbs.delete({ name: (<any>qvm)[0].mounts[0].name })
     }
-    await grid.qsfs_zdbs.delete({ name: (<any>qvm)[0].mounts[0].name })
-    updateGrid(grid, { projectName: options.projectName })
   }
 
   /* Delete gateway */
@@ -26,15 +24,9 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
   }
 
   /* Delete deployment */
-  if (options.projectName === ProjectName.Kubernetes) {
-    const result = await grid.k8s.delete({ name: options.name })
-    if (result.deleted.length) return result
-    return updateGrid(grid, { projectName: '' }).k8s.delete({ name: options.name })
-  }
-
-  const result = await grid.machines.delete({ name: options.name })
-  if (result.deleted.length) return result
-  return updateGrid(grid, { projectName: '' }).machines.delete({ name: options.name })
+  return options.projectName === ProjectName.Kubernetes
+    ? grid.k8s.delete({ name: options.name })
+    : grid.machines.delete({ name: options.name })
 }
 
 export async function deleteDeploymentGateway(grid: GridClient, options: DeleteDeploymentOptions) {
@@ -57,7 +49,7 @@ export async function deleteGateway(grid: GridClient, name: string) {
 }
 
 export function solutionHasGateway(projectName: ProjectName) {
-  return [
+  const solutions = [
     ProjectName.Discourse,
     ProjectName.Funkwhale,
     ProjectName.Mastodon,
@@ -67,5 +59,8 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Subsquid,
     ProjectName.Taiga,
     ProjectName.Wordpress,
-  ].includes(projectName)
+  ]
+  return solutions.includes(projectName)
+    ? true
+    : solutions.map((s) => s.toLowerCase()).includes(projectName)
 }

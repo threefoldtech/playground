@@ -16,7 +16,7 @@ export async function getGrid(profile: Pick<Profile, 'mnemonics'>, projectName?:
 }
 
 interface UpdateGridOptions {
-  projectName: string
+  projectName?: string
 }
 export function updateGrid(grid: GridClient, options: UpdateGridOptions) {
   grid.clientOptions!.projectName = options.projectName
