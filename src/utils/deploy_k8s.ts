@@ -4,7 +4,7 @@ import {
   KubernetesNodeModel,
   randomChoice,
   K8SModel
-} from 'grid3_client'
+} from '@threefold/grid_client'
 import type { K8SWorker } from '../types'
 import { createNetwork } from './deploy_helpers'
 

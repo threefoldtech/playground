@@ -64,7 +64,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
 import { useProfileManager } from '../stores'
-import { events } from 'grid3_client'
+import { events } from '@threefold/grid_client'
 
 export type WebletStatus = 'deploy' | 'success' | 'failed'
 

@@ -1,4 +1,4 @@
-import { GridClient, NetworkEnv, BackendStorageType } from 'grid3_client'
+import { GridClient, NetworkEnv, BackendStorageType } from '@threefold/grid_client'
 import type { Profile } from '../stores/profile_manager'
 
 const NETWORK = process.env.NETWORK as NetworkEnv

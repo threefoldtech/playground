@@ -94,7 +94,7 @@ defineProps<{ modelValue: K8SWorker }>()
 
 <script lang="ts">
 import SelectFarm from './select_farm.vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import RootFsSize from './root_fs_size.vue'
 import type { K8SWorker, Farm } from '../types'
 
