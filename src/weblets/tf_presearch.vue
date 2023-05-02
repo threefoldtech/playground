@@ -19,7 +19,7 @@
       <d-tabs
         :tabs="[
           { title: 'Base', value: 'base', invalid: !isBaseValid },
-          { title: 'Restore', value: 'restore' }
+          { title: 'Restore', value: 'restore' },
         ]"
       >
         <template #base>
@@ -31,7 +31,7 @@
                 :rules="[
                   validators.required('Name is required.'),
                   validators.minLength('Name minLength is 2 chars.', 2),
-                  validators.maxLength('Name maxLength is 15 chars.', 15)
+                  validators.maxLength('Name maxLength is 15 chars.', 15),
                 ]"
               >
                 <template #default="{ props }">
@@ -44,7 +44,7 @@
                 :value="code"
                 :rules="[
                   validators.required('Presearch registration code is required.'),
-                  validators.equal('Presearch registration code must be 32 characters long.', 32)
+                  validators.equal('Presearch registration code must be 32 characters long.', 32),
                 ]"
               >
                 <template #default="{ props }">
@@ -66,7 +66,7 @@
                   cpu,
                   memory,
                   ssd: rootFsSize,
-                  publicIp: ipv4
+                  publicIp: ipv4,
                 }"
                 v-model="farm"
                 v-model:country="country"
@@ -145,23 +145,23 @@ async function deploy() {
         envs: [
           {
             key: 'SSH_KEY',
-            value: profileManager.profile!.ssh
+            value: profileManager.profile!.ssh,
           },
           {
             key: 'PRESEARCH_REGISTRATION_CODE',
-            value: code.value
+            value: code.value,
           },
           {
             key: 'PRESEARCH_BACKUP_PRI_KEY',
-            value: privateRestoreKey.value
+            value: privateRestoreKey.value,
           },
           {
             key: 'PRESEARCH_BACKUP_PUB_KEY',
-            value: publicRestoreKey.value
-          }
-        ]
-      }
-    ]
+            value: publicRestoreKey.value,
+          },
+        ],
+      },
+    ],
   })
     .then((vm) => {
       layout.value.setStatus('success', 'Successfully deployed a Presearch instance.')
@@ -180,7 +180,7 @@ import SelectFarm from '../components/select_farm.vue'
 export default {
   name: 'TFPresearch',
   components: {
-    SelectFarm
-  }
+    SelectFarm,
+  },
 }
 </script>

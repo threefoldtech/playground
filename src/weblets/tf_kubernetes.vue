@@ -17,7 +17,7 @@
         :tabs="[
           { title: 'Config', value: 'config' },
           { title: 'Master', value: 'master' },
-          { title: 'Workers', value: 'workers' }
+          { title: 'Workers', value: 'workers' },
         ]"
         ref="tabs"
       >
@@ -27,7 +27,7 @@
             :rules="[
               validators.required('Name is required.'),
               validators.minLength('Name minimum length is 2 chars.', 2),
-              validators.maxLength('Name max length is 15 chars.', 15)
+              validators.maxLength('Name max length is 15 chars.', 15),
             ]"
           >
             <template #default="{ props }">
@@ -43,7 +43,7 @@
               validators.maxLength('Token max length is 15 chars.', 15),
               validators.isAlphanumeric(
                 'Token cannot contain any characters other than alphabets and numbers.'
-              )
+              ),
             ]"
           >
             <template #default="{ props }">
@@ -109,7 +109,7 @@ async function deploy() {
     clusterToken: clusterToken.value,
     master: master.value!,
     workers: workers.value!,
-    sshKey: profileManager.profile!.ssh
+    sshKey: profileManager.profile!.ssh,
   })
     .then((vm) => {
       layout.value.setStatus('success', 'Successfully deployed a Kubernetes cluster.')
@@ -130,7 +130,7 @@ export default {
   name: 'TfKubernetes',
   components: {
     K8SWorker,
-    ExpandableLayout
-  }
+    ExpandableLayout,
+  },
 }
 </script>

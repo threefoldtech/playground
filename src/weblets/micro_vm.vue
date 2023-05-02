@@ -16,7 +16,7 @@
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Environment Variables', value: 'env' },
-        { title: 'Disks', value: 'disks' }
+        { title: 'Disks', value: 'disks' },
       ]"
     >
       <template #config>
@@ -33,7 +33,7 @@
           :filters="{
             cpu,
             memory,
-            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize)
+            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
           }"
           v-model="farm"
         />
@@ -83,23 +83,23 @@ const images = [
   {
     name: 'Ubuntu-22.04',
     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist',
-    entryPoint: '/sbin/zinit init'
+    entryPoint: '/sbin/zinit init',
   },
   {
     name: 'Alpine-3',
     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist',
-    entryPoint: '/entrypoint.sh'
+    entryPoint: '/entrypoint.sh',
   },
   {
     name: 'CentOS-8',
     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist',
-    entryPoint: '/entrypoint.sh'
+    entryPoint: '/entrypoint.sh',
   },
   {
     name: 'Nixos',
     flist: 'https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist',
-    entryPoint: '/entrypoint.sh'
-  }
+    entryPoint: '/entrypoint.sh',
+  },
 ]
 
 const name = ref('VM' + generateString(8))
@@ -116,8 +116,8 @@ const farm = ref() as Ref<Farm>
 const envs = ref<Env[]>([
   {
     key: 'SSH_KEY',
-    value: profileManager.profile!.ssh
-  }
+    value: profileManager.profile!.ssh,
+  },
 ])
 const disks = ref<Disk[]>([])
 
@@ -126,7 +126,7 @@ function addDisk() {
   disks.value.push({
     name: 'DISK' + name,
     size: 50,
-    mountPoint: '/mnt/' + name
+    mountPoint: '/mnt/' + name,
   })
 }
 
@@ -138,7 +138,7 @@ async function deploy() {
   deployVM(grid!, {
     name: name.value,
     network: {
-      addAccess: wireguard.value
+      addAccess: wireguard.value,
     },
     machines: [
       {
@@ -154,9 +154,9 @@ async function deploy() {
         planetary: planetary.value,
         publicIpv4: ipv4.value,
         publicIpv6: ipv6.value,
-        rootFilesystemSize: rootFsSize.value
-      }
-    ]
+        rootFilesystemSize: rootFsSize.value,
+      },
+    ],
   })
     .then(console.log)
     .catch(console.log)
@@ -176,7 +176,7 @@ export default {
     SelectVmImage,
     RootFsSize,
     SelectFarm,
-    ExpandableLayout
-  }
+    ExpandableLayout,
+  },
 }
 </script>
