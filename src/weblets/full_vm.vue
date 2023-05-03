@@ -166,6 +166,7 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
+import { type Farm, type Flist, ProjectName } from '../types'
 
 const layout = ref()
 const tabs = ref()
@@ -261,7 +262,6 @@ async function deploy() {
 import SelectVmImage, { type VmImage } from '../components/select_vm_image.vue'
 import SelectFarm from '../components/select_farm.vue'
 import ExpandableLayout from '../components/expandable_layout.vue'
-import { type Farm, type Flist, ProjectName } from '../types'
 
 export default {
   name: 'FullVm',
