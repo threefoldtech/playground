@@ -3,8 +3,10 @@ import {
   type FilterOptions,
   KubernetesNodeModel,
   randomChoice,
-  K8SModel
-} from 'grid3_client'
+  K8SModel,
+  AddWorkerModel,
+  DeleteWorkerModel,
+} from '@threefold/grid_client'
 import type { K8SWorker } from '../types'
 import { createNetwork } from './deploy_helpers'
 
@@ -35,7 +37,7 @@ async function createWorker(grid: GridClient, data: K8SWorker) {
     sru: data.diskSize + data.rootFsSize,
     publicIPs: data.ipv4,
     availableFor: grid.twinId,
-    country: data.farm!.country
+    country: data.farm!.country,
   }
 
   const worker = new KubernetesNodeModel()
@@ -60,4 +62,54 @@ export interface DeployK8SOptions {
   sshKey: string
   metadata?: string
   description?: string
+}
+
+export async function deployWorker(
+  grid: GridClient,
+  options: K8SWorker & { deploymentName: string }
+) {
+  const filters: FilterOptions = {
+    cru: options.cpu,
+    mru: Math.round(options.memory / 1024),
+    farmId: options.farm!.farmID,
+    farmName: options.farm!.name,
+    sru: options.diskSize + options.rootFsSize,
+    publicIPs: options.ipv4,
+    availableFor: grid.twinId,
+    country: options.farm!.country,
+  }
+
+  const worker = new AddWorkerModel()
+  worker.deployment_name = options.deploymentName
+  worker.name = options.name
+  worker.cpu = options.cpu
+  worker.memory = options.memory
+  worker.disk_size = options.diskSize
+  worker.public_ip = options.ipv4
+  worker.public_ip6 = options.ipv6
+  worker.planetary = options.planetary
+  worker.rootfs_size = options.rootFsSize
+  worker.node_id = worker.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId
+  worker.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!
+
+  await grid.k8s.add_worker(worker)
+  return loadK8S(grid, options.deploymentName)
+}
+
+export interface DeleteWorkerOptions {
+  deploymentName: string
+  name: string
+}
+export async function deleteWorker(grid: GridClient, options: DeleteWorkerOptions) {
+  const worker = new DeleteWorkerModel()
+  worker.deployment_name = options.deploymentName
+  worker.name = options.name
+
+  const deletedWorker = await grid.k8s.delete_worker(worker)
+
+  if (!deletedWorker.deleted && !deletedWorker.updated) {
+    throw new Error('Failed to delete worker')
+  }
+
+  return deletedWorker
 }

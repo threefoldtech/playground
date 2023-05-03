@@ -4,7 +4,7 @@
     :rules="[
       validators.required('Name is required.'),
       validators.minLength('Name minimum length is 2 chars.', 2),
-      validators.maxLength('Name max length is 15 chars.', 15)
+      validators.maxLength('Name max length is 15 chars.', 15),
     ]"
   >
     <template #default="{ props }">
@@ -18,7 +18,7 @@
       validators.required('CPU is required.'),
       validators.isInt('CPU must be a valid integer.'),
       validators.min('CPU min is 2 cores.', 2),
-      validators.max('CPU max is 32 cores.', 32)
+      validators.max('CPU max is 32 cores.', 32),
     ]"
   >
     <template #default="{ props }">
@@ -37,7 +37,7 @@
       validators.required('Memory is required.'),
       validators.isInt('Memory must be a valid integer.'),
       validators.min('Minimum allowed memory is 256 MB.', 256),
-      validators.max('Maximum allowed memory is 256 GB.', 256 * 1024)
+      validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
     ]"
   >
     <template #default="{ props }">
@@ -56,7 +56,7 @@
       validators.required('Disk size is required.'),
       validators.isInt('Disk size must be a valid integer.'),
       validators.min('Minimum allowed disk size is 1 GB.', 1),
-      validators.max('Maximum allowed disk size is 10000 GB.', 10000)
+      validators.max('Maximum allowed disk size is 10000 GB.', 10000),
     ]"
   >
     <template #default="{ props }">
@@ -80,7 +80,7 @@
       cpu: $props.modelValue.cpu,
       memory: $props.modelValue.memory,
       publicIp: $props.modelValue.ipv4,
-      ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize
+      ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize,
     }"
     v-model="$props.modelValue.farm"
   />
@@ -94,7 +94,7 @@ defineProps<{ modelValue: K8SWorker }>()
 
 <script lang="ts">
 import SelectFarm from './select_farm.vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import RootFsSize from './root_fs_size.vue'
 import type { K8SWorker, Farm } from '../types'
 
@@ -108,7 +108,7 @@ export function createWorker(name: string = 'WR' + generateString(9)): K8SWorker
     ipv6: false,
     planetary: true,
     rootFsSize: 2,
-    farm: undefined as Farm | undefined
+    farm: undefined as Farm | undefined,
   }
 }
 
@@ -116,7 +116,7 @@ export default {
   name: 'K8SWorker',
   components: {
     SelectFarm,
-    RootFsSize
-  }
+    RootFsSize,
+  },
 }
 </script>

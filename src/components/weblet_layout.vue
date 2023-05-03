@@ -15,7 +15,7 @@
       </div>
     </section>
 
-    <v-divider class="mt-5 mb-2" />
+    <v-divider :class="{ 'mb-2': true, 'mt-5': !!$slots.subtitle, 'mt-2': !$slots.subtitle }" />
 
     <v-card-text>
       <slot v-if="disableAlerts" />
@@ -64,7 +64,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
 import { useProfileManager } from '../stores'
-import { events } from 'grid3_client'
+import { events } from '@threefold/grid_client'
 
 export type WebletStatus = 'deploy' | 'success' | 'failed'
 
@@ -72,10 +72,10 @@ const props = defineProps({
   disableAlerts: {
     type: Boolean,
     required: false,
-    default: false
-  }
+    default: false,
+  },
 })
-const emits = defineEmits<{ (event: 'mount'): void }>()
+const emits = defineEmits<{ (event: 'mount'): void; (event: 'back'): void }>()
 
 const profileManager = useProfileManager()
 
@@ -114,12 +114,15 @@ defineExpose({
     dialogData.value = data
     environments.value = envs
     onlyJson.value = json
-  }
+  },
+
+  status: computed(() => status.value),
 })
 
 function reset() {
   status.value = undefined
   message.value = undefined
+  emits('back')
 }
 
 watch(
@@ -139,7 +142,7 @@ import DeploymentDataDialog from './deployment_data_dialog.vue'
 export default {
   name: 'WebletLayout',
   components: {
-    DeploymentDataDialog
-  }
+    DeploymentDataDialog,
+  },
 }
 </script>
