@@ -104,7 +104,14 @@
                 :value="envs[index].key"
                 :rules="[
                   validators.required('Key name is required.'),
-                  validators.validateKey('Key can\'t start with a number, a non-alphanumeric character or a whitespace'),
+validators.pattern(
+ 'Key can\'t start with a number, a non-alphanumeric character or a whitespace.', 
+ { pattern: /^[a-zA-Z]/ }
+),
+validators.pattern(
+ 'Key can\'t start with a number, a non-alphanumeric character or a whitespace.', 
+  { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
+  ),
                   validators.maxLength('Key max length is 128 chars.', 128)
                 ]"
               >
