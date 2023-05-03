@@ -311,10 +311,15 @@
               "
             />
             <IconActionBtn
-              tooltip="PreviewK8SWorker"
+              tooltip="Visit"
               color="info"
               icon="mdi-web"
-              :href="'https://' + item.value[0].publicIP.ip.slice(0, -3)"
+              :href="
+                'http://' +
+                (item.value[0].publicIP?.ip
+                  ? item.value[0].publicIP.ip.slice(0, -3)
+                  : '[' + item.value[0].planetary + ']')
+              "
             />
           </template>
 
