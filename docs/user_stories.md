@@ -6,8 +6,8 @@
 
 ### Acceptance Criteria
 
-    - User can login easily by adding his mnemonics. 
-    - If user don't have an account, click on 'Create Account' button to create an account and generate mnemonics.
+    - User can login easily by adding his mnemonics, then click on 'activate'. 
+    - If user don't have an account, click on 'Create Account' button to create an account and mnemonics will be generated automatically, then user can add or generate SSH Keys.
 ---
 ## Scenario 2
 
@@ -24,7 +24,7 @@
 ### Acceptance Criteria
 
     - User can update its SSH Key from profile manager after activating profile, by clicking on 'UPDATE PUBLIC SSH KEY' button.
-    - User also can generate new SSH Key after activating profile, by clicking on 'GENERATE SSH KEYS' button.
+    - User can also generate new SSH Key after activating profile, by clicking on 'GENERATE SSH KEYS' button.
 ---
 ## Scenario 4
 
