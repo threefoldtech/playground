@@ -6,3 +6,11 @@ export function downloadAsFile(name: string, data: string) {
   a.click()
   a.remove()
 }
+
+export function normalizeError(error: unknown, fallbackError: string): string {
+  return typeof error === 'string'
+    ? error
+    : error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+    ? error.message
+    : fallbackError
+}
