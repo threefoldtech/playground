@@ -14,9 +14,9 @@
 
     <d-tabs
       :tabs="[
-        { title: 'Config', value: 'config', invalid: !isConfigValid },
-        { title: 'Environment Variables', value: 'env', invalid: !isEnvsValid },
-        { title: 'Disks', value: 'disks', invalid: !isDisksValid }
+        { title: 'Config', value: 'config' },
+        { title: 'Environment Variables', value: 'env' },
+        { title: 'Disks', value: 'disks' },
       ]"
       ref="tabs"
     >
@@ -26,7 +26,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.minLength('Name minLength is 2 chars.', 2),
-            validators.maxLength('Name maxLength is 15 chars.', 15)
+            validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
         >
           <template #default="{ props }">
@@ -34,11 +34,7 @@
           </template>
         </input-validator>
 
-        <SelectVmImage
-          :images="images"
-          v-model:flist="flist"
-          v-model:entry-point="entryPoint"
-        />
+        <SelectVmImage :images="images" v-model:flist="flist" v-model:entry-point="entryPoint" />
 
         <RootFsSize v-model="rootFsSize" />
 
@@ -48,16 +44,11 @@
             validators.required('CPU is required.'),
             validators.isInt('CPU must be a valid integer.'),
             validators.min('CPU min is 2 cores.', 2),
-            validators.max('CPU max is 32 cores.', 32)
+            validators.max('CPU max is 32 cores.', 32),
           ]"
         >
           <template #default="{ props }">
-            <v-text-field
-              label="CPU (vCores)"
-              type="number"
-              v-model.number="cpu"
-              v-bind="props"
-            />
+            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
           </template>
         </input-validator>
 
@@ -67,7 +58,7 @@
             validators.required('Memory is required.'),
             validators.isInt('Memory must be a valid integer.'),
             validators.min('Minimum allowed memory is 256 MB.', 256),
-            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024)
+            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
           ]"
         >
           <template #default="{ props }">
@@ -90,7 +81,7 @@
             cpu,
             memory,
             publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize)
+            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
           }"
           v-model="farm"
           v-model:country="country"
@@ -101,20 +92,20 @@
         <ExpandableLayout v-model="envs" @add="envs.push({ key: '', value: '' })">
           <template #default="{ index }">
             <input-validator
-                :value="envs[index].key"
-                :rules="[
-                  validators.required('Key name is required.'),
-validators.pattern(
- 'Key can\'t start with a number, a non-alphanumeric character or a whitespace.', 
- { pattern: /^[a-zA-Z]/ }
-),
-validators.pattern(
- 'Key can\'t start with a number, a non-alphanumeric character or a whitespace.', 
-  { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
-  ),
-                  validators.maxLength('Key max length is 128 chars.', 128)
-                ]"
-              >
+              :value="envs[index].key"
+              :rules="[
+                validators.required('Key name is required.'),
+                validators.pattern(
+                  'Key can\'t start with a number, a non-alphanumeric character or a whitespace.',
+                  { pattern: /^[a-zA-Z]/ }
+                ),
+                validators.pattern(
+                  'Key can\'t start with a number, a non-alphanumeric character or a whitespace.',
+                  { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
+                ),
+                validators.maxLength('Key max length is 128 chars.', 128),
+              ]"
+            >
               <template #default="{ props }">
                 <v-text-field label="Name" v-model="envs[index].key" v-bind="props" />
               </template>
@@ -127,59 +118,57 @@ validators.pattern(
 
       <template #disks>
         <ExpandableLayout v-model="disks" @add="addDisk">
-            <template #default="{ index }">
-              <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
-              <input-validator
-                :value="disks[index].name"
-                :rules="[
-                  validators.required('Disk name is required.'),
-                  validators.pattern(
-                    'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
-                    { pattern: /^[A-Za-z]/ }
-                  ),
-                  validators.minLength('Disk minLength is 2 chars.', 2),
-                  validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-                  validators.maxLength('Disk maxLength is 15 chars.', 15)
-                ]"
-              >
-                <template #default="{ props }">
-                  <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
-                </template>
-              </input-validator>
-              <input-validator
-                :value="disks[index].size"
-                :rules="[
-                  validators.required('Disk size is required.'),
-                  validators.isInt('Disk size must be a valid integer.'),
-                  validators.min('Minimum allowed disk size is 1 GB.', 1),
-                  validators.max('Maximum allowed disk size is 10000 GB.', 10000)
-                ]"
-              >
-                <template #default="{ props }">
-                  <v-text-field
-                    label="Size (GB)"
-                    type="number"
-                    v-model.number="disks[index].size"
-                    v-bind="props"
-                  />
-                </template>
-              </input-validator>
-            </template>
+          <template #default="{ index }">
+            <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
+            <input-validator
+              :value="disks[index].name"
+              :rules="[
+                validators.required('Disk name is required.'),
+                validators.pattern(
+                  'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
+                  { pattern: /^[A-Za-z]/ }
+                ),
+                validators.minLength('Disk minLength is 2 chars.', 2),
+                validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
+                validators.maxLength('Disk maxLength is 15 chars.', 15),
+              ]"
+            >
+              <template #default="{ props }">
+                <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+              </template>
+            </input-validator>
+            <input-validator
+              :value="disks[index].size"
+              :rules="[
+                validators.required('Disk size is required.'),
+                validators.isInt('Disk size must be a valid integer.'),
+                validators.min('Minimum allowed disk size is 1 GB.', 1),
+                validators.max('Maximum allowed disk size is 10000 GB.', 10000),
+              ]"
+            >
+              <template #default="{ props }">
+                <v-text-field
+                  label="Size (GB)"
+                  type="number"
+                  v-model.number="disks[index].size"
+                  v-bind="props"
+                />
+              </template>
+            </input-validator>
+          </template>
         </ExpandableLayout>
       </template>
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy"
-        >Deploy</v-btn
-      >
+      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy">Deploy</v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, type Ref } from 'vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import type { Farm } from '../types'
 import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
@@ -199,23 +188,23 @@ const images = [
   {
     name: 'Ubuntu-22.04',
     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist',
-    entryPoint: '/sbin/zinit init'
+    entryPoint: '/sbin/zinit init',
   },
   {
     name: 'Alpine-3',
     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist',
-    entryPoint: '/entrypoint.sh'
+    entryPoint: '/entrypoint.sh',
   },
   {
     name: 'CentOS-8',
     flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist',
-    entryPoint: '/entrypoint.sh'
+    entryPoint: '/entrypoint.sh',
   },
   {
     name: 'Nixos',
     flist: 'https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist',
-    entryPoint: '/entrypoint.sh'
-  }
+    entryPoint: '/entrypoint.sh',
+  },
 ]
 
 const country = ref<string>()
@@ -233,8 +222,8 @@ const farm = ref() as Ref<Farm>
 const envs = ref<Env[]>([
   {
     key: 'SSH_KEY',
-    value: profileManager.profile!.ssh
-  }
+    value: profileManager.profile!.ssh,
+  },
 ])
 const disks = ref<Disk[]>([])
 
@@ -243,7 +232,7 @@ function addDisk() {
   disks.value.push({
     name: 'DISK' + name,
     size: 50,
-    mountPoint: '/mnt/' + name
+    mountPoint: '/mnt/' + name,
   })
 }
 
@@ -253,7 +242,7 @@ async function deploy() {
   deployVM(grid!, {
     name: name.value,
     network: {
-      addAccess: wireguard.value
+      addAccess: wireguard.value,
     },
     machines: [
       {
@@ -269,11 +258,11 @@ async function deploy() {
         planetary: planetary.value,
         publicIpv4: ipv4.value,
         publicIpv6: ipv6.value,
-        rootFilesystemSize: rootFsSize.value
-      }
-    ]
+        rootFilesystemSize: rootFsSize.value,
+      },
+    ],
   })
-  .then((vm) => {
+    .then((vm) => {
       layout.value.setStatus('success', 'Successfully deployed a micro virtual machine.')
       layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
     })
@@ -296,7 +285,7 @@ export default {
     SelectVmImage,
     RootFsSize,
     SelectFarm,
-    ExpandableLayout
-  }
+    ExpandableLayout,
+  },
 }
 </script>

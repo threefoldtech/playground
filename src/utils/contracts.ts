@@ -1,10 +1,10 @@
 import Decimal from 'decimal.js'
-import { ContractStates, type GridClient } from 'grid3_client'
+import { ContractStates, type GridClient } from '@threefold/grid_client'
 
 const SOLUTION_TYPE: { [key: string]: string } = {
   vm: 'Micro Virtual Machine',
   Fullvm: 'Full Virtual Machine',
-  kubernetes: 'Kubernetes Cluster'
+  kubernetes: 'Kubernetes Cluster',
 }
 
 export async function getUserContracts(grid: GridClient) {
@@ -13,7 +13,7 @@ export async function getUserContracts(grid: GridClient) {
   const promises = [
     res.nameContracts.map((c: any) => normalizeContract(grid!, c, 'name')),
     res.nodeContracts.map((c: any) => normalizeContract(grid!, c, 'node')),
-    res.rentContracts.map((c: any) => normalizeContract(grid!, c, 'rent'))
+    res.rentContracts.map((c: any) => normalizeContract(grid!, c, 'rent')),
   ]
 
   return Promise.all(promises.flat(1))
@@ -55,7 +55,7 @@ async function normalizeContract(
     solutionName: data.name,
     solutionType: SOLUTION_TYPE[data.type],
     expiration,
-    consumption
+    consumption,
   }
 }
 

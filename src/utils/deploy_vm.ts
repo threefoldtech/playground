@@ -6,8 +6,10 @@ import {
   MachinesModel,
   MachineModel,
   QSFSDiskModel,
-  generateString
-} from 'grid3_client'
+  generateString,
+  AddMachineModel,
+  DeleteMachineModel,
+} from '@threefold/grid_client'
 import { createNetwork, type Network } from './deploy_helpers'
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
@@ -35,7 +37,7 @@ async function createMachine(grid: GridClient, machine: Machine): Promise<Machin
     hru: machine.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
     sru: machine.disks?.reduce((total, disk) => total + disk.size, machine.rootFilesystemSize || 0),
     publicIPs: machine.publicIpv4,
-    availableFor: grid.twinId
+    availableFor: grid.twinId,
   }
 
   const vm = new MachineModel()
@@ -130,4 +132,60 @@ export interface DeployVMOptions {
   machines: Machine[]
   metadata?: string
   description?: string
+}
+
+export type AddMachineOptions = Machine & { deploymentName: string }
+
+export async function addMachine(grid: GridClient, options: AddMachineOptions) {
+  console.log(options)
+
+  const filters: FilterOptions = {
+    cru: options.cpu,
+    mru: Math.round(options.memory / 1024),
+    country: options.country,
+    farmId: options.farmId,
+    farmName: options.farmName,
+    hru: options.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
+    sru: options.disks?.reduce((total, disk) => total + disk.size, options.rootFilesystemSize || 0),
+    publicIPs: options.publicIpv4,
+    availableFor: grid.twinId,
+  }
+
+  const machine = new AddMachineModel()
+  machine.deployment_name = options.deploymentName
+  machine.cpu = options.cpu
+  machine.memory = options.memory
+  machine.disks = createDisks(options.disks)
+  machine.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId
+  machine.public_ip = options.publicIpv4 || false
+  machine.public_ip6 = options.publicIpv6 || false
+  machine.name = options.name
+  machine.planetary = options.planetary || true
+  machine.flist = options.flist
+  machine.entrypoint = options.entryPoint
+  machine.qsfs_disks = createQsfsDisks(options.qsfsDisks)
+  machine.rootfs_size = options.rootFilesystemSize || 0
+  machine.env = createEnvs(options.envs)
+  machine.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!
+
+  await grid.machines.add_machine(machine)
+  return loadVM(grid, options.deploymentName)
+}
+
+export interface DeleteMachineOptions {
+  deploymentName: string
+  name: string
+}
+export async function deleteMachine(grid: GridClient, options: DeleteMachineOptions) {
+  const machine = new DeleteMachineModel()
+  machine.deployment_name = options.deploymentName
+  machine.name = options.name
+
+  const deletedMachine = await grid.machines.delete_machine(machine)
+
+  if (!deletedMachine.deleted && !deletedMachine.updated) {
+    throw new Error('Failed to delete machine')
+  }
+
+  return deletedMachine
 }

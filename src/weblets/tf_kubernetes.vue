@@ -17,18 +17,17 @@
         :tabs="[
           { title: 'Config', value: 'config' },
           { title: 'Master', value: 'master' },
-          { title: 'Workers', value: 'workers' }
+          { title: 'Workers', value: 'workers' },
         ]"
         ref="tabs"
       >
-        <template #config="{ form }">
+        <template #config>
           <input-validator
-            v-bind="form"
             :value="name"
             :rules="[
               validators.required('Name is required.'),
               validators.minLength('Name minimum length is 2 chars.', 2),
-              validators.maxLength('Name max length is 15 chars.', 15)
+              validators.maxLength('Name max length is 15 chars.', 15),
             ]"
           >
             <template #default="{ props }">
@@ -37,7 +36,6 @@
           </input-validator>
 
           <input-validator
-            v-bind="form"
             :value="clusterToken"
             :rules="[
               validators.required('Token is required.'),
@@ -45,7 +43,7 @@
               validators.maxLength('Token max length is 15 chars.', 15),
               validators.isAlphanumeric(
                 'Token cannot contain any characters other than alphabets and numbers.'
-              )
+              ),
             ]"
           >
             <template #default="{ props }">
@@ -56,14 +54,14 @@
           </input-validator>
         </template>
 
-        <template #master="{ form }">
-          <K8SWorker v-model="master" :form="form" />
+        <template #master>
+          <K8SWorker v-model="master" />
         </template>
 
-        <template #workers="{ form }">
+        <template #workers>
           <ExpandableLayout v-model="workers" @add="addWorker">
             <template #default="{ index }">
-              <K8SWorker v-model="workers[index]" :form="form" />
+              <K8SWorker v-model="workers[index]" />
             </template>
           </ExpandableLayout>
         </template>
@@ -80,7 +78,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { generateString } from 'grid3_client'
+import { generateString } from '@threefold/grid_client'
 import { createWorker } from '../components/k8s_worker.vue'
 import type { K8SWorker as K8sWorker } from '../types'
 import { useProfileManager } from '../stores'
@@ -111,7 +109,7 @@ async function deploy() {
     clusterToken: clusterToken.value,
     master: master.value!,
     workers: workers.value!,
-    sshKey: profileManager.profile!.ssh
+    sshKey: profileManager.profile!.ssh,
   })
     .then((vm) => {
       layout.value.setStatus('success', 'Successfully deployed a Kubernetes cluster.')
@@ -132,7 +130,7 @@ export default {
   name: 'TfKubernetes',
   components: {
     K8SWorker,
-    ExpandableLayout
-  }
+    ExpandableLayout,
+  },
 }
 </script>

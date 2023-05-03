@@ -12,8 +12,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, getCurrentInstance, onUnmounted, type PropType } from 'vue'
+import {
+  ref,
+  watch,
+  onMounted,
+  getCurrentInstance,
+  onUnmounted,
+  inject,
+  computed,
+  type PropType
+} from 'vue'
 import debounce from 'lodash/debounce.js'
+import type { FormValidatorService } from '../types'
 
 export type RuleReturn = { message: string; [key: string]: any } | undefined | void
 export type SyncRule = (value: string) => RuleReturn
@@ -36,24 +46,27 @@ const props = defineProps({
     default: [] as AsyncRule[]
   },
   value: {
-    type: String as PropType<string | number>,
+    type: String as PropType<string | number | undefined>,
     required: true
   }
 })
 const emits = defineEmits<{
   (events: 'update:status', value: ValidatorStatus): void
   (events: 'update:valid', value: boolean): void
-  (events: 'unregister', value: number): void
-  (events: 'valid', uid: number, boolean: boolean, reset: () => void): void
 }>()
 
-const touched = ref(false)
+const form = inject('form:validator', null) as FormValidatorService | null
+
+const isTouched = ref(false)
+const initializedValidation = ref(false)
+const touched = computed(() => isTouched.value || initializedValidation.value)
+
 const errorMessage = ref<string>()
 const required = ref(false)
 const inputStatus = ref<ValidatorStatus>()
 watch(inputStatus, (s) => {
   emits('update:valid', s === ValidatorStatus.VALID)
-  emits('valid', uid!, s === ValidatorStatus.VALID, reset)
+  form?.setValid(uid!, s === ValidatorStatus.VALID, reset)
   if (s) emits('update:status', s)
 })
 
@@ -67,24 +80,31 @@ onMounted(async () => {
     }
   }
 })
-onUnmounted(() => emits('unregister', uid!))
+onUnmounted(() => form?.unregister(uid!))
 
 function onBlur() {
-  touched.value = true
-  validate(props.value?.toString())
+  isTouched.value = true
+  validate(props.value?.toString() ?? '')
 }
 
-const onInput = debounce((value: string | number) => validate(value?.toString()), 250)
+const onInput = debounce((value?: string | number) => validate(value?.toString() ?? ''), 250)
 watch(() => props.value, onInput, { immediate: true })
 
-defineExpose({ reset })
+defineExpose({
+  reset,
+  validate,
+  touch() {
+    isTouched.value = true
+  }
+})
 function reset() {
-  touched.value = false
+  isTouched.value = false
+  initializedValidation.value = false
   errorMessage.value = undefined
   inputStatus.value = undefined
 }
 
-async function validate(value: string) {
+async function validate(value: string): Promise<boolean> {
   errorMessage.value = undefined
   inputStatus.value = ValidatorStatus.PENDING
   for (const rule of [...props.rules, ...props.asyncRules]) {
@@ -94,7 +114,11 @@ async function validate(value: string) {
       break
     }
   }
+  if (!initializedValidation.value && value) {
+    initializedValidation.value = true
+  }
   inputStatus.value = errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID
+  return inputStatus.value === ValidatorStatus.VALID
 }
 </script>
 
