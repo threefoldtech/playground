@@ -36,7 +36,7 @@
 ---
 ## Scenario 5
 
-    - As a user I expect to know the calcula `git status`tions of all kind of deployments from TFT Balance
+    - As a user I expect to know the calculations of all kind of deployments from my TFT Balance
 
 ### Acceptance Criteria
     - 
@@ -108,7 +108,7 @@
 
     - User can view all contracts and deployments from 'Contracts' and 'Deployments' in profile.
     - User can also view details of any contract/deployment and delete any of them. 
-    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button. 
+    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
 ---
 
 
