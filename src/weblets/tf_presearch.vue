@@ -97,27 +97,30 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import rootFs from '../utils/root_fs'
 import * as validators from '../utils/validators'
+import { normalizeError } from '../utils/helpers'
 
 const layout = ref()
 const tabs = ref()
 const profileManager = useProfileManager()
 
 const name = ref('PS' + generateString(8))
-const code = ref() as Ref<string>
+const code = ref('')
 const ipv4 = ref(false)
 const planetary = ref(true)
 const cpu = 4
 const memory = 8192
 const rootFsSize = rootFs(cpu, memory)
 const farm = ref() as Ref<Farm>
-const privateRestoreKey = ref('') as Ref<string>
-const publicRestoreKey = ref('') as Ref<string>
+const privateRestoreKey = ref('')
+const publicRestoreKey = ref('')
 
 async function deploy() {
   layout.value.setStatus('deploy')
 
   try {
     const grid = await getGrid(profileManager.profile!)
+
+    await layout.value.validateBalance(grid)
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -163,9 +166,7 @@ async function deploy() {
       PRESEARCH_BACKUP_PUB_KEY: 'Presearch Backup Public Key',
     })
   } catch (e) {
-    /*  */
-    // const e = typeof error === 'string' ? error : error.message
-    // layout.value.setStatus('failed', e)
+    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a Presearch instance.'))
   }
 }
 </script>
