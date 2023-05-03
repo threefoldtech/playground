@@ -108,6 +108,13 @@
 ---
 ## Scenario 13
 
+    - As I user I expect to deploy Kubernetes Cluster with many workers, each on different node
+### Acceptance Criteria
+
+    - TODO
+---
+## Scenario 14
+
     - As I user I should be able to view all of my contracts and deployments
 ### Acceptance Criteria
 
@@ -115,7 +122,7 @@
     - User can also view details of any contract/deployment and delete any of them. 
     - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
 ---
-## Scenario 14
+## Scenario 15
 
     - As I user I should be able to view all of my contracts and deployments
 ### Acceptance Criteria
