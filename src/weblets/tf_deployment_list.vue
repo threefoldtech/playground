@@ -452,7 +452,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, type Ref } from 'vue'
+import { ref, watch, type Ref, inject, getCurrentInstance, onUnmounted } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid, updateGrid } from '../utils/grid'
 import { deleteDeployment } from '../utils/delete_deployment'
@@ -511,6 +511,16 @@ async function onDelete() {
   table.value?.loadDeployments()
   deleting.value = false
 }
+
+/* List Manager */
+const { uid } = getCurrentInstance() as { uid: number }
+const deploymentListManager = useDeploymentListManager()
+
+deploymentListManager?.register(uid, () => {
+  return table.value?.loadDeployments
+})
+
+onUnmounted(() => deploymentListManager?.unregister(uid))
 </script>
 
 <script lang="ts">
@@ -520,6 +530,7 @@ import K8sDeploymentTable from '../components/k8s_deployment_table.vue'
 import ManageK8SWorkerDialog from '../components/manage_k8s_worker_dialog.vue'
 import ManageCaproverWorkerDialog from '../components/manage_caprover_worker_dialog.vue'
 import type { ProjectName } from '../types'
+import { useDeploymentListManager } from '../components/deployment_list_manager.vue'
 
 export default {
   name: 'TfDeploymentList',

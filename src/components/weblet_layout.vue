@@ -122,6 +122,10 @@ defineExpose({
 
     message.value = m ? m : 'Preparing to deploy...'
     status.value = s
+
+    if (status.value === 'success') {
+      loadDeployments()
+    }
   },
 
   openDialog(data?: any, envs?: { [key: string]: string | boolean } | false, json?: boolean) {
@@ -131,12 +135,19 @@ defineExpose({
   },
 
   status: computed(() => status.value),
+
+  loadDeployments,
 })
 
 function reset() {
   status.value = undefined
   message.value = undefined
   emits('back')
+}
+
+const deploymentListManager = useDeploymentListManager()
+function loadDeployments() {
+  deploymentListManager?.load()
 }
 
 watch(
@@ -152,6 +163,7 @@ watch(
 
 <script lang="ts">
 import DeploymentDataDialog from './deployment_data_dialog.vue'
+import { useDeploymentListManager } from './deployment_list_manager.vue'
 
 export default {
   name: 'WebletLayout',
