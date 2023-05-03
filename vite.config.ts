@@ -14,7 +14,7 @@ export default defineConfig({
   },
   define: {
     'process.env': {
-      NETWORK: process.env.NETWORK || 'dev',
+      NETWORK: process.env.NETWORK || 'qa',
       INTERNAL_SOLUTION_PROVIDER_ID: process.env.INTERNAL_SOLUTION_PROVIDER_ID || 1
     }
   }
