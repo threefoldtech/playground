@@ -101,6 +101,16 @@
 
     - User can deploy Kubernetes Cluster easily with all its configurations for both master and workers 
 ---
+## Scenario 13
+
+    - As I user I should be able to view all of my contracts and deployments
+### Acceptance Criteria
+
+    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in profile.
+    - User can also view details of any contract/deployment and delete any of them. 
+    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button. 
+---
+
 
 
 
