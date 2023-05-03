@@ -64,7 +64,8 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
 import { useProfileManager } from '../stores'
-import { events } from '@threefold/grid_client'
+import { events, type GridClient } from '@threefold/grid_client'
+import { loadBalance } from '../utils/grid'
 
 export type WebletStatus = 'deploy' | 'success' | 'failed'
 
@@ -101,6 +102,19 @@ const dialogData = ref()
 const environments = ref()
 const onlyJson = ref()
 defineExpose({
+  async validateBalance(grid: GridClient, min = 2) {
+    message.value = 'Checking your balance...'
+
+    const balance = await loadBalance(grid)
+    const b = balance.free - balance.locked
+
+    if (b < min) {
+      throw new Error(`You have ${b.toFixed(2)} TFT but it's required to have at least ${min} TFT.`)
+    }
+    message.value = 'You have enough TFT to continue...'
+    return balance
+  },
+
   setStatus(s: WebletStatus, m?: string) {
     if (s !== 'deploy' && !m) {
       throw new Error('Message need to be passed while settingStatus.')
