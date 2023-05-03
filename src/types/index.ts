@@ -84,3 +84,8 @@ export interface FormValidatorService {
   setValid(uid: number, value: boolean, reset: () => void): void
   unregister(uid: number): void
 }
+
+export interface GatewayNode {
+  id: number
+  domain: string
+}
