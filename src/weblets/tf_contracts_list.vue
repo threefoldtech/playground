@@ -43,9 +43,11 @@
             @click="onShowDetails(item.value.contractId)"
             :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
             :loading="loadingContractId == item.value.contractId"
+            v-if="item.value.type !== 'name'"
           >
             Show Details
           </v-btn>
+          <p v-else>-</p>
         </template>
       </ListTable>
     </template>
@@ -125,9 +127,16 @@ const loadingContractId = ref<number>()
 async function onShowDetails(contractId: number) {
   loading.value = true
   loadingContractId.value = contractId
-  const grid = await getGrid(profileManager.profile!)
-  const deployment = await grid!.zos.getDeployment({ contractId })
-  layout.value.openDialog(deployment, false, true)
+  try {
+    const grid = await getGrid(profileManager.profile!)
+    const deployment = await grid!.zos.getDeployment({ contractId })
+    layout.value.openDialog(deployment, false, true)
+  } catch (e) {
+    layout.value.setStatus(
+      'failed',
+      normalizeError(e, `Failed to load details of contract(${contractId})`)
+    )
+  }
   loadingContractId.value = undefined
   loading.value = false
 }
@@ -162,7 +171,10 @@ async function onDelete() {
     contracts.value = contracts.value!.filter((c) => !selectedContracts.value.includes(c))
     selectedContracts.value = []
   } catch (e) {
-    layout.value.setStatus('failed', (e as Error).message)
+    layout.value.setStatus(
+      'failed',
+      normalizeError(e, `Failed to delete some of the selected contracts.`)
+    )
   }
   deleting.value = false
 }
@@ -170,6 +182,7 @@ async function onDelete() {
 
 <script lang="ts">
 import ListTable from '../components/list_table.vue'
+import { normalizeError } from '../utils/helpers'
 
 export default {
   name: 'TfContractsList',
