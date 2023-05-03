@@ -21,9 +21,7 @@
       </template>
 
       <form-validator v-model="valid" v-else>
-        <template #default="{ form }">
-          <slot name="deploy" :form="form"></slot>
-        </template>
+        <slot name="deploy"></slot>
       </form-validator>
 
       <template #footer-actions>

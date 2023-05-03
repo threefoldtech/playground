@@ -36,8 +36,8 @@
       </ListTable>
     </template>
 
-    <template #deploy="{ form }">
-      <K8SWorker v-model="worker" :form="form" />
+    <template #deploy>
+      <K8SWorker v-model="worker" />
     </template>
   </ManageWorkerDialog>
 </template>
