@@ -154,6 +154,7 @@ watch(
   () => !!profileManager.profile || props.disableAlerts,
   (value, oldValue) => {
     if (value && value !== oldValue) {
+      reset()
       emits('mount')
     }
   },
