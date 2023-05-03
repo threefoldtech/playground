@@ -37,6 +37,8 @@ defineProps<{ modelValue: CaproverWorker }>()
 <script lang="ts">
 import { generateString } from '@threefold/grid_client'
 import type { CaproverWorker } from '../types'
+import SelectSolutionFlavor from './select_solution_flavor.vue'
+import SelectFarm from './select_farm.vue'
 
 export function createWorker(name: string = 'WR' + generateString(9)): CaproverWorker {
   return { name }
@@ -44,5 +46,9 @@ export function createWorker(name: string = 'WR' + generateString(9)): CaproverW
 
 export default {
   name: 'CaproverWorker',
+  components: {
+    SelectSolutionFlavor,
+    SelectFarm,
+  },
 }
 </script>
