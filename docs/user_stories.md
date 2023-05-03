@@ -1,4 +1,4 @@
-# User Stories
+# **User Stories**
 
 ## Scenario 1
 
@@ -6,7 +6,7 @@
 
 ### Acceptance Criteria
 
-    - User can login easily by adding his mnemonics, then click on 'activate'. 
+    - User can login easily by adding his mnemonics, then click on 'activate' button. 
     - If user don't have an account, click on 'Create Account' button to create an account and mnemonics will be generated automatically, then user can add or generate SSH Keys.
 ---
 ## Scenario 2
@@ -36,7 +36,7 @@
 ---
 ## Scenario 5
 
-    - As a user I expect to know the calculations of all kind of deployments from TFT Balance
+    - As a user I expect to know the calcula `git status`tions of all kind of deployments from TFT Balance
 
 ### Acceptance Criteria
     - 
