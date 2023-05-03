@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout ref="layout" @mount="layoutMount">
     <template #title>Deploy a Micro Virtual Machine </template>
     <template #subtitle
       >Deploy a new micro virtual machine on the Threefold Grid
@@ -34,7 +34,7 @@
           </template>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model:flist="flist" v-model:entry-point="entryPoint" />
+        <SelectVmImage :images="images" v-model="flist" />
 
         <RootFsSize v-model="rootFsSize" />
 
@@ -84,7 +84,6 @@
             ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
           }"
           v-model="farm"
-          v-model:country="country"
         />
       </template>
 
@@ -111,7 +110,20 @@
               </template>
             </input-validator>
 
-            <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
+            <input-validator
+              :value="envs[index].value"
+              :rules="[validators.required('Value is required.')]"
+            >
+              <template #default="{ props }">
+                <v-textarea
+                  label="Value"
+                  v-model="envs[index].value"
+                  no-resize
+                  :spellcheck="false"
+                  v-bind="props"
+                />
+              </template>
+            </input-validator>
           </template>
         </ExpandableLayout>
       </template>
@@ -161,15 +173,17 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="isInvalid" @click="deploy">Deploy</v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid" @click="deploy"
+        >Deploy</v-btn
+      >
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, type Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { generateString } from '@threefold/grid_client'
-import type { Farm } from '../types'
+import { type Farm, type Flist, ProjectName } from '../types'
 import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
@@ -178,11 +192,6 @@ import * as validators from '../utils/validators'
 const layout = ref()
 const tabs = ref()
 const profileManager = useProfileManager()
-
-const isConfigValid = ref(false)
-const isDisksValid = ref(true)
-const isEnvsValid = ref(true)
-const isInvalid = computed(() => !isConfigValid.value || !isDisksValid.value || !isEnvsValid.value)
 
 const images = [
   {
@@ -207,10 +216,8 @@ const images = [
   },
 ]
 
-const country = ref<string>()
 const name = ref('VM' + generateString(8))
-const flist = ref() as Ref<string>
-const entryPoint = ref() as Ref<string>
+const flist = ref<Flist>()
 const rootFsSize = ref(2) as Ref<number>
 const cpu = ref(4)
 const memory = ref(8192)
@@ -219,13 +226,19 @@ const ipv6 = ref(false)
 const planetary = ref(true)
 const wireguard = ref(false)
 const farm = ref() as Ref<Farm>
-const envs = ref<Env[]>([
-  {
+const envs = ref<Env[]>([])
+const disks = ref<Disk[]>([])
+
+function layoutMount() {
+  if (envs.value.length > 0) {
+    envs.value.splice(0, 1)
+  }
+
+  envs.value.unshift({
     key: 'SSH_KEY',
     value: profileManager.profile!.ssh,
-  },
-])
-const disks = ref<Disk[]>([])
+  })
+}
 
 function addDisk() {
   const name = generateString(5)
@@ -237,39 +250,46 @@ function addDisk() {
 }
 
 async function deploy() {
-  const grid = await getGrid(profileManager.profile!)
+  layout.value.setStatus('deploy')
 
-  deployVM(grid!, {
-    name: name.value,
-    network: {
-      addAccess: wireguard.value,
-    },
-    machines: [
-      {
-        name: name.value,
-        cpu: cpu.value,
-        memory: memory.value,
-        flist: flist.value,
-        entryPoint: entryPoint.value,
-        farmId: farm.value.farmID,
-        farmName: farm.value.name,
-        disks: disks.value,
-        envs: envs.value,
-        planetary: planetary.value,
-        publicIpv4: ipv4.value,
-        publicIpv6: ipv6.value,
-        rootFilesystemSize: rootFsSize.value,
+  try {
+    const grid = await getGrid(profileManager.profile!, ProjectName.VM)
+
+    await layout.value.validateBalance(grid)
+
+    const vm = await deployVM(grid!, {
+      name: name.value,
+      network: {
+        addAccess: wireguard.value,
       },
-    ],
-  })
-    .then((vm) => {
-      layout.value.setStatus('success', 'Successfully deployed a micro virtual machine.')
-      layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+      machines: [
+        {
+          name: name.value,
+          cpu: cpu.value,
+          memory: memory.value,
+          flist: flist.value!.value,
+          entryPoint: flist.value!.entryPoint,
+          farmId: farm.value.farmID,
+          farmName: farm.value.name,
+          country: farm.value.country,
+          disks: disks.value,
+          envs: envs.value,
+          planetary: planetary.value,
+          publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
+          rootFilesystemSize: rootFsSize.value,
+        },
+      ],
     })
-    .catch((error) => {
-      const e = typeof error === 'string' ? error : error.message
-      layout.value.setStatus('failed', e)
-    })
+
+    layout.value.setStatus('success', 'Successfully deployed a micro virtual machine.')
+    layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+  } catch (e) {
+    layout.value.setStatus(
+      'failed',
+      normalizeError(e, 'Failed to deploy micro virtual machine instance.')
+    )
+  }
 }
 </script>
 
@@ -278,6 +298,7 @@ import SelectVmImage from '../components/select_vm_image.vue'
 import RootFsSize from '../components/root_fs_size.vue'
 import SelectFarm from '../components/select_farm.vue'
 import ExpandableLayout from '../components/expandable_layout.vue'
+import { normalizeError } from '../utils/helpers'
 
 export default {
   name: 'MicroVm',
