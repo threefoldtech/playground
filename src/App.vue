@@ -37,13 +37,15 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid>
-        <DisclaimerToolbar />
-        <div class="my-4 d-flex justify-end">
-          <ProfileManager />
-        </div>
-        <router-view />
-      </v-container>
+      <DeploymentListManager>
+        <v-container fluid>
+          <DisclaimerToolbar />
+          <div class="my-4 d-flex justify-end">
+            <ProfileManager />
+          </div>
+          <router-view />
+        </v-container>
+      </DeploymentListManager>
     </v-main>
   </v-app>
 </template>
@@ -78,16 +80,16 @@ const routes: AppRoute[] = [
       { title: 'Algorand', icon: 'algorand.png', route: '/algorand' },
       { title: 'Node Pilot', icon: 'vm.png', route: '/nodepilot' },
       { title: 'Wordpress', icon: 'wordpress.png', route: '/wordpress' },
-      { title: 'Umbrel', icon: 'umbrel.png', route: '/umbrel' }
-    ]
+      { title: 'Umbrel', icon: 'umbrel.png', route: '/umbrel' },
+    ],
   },
   {
     title: 'MY ACCOUNT',
     items: [
       { title: 'Contracts', route: '/contractslist' },
-      { title: 'Deployments', route: '/deployedlist' }
-    ]
-  }
+      { title: 'Deployments', route: '/deployedlist' },
+    ],
+  },
 ]
 
 // eslint-disable-next-line no-undef
@@ -97,6 +99,7 @@ const network = process.env.NETWORK as string
 <script lang="ts">
 import DisclaimerToolbar from './components/disclaimer_toolbar.vue'
 import ProfileManager from './weblets/profile_manager.vue'
+import DeploymentListManager from './components/deployment_list_manager.vue'
 
 interface AppRoute {
   title: string
@@ -112,8 +115,9 @@ export default {
   name: 'App',
   components: {
     DisclaimerToolbar,
-    ProfileManager
-  }
+    ProfileManager,
+    DeploymentListManager,
+  },
 }
 </script>
 
