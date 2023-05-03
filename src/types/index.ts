@@ -12,6 +12,12 @@ export interface K8SWorker {
   farm?: Farm
 }
 
+export interface CaproverWorker {
+  name: string
+  farm?: Farm
+  solution?: solutionFlavor
+}
+
 export interface Farm {
   name: string
   farmID: number
