@@ -6,7 +6,7 @@
 import NodePilot from '../weblets/tf_node_pilot.vue'
 
 export default {
-  name: 'FullVirtualMachine',
+  name: 'NodePilot',
   components: {
     NodePilot
   }

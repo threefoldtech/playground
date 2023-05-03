@@ -12,14 +12,13 @@
     <template #default>
       <d-tabs
         :tabs="[
-          { title: 'Config', value: 'config', invalid: !isConfigValid },
+          { title: 'Config', value: 'config'},
         ]"
+        ref="tabs"
       >
         <template #config>
-          <form-validator v-model="isConfigValid">
-            <template #default="{ form }">
+            <template>
               <input-validator
-                v-bind="form"
                 :value="name"
                 :rules="[
                   validators.required('Name is required.'),
@@ -33,7 +32,6 @@
               </input-validator>
 
               <input-validator
-                v-bind="form"
                 :value="cpu"
                 :rules="[
                   validators.required('CPU is required.'),
@@ -53,7 +51,6 @@
               </input-validator>
 
               <input-validator
-                v-bind="form"
                 :value="memory"
                 :rules="[
                   validators.required('Memory is required.'),
@@ -80,35 +77,29 @@
                 }"
                 v-model="farm"
                 v-model:country="country"
-                :form="form"
               />
             </template>
-          </form-validator>
         </template>
       </d-tabs>
     </template>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="isInvalid"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { ref, type Ref, computed } from 'vue'
-import { generateString } from 'grid3_client'
+import { ref, type Ref } from 'vue'
+import { generateString } from '@threefold/grid_client'
 import { deployVM, type Disk } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
 
 const layout = ref()
+const tabs = ref()
 const profileManager = useProfileManager()
-
-const isConfigValid = ref(false)
-const isInvalid = computed(() => !isConfigValid.value)
-
-
 const name = ref('NP' + generateString(8))
 const cpu = ref(4)
 const memory = ref(8192)
@@ -158,7 +149,6 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-// import type { VmImage } from '../components/select_vm_image.vue'
 import SelectFarmId from '../components/select_farm.vue'
 import type { Farm } from '../types'
 import rootFs from '../utils/root_fs'
