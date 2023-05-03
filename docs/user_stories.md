@@ -7,7 +7,7 @@
 ### Acceptance Criteria
 
     - User can login easily by adding his mnemonics, then click on 'activate' button. 
-    - If user don't have an account, click on 'Create Account' button to create an account and mnemonics will be generated automatically, then user can add or generate SSH Keys.
+    - If user don't have an account, click on 'DON"T HAVE ACCOUNT? CREATE ONE' button to create an account and mnemonics will be generated automatically, then user can add or generate SSH Keys.
 ---
 ## Scenario 2
 
@@ -39,7 +39,7 @@
     - As a user I expect to know the calculations of all kind of deployments from my TFT Balance
 
 ### Acceptance Criteria
-    - 
+    - TODO
 ---
 ## Scenario 6
 
@@ -47,9 +47,9 @@
 
 ### Acceptance Criteria
 
-    - when deploying, there's 'Node Filters' filter nodes to choose suitable node for user.
-    - User won't have to think about which node to choose. 
-    - User will just choose Country and Farm Name.
+    - When deploying, there's 'Farm Filter' filter farms to choose farm with available nodes.
+    - User won't have to think about which farm/node to choose. 
+    - User will just choose Country and Farm Name from the drop-down list, then click on 'DEPLOY' button.
 ---
 ## Scenario 7
 
@@ -59,7 +59,8 @@
 
     - User can deploy full virtual machine easily, know the max and min of required configurations as CPU, Memory, and Disk.
     - User also can add disks to virtual machine. 
-    - All logs while deploying are available to user.
+    - All logs while deploying will be shown to user.
+    - All previous deployments will be listed at the bottom. 
 
 ---
 ## Scenario 8
@@ -68,7 +69,9 @@
 
 ### Acceptance Criteria
 
-    - After deployment, user can view all information about the virtual machine. 
+    - After deployment, all details of the deployed virtual machine will be shown to user.
+    - Also, list of all deployments available at the bottom to view details at anytime.
+    - User can also view all deployments/contracts from 'Contracts' and 'Deployments' in 'My Account'.
 ---
 ## Scenario 9
 
@@ -76,7 +79,8 @@
 
 ### Acceptance Criteria
 
-    - After deployment, user can delete all deployments or any specific deployment.
+    - After deployment, user can delete all deployments or any specific deployment from the 'Deployment List' at the bottom.
+    - User can also delete them from 'Contracts' and 'Deployments' in 'My Account'.
 ---
 ## Scenario 10
 
@@ -88,11 +92,12 @@
 ---
 ## Scenario 11
 
-    - As I user I expect to add or delete 'ENVIRONMENT VARIABLES' to Micro Virtual Machine
+    - As I user I expect to add or delete 'ENVIRONMENT VARIABLES' and 'DISKS' to Micro Virtual Machine
 
 ### Acceptance Criteria
 
     - From 'ENVIRONMENT VARIABLES' user can add, modify, or delete environment variables to micro virtual machine.
+    - From 'DISKS' user can add many disks with the micro virtual machine. 
 ---
 ## Scenario 12
 
@@ -106,7 +111,16 @@
     - As I user I should be able to view all of my contracts and deployments
 ### Acceptance Criteria
 
-    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in profile.
+    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in My Account.
+    - User can also view details of any contract/deployment and delete any of them. 
+    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
+---
+## Scenario 14
+
+    - As I user I should be able to view all of my contracts and deployments
+### Acceptance Criteria
+
+    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in My Account.
     - User can also view details of any contract/deployment and delete any of them. 
     - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
 ---
