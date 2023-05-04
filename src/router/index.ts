@@ -29,6 +29,11 @@ const router = createRouter({
       meta: { title: 'Funkwhale' },
     },
     {
+      path: '/mattermost',
+      component: () => import('../views/mattermost_view.vue'),
+      meta: { title: 'Mattermost' },
+    },
+    {
       path: '/presearch',
       component: () => import('../views/presearch_view.vue'),
       meta: { title: 'Presearch' },

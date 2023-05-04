@@ -89,3 +89,14 @@ export interface GatewayNode {
   id: number
   domain: string
 }
+
+export interface SMTPServer {
+  enabled: boolean
+  username: string
+  password: string
+  email: string
+  hostname: string
+  port: number
+  tls: boolean
+  ssl: boolean
+}
