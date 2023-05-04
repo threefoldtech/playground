@@ -50,6 +50,11 @@ const router = createRouter({
       meta: { title: 'Presearch' },
     },
     {
+      path: '/wordpress',
+      component: () => import('../views/wordpress_view.vue'),
+      meta: { title: 'Wordpress' },
+    },
+    {
       path: '/contractslist',
       component: () => import('../views/contracts_list.vue'),
       meta: { title: 'Contracts List' },
