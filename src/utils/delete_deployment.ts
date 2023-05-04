@@ -30,9 +30,10 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 }
 
 export async function deleteDeploymentGateway(grid: GridClient, options: DeleteDeploymentOptions) {
-  const subdomain = getSubdomain(grid, {
+  const subdomain = getSubdomain({
     deploymentName: options.name,
     projectName: options.projectName,
+    twinId: grid.twinId,
   })
   for (const projectName of [options.projectName, ProjectName.Gateway, '']) {
     if (await deleteGateway(updateGrid(grid, { projectName }), subdomain)) {
