@@ -139,6 +139,25 @@
     - All previous deployments of mattermost will be listed at the bottom in the 'Deployment List (mattermost)'. 
     - User can visit all mattermost instances from deployments list 
 ---
+## Scenario 16
+
+    - As I user expect to know what's Funkwhale and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Funkwhale from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of Funkwhale will be listed at the bottom in the 'Deployment List (Funkwhale)'. 
+    - User can visit all Funkwhale instances from deployments list and use it 
+---
+## Scenario 17
+
+    - As I user I would like to know what to do if I faced any issue
+### Acceptance Criteria
+
+    - User can add issues from the 'Disclaimer' part.
+    - Applying for issues in github and the developers will solve them
+---
+
+
 
 
 
