@@ -60,14 +60,15 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from '@threefold/grid_client'
+import { generateString, type GridClient } from '@threefold/grid_client'
 import { type Ref, ref } from 'vue'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
 import * as validators from '../utils/validators'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import { deployGatewayName, rollbackDeployment } from '../utils/gateway'
+import { deployVM } from '../utils/deploy_vm'
+import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 
 const layout = ref()
 const tabs = ref()
@@ -81,7 +82,91 @@ const farm = ref() as Ref<Farm>
 const smtp = ref(createSMTPServer())
 
 async function deploy() {
-  /* script */
+  layout.value.setStatus('deploy')
+
+  const subdomain = getSubdomain({
+    deploymentName: name.value,
+    projectName: ProjectName.Mattermost,
+    twinId: profileManager.profile!.twinId,
+  })
+  const domain = subdomain + '.' + gateway.value.domain
+
+  let grid: GridClient | null
+  let vm: any
+
+  try {
+    grid = await getGrid(profileManager.profile!, ProjectName.Mattermost)
+
+    await layout.value.validateBalance(grid)
+
+    vm = await deployVM(grid!, {
+      name: name.value,
+      machines: [
+        {
+          name: name.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
+          disks: [
+            {
+              size: solution.value.disk,
+              mountPoint: '/var/lib/docker',
+            },
+          ],
+          flist: 'https://hub.grid.tf/tf-official-apps/mattermost-latest.flist',
+          entryPoint: '/sbin/zinit init',
+          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          farmId: farm.value.farmID,
+          farmName: farm.value.name,
+          country: farm.value.country,
+          planetary: true,
+          envs: [
+            { key: 'SSH_KEY', value: profileManager.profile!.ssh },
+            { key: 'DB_PASSWORD', value: generateString(12) },
+            { key: 'SITE_URL', value: 'https://' + domain },
+            { key: 'MATTERMOST_DOMAIN', value: domain },
+            ...(smtp.value.enabled
+              ? [
+                  { key: 'SMTPUsername', value: smtp.value.username },
+                  { key: 'SMTPPassword', value: smtp.value.password },
+                  { key: 'SMTPServer', value: smtp.value.hostname },
+                  { key: 'SMTPPort', value: smtp.value.port.toString() },
+                ]
+              : []),
+          ],
+        },
+      ],
+    })
+  } catch (e) {
+    return layout.value.setStatus(
+      'failed',
+      normalizeError(e, 'Failed to deploy a mattermost instance.')
+    )
+  }
+
+  try {
+    layout.value.setStatus('deploy', 'Preparing to deploy gateway...')
+    await deployGatewayName(grid!, {
+      name: subdomain,
+      nodeId: gateway.value.id,
+      backends: [`http://[${vm[0].planetary}]:9000`],
+    })
+
+    layout.value.setStatus('success', 'Successfully deployed a mattermost instance.')
+    layout.value.openDialog(vm, {
+      DB_PASSWORD: 'Database Password',
+      SITE_URL: 'Site URL',
+      SMTPUsername: 'SMTP Username',
+      SMTPPassword: 'SMTP Password',
+      SMTPServer: 'SMTP Server',
+      SMTPPort: 'SMTP Port',
+      SSH_KEY: 'Public SSH Key',
+      MATTERMOST_DOMAIN: 'Mattermost Domain',
+    })
+  } catch (e) {
+    layout.value.setStatus('deploy', 'Rollbacking back due to fail to deploy gateway...')
+    await rollbackDeployment(grid!, name.value)
+    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a mattermost instance.'))
+  }
 }
 </script>
 
@@ -90,6 +175,8 @@ import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
 import SelectGatewayNode from '../components/select_gateway_node.vue'
 import SelectFarm from '../components/select_farm.vue'
 import SmtpServer, { createSMTPServer } from '../components/smtp_server.vue'
+import { normalizeError } from '../utils/helpers'
+import rootFs from '../utils/root_fs'
 
 export default {
   name: 'TfMattermost',
