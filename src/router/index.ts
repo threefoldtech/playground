@@ -28,6 +28,12 @@ const router = createRouter({
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },
     },
+
+    {
+      path: '/taiga',
+      component: () => import('../views/taiga_view.vue'),
+      meta: { title: 'Taiga' },
+    },
     {
       path: '/presearch',
       component: () => import('../views/presearch_view.vue'),
