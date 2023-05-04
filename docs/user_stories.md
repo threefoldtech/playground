@@ -53,6 +53,14 @@
 ---
 ## Scenario 7
 
+    - As I user I would like to know what to do if I faced any issue
+### Acceptance Criteria
+
+    - User can add issues from the 'Disclaimer' part.
+    - Applying for issues in github and the developers will solve them
+---
+## Scenario 8
+
     - As a user I expect to know deploy Full Virtual machine easily with all its configurations.
 
 ### Acceptance Criteria
@@ -63,7 +71,7 @@
     - All previous deployments will be listed at the bottom. 
 
 ---
-## Scenario 8
+## Scenario 9
 
     - As a user I expect to get all details about Full Virtual machine after deployment
 
@@ -73,7 +81,7 @@
     - Also, list of all deployments available at the bottom to view details at anytime.
     - User can also view all deployments/contracts from 'Contracts' and 'Deployments' in 'My Account'.
 ---
-## Scenario 9
+## Scenario 10
 
     - As a user I expect to cancel any of my deployments anytime
 
@@ -82,7 +90,7 @@
     - After deployment, user can delete all deployments or any specific deployment from the 'Deployment List' at the bottom.
     - User can also delete them from 'Contracts' and 'Deployments' in 'My Account'.
 ---
-## Scenario 10
+## Scenario 11
 
     - As I user I expect to know the difference between Full Virtual Machine and Micro Virtual Machine
 
@@ -90,7 +98,7 @@
 
     - From 'Quick start documentation' that refers to manual of TF Chain, documents all information about their differences and similarities.
 ---
-## Scenario 11
+## Scenario 12
 
     - As I user I expect to add or delete 'ENVIRONMENT VARIABLES' and 'DISKS' to Micro Virtual Machine
 
@@ -99,21 +107,21 @@
     - From 'ENVIRONMENT VARIABLES' user can add, modify, or delete environment variables to micro virtual machine.
     - From 'DISKS' user can add many disks with the micro virtual machine. 
 ---
-## Scenario 12
+## Scenario 13
 
     - As I user I expect to deploy Kubernetes Cluster easily with many workers 
 ### Acceptance Criteria
 
     - User can deploy Kubernetes Cluster easily with all its configurations for both master and workers 
 ---
-## Scenario 13
+## Scenario 14
 
     - As I user I expect to deploy Kubernetes Cluster with many workers, each on different node
 ### Acceptance Criteria
 
     - TODO
 ---
-## Scenario 14
+## Scenario 15
 
     - As I user I should be able to view all of my contracts and deployments
 ### Acceptance Criteria
@@ -122,7 +130,7 @@
     - User can also view details of any contract/deployment and delete any of them. 
     - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
 ---
-## Scenario 15
+## Scenario 16
 
     - As I user expect to know what's Peertube and how to deploy it
 ### Acceptance Criteria
@@ -130,7 +138,7 @@
     - User can learn all about the deployment on peertube from the 'Quick start documentation', that explains all about it.
     - All previous deployments of peertube will be listed at the bottom in the 'Deployment List (Peertube)'.  
 ---
-## Scenario 15
+## Scenario 17
 
     - As I user expect to know what's Mattermost and how to deploy it
 ### Acceptance Criteria
@@ -139,7 +147,7 @@
     - All previous deployments of mattermost will be listed at the bottom in the 'Deployment List (mattermost)'. 
     - User can visit all mattermost instances from deployments list 
 ---
-## Scenario 16
+## Scenario 18
 
     - As I user expect to know what's Funkwhale and how to deploy it
 ### Acceptance Criteria
@@ -148,15 +156,24 @@
     - All previous deployments of Funkwhale will be listed at the bottom in the 'Deployment List (Funkwhale)'. 
     - User can visit all Funkwhale instances from deployments list and use it 
 ---
-## Scenario 17
+## Scenario 19
 
-    - As I user I would like to know what to do if I faced any issue
+    - As I user expect to know what's Taiga and how to deploy it
 ### Acceptance Criteria
 
-    - User can add issues from the 'Disclaimer' part.
-    - Applying for issues in github and the developers will solve them
+    - User can learn all about the deployment on Taiga from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of Taiga will be listed at the bottom in the 'Deployment List (Taiga)'. 
+    - User can visit all Taiga instances from deployments list and use it 
 ---
+## Scenario 20
 
+    - As I user expect to know what's Owncloud and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Owncloud from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of Owncloud will be listed at the bottom in the 'Deployment List (Owncloud)'. 
+    - User can visit all Owncloud instances from deployments list and use it 
+---
 
 
 
