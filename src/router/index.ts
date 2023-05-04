@@ -24,6 +24,11 @@ const router = createRouter({
       meta: { title: 'Presearch' }
     },
     {
+      path: '/mattermost',
+      component: () => import('../views/mattermost_view.vue'),
+      meta: { title: 'Mattermost' }
+    },
+    {
       path: '/contractslist',
       component: () => import('../views/contracts_list.vue'),
       meta: { title: 'Contracts List' }

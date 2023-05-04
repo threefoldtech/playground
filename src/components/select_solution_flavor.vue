@@ -67,6 +67,7 @@ const emits = defineEmits<{ (event: 'update:model-value', value?: solutionFlavor
 
 const packages = computed(() => {
   const { minimum, standard, recommended } = props
+  
   return [
     {
       title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} MB, Disk: ${minimum.disk} GB)`,
@@ -105,6 +106,8 @@ watch(
   ([cpu, memory, disk]) => {
     const value = cpu && memory && disk ? { cpu, memory, disk } : undefined
     emits('update:model-value', value)
+    console.log("update:model-value", value);
+    
   },
   { immediate: true }
 )
