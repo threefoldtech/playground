@@ -128,6 +128,16 @@
 ### Acceptance Criteria
 
     - User can learn all about the deployment on peertube from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of peertube will be listed at the bottom in the 'Deployment List (Peertube)'.  
+---
+## Scenario 15
+
+    - As I user expect to know what's Mattermost and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Mattermost from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of mattermost will be listed at the bottom in the 'Deployment List (mattermost)'. 
+    - User can visit all mattermost instances from deployments list 
 ---
 
 
