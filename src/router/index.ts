@@ -19,6 +19,11 @@ const router = createRouter({
       meta: { title: 'Kubernetes' },
     },
     {
+      path: '/peertube',
+      component: () => import('../views/peertube_view.vue'),
+      meta: { title: 'Peertube' },
+    },
+    {
       path: '/funkwhale',
       component: () => import('../views/funkwhale_view.vue'),
       meta: { title: 'Funkwhale' },
