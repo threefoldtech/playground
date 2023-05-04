@@ -50,6 +50,11 @@ const router = createRouter({
       meta: { title: 'Presearch' },
     },
     {
+      path: '/umbrel',
+      component: () => import('../views/umbrel_view.vue'),
+      meta: { title: 'Umbrel' },
+    },
+    {
       path: '/contractslist',
       component: () => import('../views/contracts_list.vue'),
       meta: { title: 'Contracts List' },
