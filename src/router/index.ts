@@ -24,6 +24,21 @@ const router = createRouter({
       meta: { title: 'Caprover' },
     },
     {
+      path: '/peertube',
+      component: () => import('../views/peertube_view.vue'),
+      meta: { title: 'Peertube' },
+    },
+    {
+      path: '/mattermost',
+      component: () => import('../views/mattermost_view.vue'),
+      meta: { title: 'Mattermost' },
+    },
+    {
+      path: '/taiga',
+      component: () => import('../views/taiga_view.vue'),
+      meta: { title: 'Taiga' },
+    },
+    {
       path: '/presearch',
       component: () => import('../views/presearch_view.vue'),
       meta: { title: 'Presearch' },

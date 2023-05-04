@@ -20,11 +20,11 @@
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert type="info" v-show="!profileManager.profile">
+        <v-alert variant="tonal" type="info" v-show="!profileManager.profile">
           Please activate a profile from the profile manager
         </v-alert>
 
-        <v-alert v-show="profileManager.profile && status" :type="alertType">
+        <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
           {{ message }}
         </v-alert>
 
@@ -154,6 +154,7 @@ watch(
   () => !!profileManager.profile || props.disableAlerts,
   (value, oldValue) => {
     if (value && value !== oldValue) {
+      reset()
       emits('mount')
     }
   },

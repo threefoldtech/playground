@@ -1,81 +1,87 @@
 <template>
-  <v-toolbar-title>Select Gateway Node</v-toolbar-title>
-  <v-autocomplete
-    label="Choose your node"
-    :items="items"
-    :loading="loading"
-    item-title="publicConfig.domain"
-    item-value="nodeId"
-    v-model="selectedNode"
+  <input-validator
+    :value="$props.modelValue?.id"
+    :rules="[validators.required('Gateway node is required.')]"
   >
-    <template v-slot:append-item v-if="!noMoreResults">
-      <div v-intersect="handleLoadMoreGateWayNodes" class="pa-4 teal--text">
-        Loading more items ...
-      </div>
+    <template #default="{ props }">
+      <v-autocomplete
+        label="Select gateway Node"
+        placeholder="Please select a domain."
+        :items="items"
+        item-title="domain"
+        return-object
+        v-bind="props"
+        @update:model-value="$emit('update:model-value', $event)"
+        :loading="items.length === 0 && loading"
+        :disabled="items.length === 0 && loading"
+        :model-value="$props.modelValue"
+      >
+        <template v-slot:append-item v-if="page !== -1">
+          <div class="px-4 mt-4">
+            <v-btn
+              block
+              color="secondary"
+              variant="tonal"
+              rounded="large"
+              size="large"
+              @click="loadNextPage"
+              :loading="loading"
+            >
+              Load More Gateway Nodes
+            </v-btn>
+          </div>
+        </template>
+      </v-autocomplete>
     </template>
-  </v-autocomplete>
+  </input-validator>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
-import { loadGateways } from '../utils/gateway'
+import { ref, onMounted } from 'vue'
+import { loadGatewayNodes } from '../utils/gateway'
+import * as validators from '../utils/validators'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import type { GridClient, NodeInfo } from '@threefold/grid_client'
+import type { GatewayNode } from '../types'
 
-//states
-defineProps<{ modelValue?: number }>()
-const $emit = defineEmits<{ (event: 'update:modelValue', value?: number): void }>()
-const loading = ref(true)
-const items = ref<NodeInfo[]>([])
-const selectedNode = ref<number>()
-const noMoreResults = ref(false)
+const props = defineProps<{ modelValue?: GatewayNode }>()
+const emits = defineEmits<{ (event: 'update:model-value', value: GatewayNode): void }>()
 
-// used variables and instances
 const profileManager = useProfileManager()
-let loadMoreNodes = 1
 
-//methods
-const handleGetGetWayNodes = async (grid: GridClient) => {
-  loadGateways(grid, { page: loadMoreNodes })
-    .then((res) => {
-      loading.value = false
-      items.value = [...res]
-    })
-    .catch((error: any) => {
-      noMoreResults.value = true
-      console.error('Error occurred while calling handleGetGetWayNodes API:', error)
-    })
+const loading = ref(false)
+const items = ref<any[]>([])
+const page = ref(1)
+const size = 50
+
+onMounted(loadNextPage)
+async function loadNextPage() {
+  loading.value = true
+  const grid = await getGrid(profileManager.profile!)
+  const nodes = await loadGatewayNodes(grid!, { page: page.value++, size })
+
+  if (nodes.length === 0 || nodes.length < size) {
+    page.value = -1
+  }
+
+  items.value = items.value.concat(nodes.map(normalizeGatewayNode))
+  loading.value = false
+
+  if (!props.modelValue && items.value.length > 0) {
+    emits('update:model-value', items.value[0])
+  }
 }
 
-const handleLoadMoreGateWayNodes = async () => {
-  if (noMoreResults.value) return
-  loadMoreNodes = loadMoreNodes + 1
-  const grid = await getGrid(profileManager)
-  handleGetGetWayNodes(grid!)
-    .then((res: any) => {
-      if (res) {
-        items.value = res.concat(items.value)
-      } else {
-        noMoreResults.value = true
-      }
-    })
-    .catch((error: any) => {
-      noMoreResults.value = true
-      console.error('Error occurred while calling handleGetGetWayNodes API:', error)
-    })
+function normalizeGatewayNode(item: any): GatewayNode {
+  return {
+    id: +item.nodeId,
+    domain: item.publicConfig.domain,
+  }
 }
-//hooks
-onMounted(async () => {
-  const grid = await getGrid(profileManager)
-  handleGetGetWayNodes(grid!)
-})
-watch(selectedNode, (selectedNode) => {
-  $emit('update:modelValue', selectedNode ? +selectedNode : selectedNode)
-})
 </script>
+
 <script lang="ts">
 export default {
-  name: 'SelectGateWayNode',
+  name: 'SelectGatewayNode',
 }
 </script>
