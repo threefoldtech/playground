@@ -29,6 +29,11 @@ const router = createRouter({
       meta: { title: 'Mattermost' },
     },
     {
+      path: '/owncloud',
+      component: () => import('../views/owncloud_view.vue'),
+      meta: { title: 'Owncloud' },
+    },
+    {
       path: '/presearch',
       component: () => import('../views/presearch_view.vue'),
       meta: { title: 'Presearch' },
