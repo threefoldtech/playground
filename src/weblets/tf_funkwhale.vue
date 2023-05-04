@@ -91,12 +91,15 @@
 
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
-import { generateString } from '@threefold/grid_client'
+import { generateString, type GridClient } from '@threefold/grid_client'
 import type { solutionFlavor as SolutionFlavor, GatewayNode, Farm } from '../types'
 import { ProjectName } from '../types'
 import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
 import * as validators from '../utils/validators'
+import { normalizeError } from '../utils/helpers'
+import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
+import { deployVM } from '../utils/deploy_vm'
 
 const layout = ref()
 const valid = ref(false)
@@ -113,13 +116,63 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const subdomain = getSubdomain({
+    deploymentName: name.value,
+    projectName: ProjectName.Funkwhale,
+    twinId: profileManager.profile!.twinId,
+  })
+  const domain = subdomain + '.' + gateway.value.domain
+
+  let grid: GridClient | null
+  let vm: any
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.Funkwhale)
+    grid = await getGrid(profileManager.profile!, ProjectName.Funkwhale)
 
     await layout.value.validateBalance(grid)
 
-    /* Deploy */
-    const vm = {}
+    vm = await deployVM(grid!, {
+      name: name.value,
+      machines: [
+        {
+          name: name.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
+          disks: [
+            {
+              size: solution.value.disk,
+              mountPoint: '/data',
+            },
+          ],
+          flist: 'https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist',
+          entryPoint: '/init.sh',
+          farmId: farm.value.farmID,
+          farmName: farm.value.name,
+          country: farm.value.country,
+          envs: [
+            { key: 'FUNKWHALE_HOSTNAME', value: domain },
+            { key: 'DJANGO_SUPERUSER_EMAIL', value: email.value },
+            { key: 'DJANGO_SUPERUSER_USERNAME', value: username.value },
+            { key: 'DJANGO_SUPERUSER_PASSWORD', value: password.value },
+          ],
+        },
+      ],
+    })
+  } catch (e) {
+    return layout.value.setStatus(
+      'failed',
+      normalizeError(e, 'Failed to deploy a funkwhale instance.')
+    )
+  }
+
+  try {
+    layout.value.setStatus('deploy', 'Preparing to deploy gateway...')
+
+    await deployGatewayName(grid!, {
+      name: subdomain,
+      nodeId: gateway.value.id,
+      backends: [`http://[${vm[0].planetary}]:9000`],
+    })
 
     layout.value.setStatus('success', 'Successfully deployed a funkwhale instance.')
     layout.value.openDialog(vm, {
@@ -129,6 +182,9 @@ async function deploy() {
       DJANGO_SUPERUSER_PASSWORD: 'Django Superuser Password',
     })
   } catch (e) {
+    layout.value.setStatus('deploy', 'Rollbacking back due to fail to deploy gateway...')
+
+    await rollbackDeployment(grid!, name.value)
     layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a funkwhale instance.'))
   }
 }
@@ -138,7 +194,6 @@ async function deploy() {
 import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
 import SelectGatewayNode from '../components/select_gateway_node.vue'
 import SelectFarm from '../components/select_farm.vue'
-import { normalizeError } from '../utils/helpers'
 
 export default {
   name: 'TfFunkwhale',
