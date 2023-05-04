@@ -19,6 +19,11 @@ const router = createRouter({
       meta: { title: 'Kubernetes' },
     },
     {
+      path: '/peertube',
+      component: () => import('../views/peertube_view.vue'),
+      meta: { title: 'Peertube' },
+    },
+    {
       path: '/mattermost',
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },

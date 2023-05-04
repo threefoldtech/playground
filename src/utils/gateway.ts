@@ -14,11 +14,12 @@ export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, 
 export interface GetHostnameOptions {
   deploymentName: string
   projectName: ProjectName
+  twinId: number
 }
-export function getSubdomain(grid: GridClient, options: GetHostnameOptions) {
+export function getSubdomain(options: GetHostnameOptions) {
   return (
     SolutionCode[options.projectName as keyof typeof SolutionCode] +
-    grid.twinId +
+    options.twinId +
     options.deploymentName.toLowerCase()
   )
 }
