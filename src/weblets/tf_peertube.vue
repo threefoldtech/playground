@@ -62,7 +62,15 @@
 
       <SelectSolutionFlavor v-model="solution" />
       <SelectGatewayNode v-model="gateway" />
-      <SelectFarm v-model="farm" />
+      <SelectFarm
+        :filters="{
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          ssd: solution?.disk,
+          publicIp: false,
+        }"
+        v-model="farm"
+      />
     </form-validator>
 
     <template #footer-actions>
@@ -73,11 +81,13 @@
 
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
-import { generateString } from '@threefold/grid_client'
+import { generateString, GridClient } from '@threefold/grid_client'
 import * as validators from '../utils/validators'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
+import { deployVM } from '../utils/deploy_vm'
+import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 
 const layout = ref()
 const valid = ref(false)
@@ -93,13 +103,64 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const subdomain = getSubdomain({
+    deploymentName: name.value,
+    projectName: ProjectName.Peertube,
+    twinId: profileManager.profile!.twinId,
+  })
+  const domain = subdomain + '.' + gateway.value.domain
+
+  let grid: GridClient | null
+  let vm: any
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.Peertube)
+    grid = await getGrid(profileManager.profile!, ProjectName.Peertube)
 
     await layout.value.validateBalance(grid)
 
-    /* Deploy */
-    const vm = {}
+    vm = await deployVM(grid!, {
+      name: name.value,
+      machines: [
+        {
+          name: name.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
+          disks: [
+            {
+              size: solution.value.disk,
+              mountPoint: '/data',
+            },
+          ],
+          flist: 'https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist',
+          entryPoint: '/sbin/zinit init',
+          farmId: farm.value.farmID,
+          farmName: farm.value.name,
+          country: farm.value.country,
+          planetary: true,
+          envs: [
+            { key: 'SSH_KEY', value: profileManager.profile!.ssh },
+            { key: 'PEERTUBE_ADMIN_EMAIL', value: email.value },
+            { key: 'PT_INITIAL_ROOT_PASSWORD', value: password.value },
+            { key: 'PEERTUBE_WEBSERVER_HOSTNAME', value: domain },
+          ],
+        },
+      ],
+    })
+  } catch (e) {
+    return layout.value.setStatus(
+      'failed',
+      normalizeError(e, 'Failed to deploy a peertube instance.')
+    )
+  }
+
+  try {
+    layout.value.setStatus('deploy', 'Preparing to deploy gateway...')
+
+    await deployGatewayName(grid!, {
+      name: subdomain,
+      nodeId: gateway.value.id,
+      backends: [`http://[${vm[0].planetary}]:9000`],
+    })
 
     layout.value.setStatus('success', 'Successfully deployed a peertube instance.')
     layout.value.openDialog(vm, {
@@ -109,6 +170,9 @@ async function deploy() {
       PEERTUBE_WEBSERVER_HOSTNAME: 'Peertube Webserver Hostname',
     })
   } catch (e) {
+    layout.value.setStatus('deploy', 'Rollbacking back due to fail to deploy gateway...')
+
+    await rollbackDeployment(grid!, name.value)
     layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a peertube instance.'))
   }
 }
