@@ -28,6 +28,12 @@ const router = createRouter({
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },
     },
+
+    {
+      path: '/taiga',
+      component: () => import('../views/taiga_view.vue'),
+      meta: { title: 'Taiga' },
+    },
     {
       path: '/owncloud',
       component: () => import('../views/owncloud_view.vue'),
