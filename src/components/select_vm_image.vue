@@ -12,8 +12,8 @@
       :rules="[
         validators.required('Flist is required.'),
         validators.isURL('Flist must be a valid URL.', {
-          protocols: ['https']
-        })
+          protocols: ['https'],
+        }),
       ]"
       :async-rules="image.name === 'Other' ? [isFlistExist] : []"
       :value="flist"
@@ -42,12 +42,14 @@ export interface VmImage {
   entryPoint: string
 }
 const props = defineProps({
-  flist: String,
-  entryPoint: String,
+  modelValue: {
+    type: Object as PropType<Flist>,
+    required: false,
+  },
   images: {
     type: Array as PropType<VmImage[]>,
-    required: true
-  }
+    required: true,
+  },
 })
 const emits = defineEmits<{ (event: 'update:model-value', value?: Flist): void }>()
 const flist = ref<string>()
@@ -87,6 +89,6 @@ function isFlistExist(flist: string) {
 
 <script lang="ts">
 export default {
-  name: 'SelectVmImage'
+  name: 'SelectVmImage',
 }
 </script>

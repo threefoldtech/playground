@@ -20,11 +20,11 @@
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert type="info" v-show="!profileManager.profile">
+        <v-alert variant="tonal" type="info" v-show="!profileManager.profile">
           Please activate a profile from the profile manager
         </v-alert>
 
-        <v-alert v-show="profileManager.profile && status" :type="alertType">
+        <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
           {{ message }}
         </v-alert>
 
@@ -122,6 +122,10 @@ defineExpose({
 
     message.value = m ? m : 'Preparing to deploy...'
     status.value = s
+
+    if (status.value === 'success') {
+      loadDeployments()
+    }
   },
 
   openDialog(data?: any, envs?: { [key: string]: string | boolean } | false, json?: boolean) {
@@ -131,6 +135,8 @@ defineExpose({
   },
 
   status: computed(() => status.value),
+
+  loadDeployments,
 })
 
 function reset() {
@@ -139,10 +145,16 @@ function reset() {
   emits('back')
 }
 
+const deploymentListManager = useDeploymentListManager()
+function loadDeployments() {
+  deploymentListManager?.load()
+}
+
 watch(
   () => !!profileManager.profile || props.disableAlerts,
   (value, oldValue) => {
     if (value && value !== oldValue) {
+      reset()
       emits('mount')
     }
   },
@@ -152,6 +164,7 @@ watch(
 
 <script lang="ts">
 import DeploymentDataDialog from './deployment_data_dialog.vue'
+import { useDeploymentListManager } from './deployment_list_manager.vue'
 
 export default {
   name: 'WebletLayout',

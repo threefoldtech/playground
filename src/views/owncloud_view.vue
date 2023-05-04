@@ -1,5 +1,5 @@
 <template>
-  <MicroVm />
+  <TfOwncloud />
 
   <div class="mt-4">
     <TfDeploymentList :project-name="name" />
@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import MicroVm from '../weblets/micro_vm.vue'
+import TfOwncloud from '../weblets/tf_owncloud.vue'
 import TfDeploymentList from '../weblets/tf_deployment_list.vue'
 import { ProjectName } from '../types'
 
 export default {
-  name: 'MicroVirtualMachine',
+  name: 'MattermostView',
   components: {
-    MicroVm,
+    TfOwncloud,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.VM }
+    return { name: ProjectName.Owncloud }
   },
 }
 </script>

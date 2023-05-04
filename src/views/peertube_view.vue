@@ -1,5 +1,5 @@
 <template>
-  <MicroVm />
+  <TfPeertube />
 
   <div class="mt-4">
     <TfDeploymentList :project-name="name" />
@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import MicroVm from '../weblets/micro_vm.vue'
+import TfPeertube from '../weblets/tf_peertube.vue'
 import TfDeploymentList from '../weblets/tf_deployment_list.vue'
 import { ProjectName } from '../types'
 
 export default {
-  name: 'MicroVirtualMachine',
+  name: 'PeertubeView',
   components: {
-    MicroVm,
+    TfPeertube,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.VM }
+    return { name: ProjectName.Peertube }
   },
 }
 </script>
