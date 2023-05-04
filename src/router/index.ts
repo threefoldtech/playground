@@ -24,6 +24,11 @@ const router = createRouter({
       meta: { title: 'Peertube' },
     },
     {
+      path: '/funkwhale',
+      component: () => import('../views/funkwhale_view.vue'),
+      meta: { title: 'Funkwhale' },
+    },
+    {
       path: '/mattermost',
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },
