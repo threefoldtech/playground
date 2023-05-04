@@ -18,7 +18,6 @@
   "dependencies": {
     "@mdi/font": "^7.2.96",
     "@threefold/grid_client": "^2.0.0-rc4",
-    "@types/uuid": "^9.0.1",
     "bip39": "^3.1.0",
     "decimal.js": "^10.4.3",
     "highlight.js": "^11.7.0",
@@ -27,7 +26,6 @@
     "qrcode": "^1.5.1",
     "tf_gridproxy_client": "^1.0.2",
     "tfgrid-gql": "^1.0.1",
-    "uuid": "^9.0.0",
     "validator": "^13.9.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",

@@ -71,7 +71,7 @@
             :filters="{
               cpu,
               memory,
-              ssd: diskSize + rootFsSize,
+              ssd: 100 + rootFsSize,
             }"
             v-model="farm"
             v-model:country="country"
@@ -94,7 +94,6 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
 import { type Farm, ProjectName } from '../types'
-import Disk from '../utils/disk'
 
 const layout = ref()
 const tabs = ref()
@@ -102,54 +101,66 @@ const profileManager = useProfileManager()
 const name = ref('NP' + generateString(8))
 const cpu = ref(4)
 const memory = ref(8192)
-const diskSize = ref(50)
 const rootFsSize = rootFs(cpu.value, memory.value)
 const planetary = ref(true)
 const farm = ref() as Ref<Farm>
 const country = ref<string>()
-const disks = ref<Disk[]>([])
-const disk1 = new Disk();
-const disk2 = new Disk();
-disks.value.push(disk1, disk2)
+
 
 async function deploy() {
-  const grid = await getGrid(profileManager.profile!, ProjectName.NodePilot)
+  try {
+    const grid = await getGrid(profileManager.profile!, ProjectName.NodePilot)
 
-  layout.value.setStatus('deploy')
-  deployVM(grid!, {
-    name: name.value,
-    machines: [
-      {
-        name: name.value,
-        cpu: cpu.value,
-        memory: memory.value,
-        flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
-        entryPoint: "/",
-        farmId: farm.value.farmID,
-        farmName: farm.value.name,
-        country: country.value,
-        planetary: planetary.value,
-        envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
-        rootFilesystemSize: 2,
-        disks: [...disks.value]
-      }
-    ],
-  })
-    .then((vm) => {
-      layout.value.setStatus('success', 'Successfully deployed a node pilot instance.')
-      layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+    await layout.value.validateBalance(grid)
+  
+    layout.value.setStatus('deploy')
+
+    const vm = await deployVM(grid!, {
+      name: name.value,
+      machines: [
+        {
+          name: name.value,
+          cpu: cpu.value,
+          memory: memory.value,
+          flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
+          entryPoint: "/",
+          farmId: farm.value.farmID,
+          farmName: farm.value.name,
+          country: country.value,
+          planetary: planetary.value,
+          envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
+          rootFilesystemSize: 2,
+          disks: [
+            {
+            size: 50,
+            mountPoint: '/mnt/' + generateString(10)
+          },
+          {
+            size: 50,
+            mountPoint: '/mnt/' + generateString(10)
+          },
+        
+        ]
+        }
+      ],
     })
-    .catch((error) => {
-      const e = typeof error === 'string' ? error : error.message
-      layout.value.setStatus('failed', e)
-    })
+
+    layout.value.setStatus('success', 'Successfully deployed a node pilot instance.')
+    layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+    
+  } catch (e) {
+    layout.value.setStatus(
+      'failed',
+      normalizeError(e, 'Failed to deploy a Node Pilot instance.')
+    )
+  }
 }
 </script>
 
 <script lang="ts">
 import SelectFarmId from '../components/select_farm.vue'
 import rootFs from '../utils/root_fs'
-// import type { DiskModel } from '@threefold/grid_client'
+import { normalizeError } from '../utils/helpers'
 
 export default {
   name: 'NodePilot',
