@@ -50,6 +50,11 @@ const router = createRouter({
       meta: { title: 'Presearch' },
     },
     {
+      path: '/casperlabs',
+      component: () => import('../views/casperlabs_view.vue'),
+      meta: { title: 'Casperlabs' },
+    },
+    {
       path: '/contractslist',
       component: () => import('../views/contracts_list.vue'),
       meta: { title: 'Contracts List' },
