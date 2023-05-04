@@ -452,7 +452,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, type Ref, inject, getCurrentInstance, onUnmounted } from 'vue'
+import { ref, watch, type Ref, getCurrentInstance, onUnmounted } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid, updateGrid } from '../utils/grid'
 import { deleteDeployment } from '../utils/delete_deployment'

@@ -50,6 +50,11 @@ const router = createRouter({
       meta: { title: 'Presearch' },
     },
     {
+      path: '/subsquid',
+      component: () => import('../views/subsquid_view.vue'),
+      meta: { title: 'Subsquid' },
+    },
+    {
       path: '/contractslist',
       component: () => import('../views/contracts_list.vue'),
       meta: { title: 'Contracts List' },
