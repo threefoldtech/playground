@@ -118,19 +118,18 @@
     - As I user I should be able to view all of my contracts and deployments
 ### Acceptance Criteria
 
-    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in My Account.
+    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in 'My Account'.
     - User can also view details of any contract/deployment and delete any of them. 
     - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
 ---
 ## Scenario 15
 
-    - As I user I should be able to view all of my contracts and deployments
+    - As I user expect to know what's Peertube and how to deploy it
 ### Acceptance Criteria
 
-    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in My Account.
-    - User can also view details of any contract/deployment and delete any of them. 
-    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
+    - User can learn all about the deployment on peertube from the 'Quick start documentation', that explains all about it.
 ---
+
 
 
 
