@@ -20,8 +20,8 @@
       memory: $props.modelValue.solution?.memory,
       publicIp: true,
       ssd:
-        $props.modelValue.solution?.disk ??
-        0 + rootFs($props.modelValue.solution?.cpu ?? 0, $props.modelValue.solution?.memory ?? 0),
+        ($props.modelValue.solution?.disk ?? 0) +
+        rootFs($props.modelValue.solution?.cpu ?? 0, $props.modelValue.solution?.memory ?? 0),
     }"
     v-model="$props.modelValue.farm"
   />
