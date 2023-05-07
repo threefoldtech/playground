@@ -62,7 +62,14 @@
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
-      <SelectFarm v-model="farm" />
+      <SelectFarm 
+      :filters="{
+        cpu: solution?.cpu,
+        memory: solution?.memory,
+        ssd: (solution?.disk ?? 0) + 10,
+        publicIp: false,
+      }"
+      v-model="farm" />
     </form-validator>
 
     <template #footer-actions>
@@ -73,7 +80,7 @@
 
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
-import { generateString, type GridClient } from '@threefold/grid_client'
+import { generateString } from '@threefold/grid_client'
 import type { solutionFlavor as SolutionFlavor, Farm } from '../types'
 import { ProjectName } from '../types'
 import { getGrid } from '../utils/grid'
@@ -127,7 +134,7 @@ const farm = ref() as Ref<Farm>
             { key: 'SSH_KEY', value: profileManager.profile!.ssh },
             { key: 'USERNAME', value: username.value },
             { key: 'PASSWORD', value: password.value },
-            { key: 'UMBREL_DISK', value: solution.value.disk },
+            { key: 'UMBREL_DISK', value: '/umbrelDisk' },
           ],
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory)
         },
