@@ -71,10 +71,10 @@
             :filters="{
               cpu,
               memory,
-              ssd: 100 + rootFsSize,
+              ssd: (rootFsSize ?? 0) + 30,
+              publicIp: true,
             }"
             v-model="farm"
-            v-model:country="country"
           />
         </template>
       </d-tabs>
@@ -102,7 +102,6 @@ const name = ref('NP' + generateString(8))
 const cpu = ref(4)
 const memory = ref(8192)
 const rootFsSize = rootFs(cpu.value, memory.value)
-const planetary = ref(true)
 const farm = ref() as Ref<Farm>
 const country = ref<string>()
 
@@ -127,19 +126,20 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: country.value,
-          planetary: planetary.value,
+          publicIpv4: true,
+          publicIpv6: true,
+          planetary: false,
           envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           disks: [
             {
-            size: 50,
+            size: 15,
             mountPoint: '/mnt/' + generateString(10)
           },
           {
-            size: 50,
+            size: 15,
             mountPoint: '/mnt/' + generateString(10)
           },
-        
         ]
         }
       ],
