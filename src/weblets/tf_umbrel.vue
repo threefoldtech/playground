@@ -92,13 +92,12 @@ const password = ref(generateString(12))
 const solution = ref() as Ref<SolutionFlavor>
 const farm = ref() as Ref<Farm>
 
-async function deploy() {
+  async function deploy() {
   layout.value.setStatus('deploy')
-  let grid: GridClient | null
-  let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Umbrel)
+    const grid = await getGrid(profileManager.profile!, ProjectName.Fullvm)
+
     await layout.value.validateBalance(grid)
 
     const vm = await deployVM(grid!, {
@@ -110,35 +109,41 @@ async function deploy() {
           memory: solution.value.memory,
           disks: [
             {
+              size: 10,
+              mountPoint: '/var/lib/docker'
+            },
+            {
               size: solution.value.disk,
               mountPoint: '/umbrelDisk',
             },
           ],
           flist: 'https://hub.grid.tf/tf-official-apps/umbrel-latest.flist',
-          entryPoint: '/init.sh',
+          entryPoint: '/sbin/zinit init',
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
+          planetary: true,
           envs: [
             { key: 'SSH_KEY', value: profileManager.profile!.ssh },
             { key: 'USERNAME', value: username.value },
             { key: 'PASSWORD', value: password.value },
             { key: 'UMBREL_DISK', value: solution.value.disk },
           ],
+          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory)
         },
       ],
     })
     layout.value.setStatus('success', 'Successfully deployed an Umbrell instance.')
-    layout.value.openDialog(vm, {
-       SSH_KEY: 'Public SSH Key',
+    layout.value.openDialog(vm, { 
+      SSH_KEY: 'Public SSH Key',
        USERNAME: "Username",
        PASSWORD: "Password",
        UMBREL_DISK: "Umbrel Disk",
-      })
+    })
   } catch (e) {
     layout.value.setStatus(
       'failed',
-      normalizeError(e, 'Failed to deploy an Umbrel instance.')
+      normalizeError(e, 'Failed to deploy an Umbrell instance.')
     )
   }
 }
@@ -147,6 +152,7 @@ async function deploy() {
 <script lang="ts">
 import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
 import SelectFarm from '../components/select_farm.vue'
+import rootFs from '../utils/root_fs'
 
 export default {
   name: 'TFUmbrel',
