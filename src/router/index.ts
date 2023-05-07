@@ -29,6 +29,11 @@ const router = createRouter({
       meta: { title: 'Peertube' },
     },
     {
+      path: '/funkwhale',
+      component: () => import('../views/funkwhale_view.vue'),
+      meta: { title: 'Funkwhale' },
+    },
+    {
       path: '/mattermost',
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },
@@ -39,9 +44,19 @@ const router = createRouter({
       meta: { title: 'Taiga' },
     },
     {
+      path: '/owncloud',
+      component: () => import('../views/owncloud_view.vue'),
+      meta: { title: 'Owncloud' },
+    },
+    {
       path: '/presearch',
       component: () => import('../views/presearch_view.vue'),
       meta: { title: 'Presearch' },
+    },
+    {
+      path: '/nodepilot',
+      component: () => import('../views/node_pilot.vue'),
+      meta: { title: 'Node Pilot' }
     },
     {
       path: '/contractslist',
