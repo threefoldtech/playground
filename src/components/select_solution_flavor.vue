@@ -61,7 +61,6 @@ const props = defineProps({
     type: Object as Package,
     default: () => ({ cpu: 4, memory: 1024 * 4, disk: 500 }),
   },
-  form: { type: Object, default: () => ({}) },
 })
 const emits = defineEmits<{ (event: 'update:model-value', value?: solutionFlavor): void }>()
 
