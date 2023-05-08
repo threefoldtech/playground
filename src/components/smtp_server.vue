@@ -1,5 +1,5 @@
 <template>
-  <v-alert variant="tonal" type="warning">
+  <v-alert variant="tonal" type="warning" :class="{'mb-2':persistent}">
     <slot v-if="$slots.default"></slot>
     <p v-else>Configure your SMTP Server.</p>
   </v-alert>
@@ -94,8 +94,8 @@
       </template>
     </input-validator>
 
-    <v-switch inset color="primary" label="Use TLS" v-if="ssl" />
-    <v-switch inset color="primary" label="Use SSL" v-if="tls" />
+    <v-switch inset color="primary" label="Use TLS" v-if="tls" />
+    <v-switch inset color="primary" label="Use SSL" v-if="ssl" />
   </template>
 </template>
 
