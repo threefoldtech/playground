@@ -33,7 +33,11 @@ const router = createRouter({
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },
     },
-
+    {
+      path: '/discourse',
+      component: () => import('../views/discourse_view.vue'),
+      meta: { title: 'Discourse'}
+    },
     {
       path: '/taiga',
       component: () => import('../views/taiga_view.vue'),
