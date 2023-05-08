@@ -174,6 +174,14 @@
     - All previous deployments of Owncloud will be listed at the bottom in the 'Deployment List (Owncloud)'. 
     - User can visit all Owncloud instances from deployments list and use it 
 ---
+## Scenario 21
+
+    - As I user I want to know how to access my deployments 
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+    - User can access them via SSH command which is explained in the documentation. 
+---
 
 
 
