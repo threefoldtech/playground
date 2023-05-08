@@ -55,7 +55,15 @@
           <div class="my-4 d-flex justify-end">
             <ProfileManager />
           </div>
-          <router-view />
+          <div :style="{ position: 'relative' }">
+            <router-view v-slot="{ Component }">
+              <transition name="fade">
+                <div :key="$route.path">
+                  <component :is="Component"></component>
+                </div>
+              </transition>
+            </router-view>
+          </div>
         </v-container>
       </DeploymentListManager>
     </v-main>
@@ -142,5 +150,21 @@ export default {
   font-weight: bold;
   color: #0d47a1;
   cursor: pointer;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+
+  transition: opacity 1s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
