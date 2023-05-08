@@ -2,8 +2,8 @@
   <weblet-layout ref="layout">
     <template #title>Deploy a Subsquid Instance </template>
     <template #subtitle>
-      Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and
-      stores them for processing in a later stage.
+      Subsquid indexer is a piece of software that reads all the blocks from a Substrate based
+      blockchain, decodes and stores them for processing in a later stage.
       <a
         target="_blank"
         href="https://manual.grid.tf/weblets/weblets_subsquid.html"
@@ -31,10 +31,7 @@
         :value="endpoint"
         :rules="[
           validators.required('Endpoint is required.'),
-          validators.pattern(
-            'Invalid endpoint format',
-            { pattern: endpointPattern }
-          ),
+          validators.isURL('Please provide a valid endpoint.', { protocols: ['wss'] }),
         ]"
       >
         <template #default="{ props }">
@@ -46,7 +43,15 @@
 
       <SelectSolutionFlavor v-model="solution" />
       <SelectGatewayNode v-model="gateway" />
-      <SelectFarm v-model="farm" />
+      <SelectFarm
+        :filters="{
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          ssd: solution?.disk,
+          publicIp: ipv4,
+        }"
+        v-model="farm"
+      />
     </form-validator>
 
     <template #footer-actions>
@@ -72,13 +77,11 @@ const valid = ref(false)
 const profileManager = useProfileManager()
 
 const name = ref('SS' + generateString(9))
-const endpoint = ref()
+const endpoint = ref('')
 const ipv4 = ref(false)
 const solution = ref() as Ref<SolutionFlavor>
 const gateway = ref() as Ref<GatewayNode>
 const farm = ref() as Ref<Farm>
-// eslint-disable-next-line no-useless-escape
-const endpointPattern = /^((?:wss):\/\/.)(?:[-a-zA-Z0-9@:%_\+~#=]{1,63}\.)+[a-z]{1,10}\b((?:[-a-zA-Z0-9@:%_\+~#?&//="]+\.)*[-a-zA-Z0-9@:%_\+~#?&//="]+)?$/
 
 async function deploy() {
   layout.value.setStatus('deploy')
@@ -118,8 +121,8 @@ async function deploy() {
           country: farm.value.country,
           envs: [
             { key: 'SSH_KEY', value: profileManager.profile!.ssh },
-            { key: 'CHAIN_ENDPOINT', value: endpoint.value},
-            { key: 'SUBSQUID_WEBSERVER_HOSTNAME', value: domain},
+            { key: 'CHAIN_ENDPOINT', value: endpoint.value },
+            { key: 'SUBSQUID_WEBSERVER_HOSTNAME', value: domain },
           ],
         },
       ],
