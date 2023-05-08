@@ -24,7 +24,9 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
 }
 
 export async function loadVM(grid: GridClient, name: string) {
-  return grid.machines.getObj(name)
+  const vm = (await grid.machines.getObj(name)) as any
+  vm.deploymentName = name
+  return vm
 }
 
 async function createMachine(grid: GridClient, machine: Machine): Promise<MachineModel> {

@@ -19,6 +19,11 @@ const router = createRouter({
       meta: { title: 'Kubernetes' },
     },
     {
+      path: '/caprover',
+      component: () => import('../views/caprover_view.vue'),
+      meta: { title: 'Caprover' },
+    },
+    {
       path: '/peertube',
       component: () => import('../views/peertube_view.vue'),
       meta: { title: 'Peertube' },
@@ -33,7 +38,6 @@ const router = createRouter({
       component: () => import('../views/mattermost_view.vue'),
       meta: { title: 'Mattermost' },
     },
-
     {
       path: '/taiga',
       component: () => import('../views/taiga_view.vue'),
@@ -50,9 +54,19 @@ const router = createRouter({
       meta: { title: 'Presearch' },
     },
     {
+      path: '/subsquid',
+      component: () => import('../views/subsquid_view.vue'),
+      meta: { title: 'Subsquid' },
+    },
+    {
       path: '/casperlabs',
       component: () => import('../views/casperlabs_view.vue'),
       meta: { title: 'Casperlabs' },
+    },
+    {
+      path: '/nodepilot',
+      component: () => import('../views/node_pilot.vue'),
+      meta: { title: 'Node Pilot' },
     },
     {
       path: '/contractslist',
