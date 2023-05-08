@@ -38,23 +38,7 @@
     </template>
 
     <template #deploy>
-      <input-validator :rules="[]" :value="name">
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
-      </input-validator>
-
-      <SelectSolutionFlavor v-model="solution" />
-
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          publicIp: true,
-          ssd: solution?.disk ?? 0 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
-        }"
-        v-model="farm"
-      />
+      <CaproverWorker v-model="worker" />
     </template>
   </ManageWorkerDialog>
 
@@ -105,8 +89,7 @@ import { ref } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { addMachine, deleteMachine, loadVM } from '../utils/deploy_vm'
-import { generateString } from '@threefold/grid_client'
-import { type Farm, ProjectName, type solutionFlavor } from '../types'
+import { ProjectName } from '../types'
 import rootFs from '../utils/root_fs'
 
 const props = defineProps<{ master: any; data: any[] }>()
@@ -118,9 +101,7 @@ const selectedWorkers = ref<any[]>([])
 const deleting = ref(false)
 const deployedDialog = ref(false)
 
-const name = ref('CR' + generateString(8))
-const solution = ref<solutionFlavor>()
-const farm = ref<Farm>()
+const worker = ref(createWorker())
 
 function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3
@@ -136,43 +117,46 @@ function updateCaprover() {
 async function deploy(layout: any) {
   layout.setStatus('deploy')
 
-  const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
-  addMachine(grid!, {
-    name: name.value,
-    deploymentName: props.master.name,
-    cpu: solution.value!.cpu,
-    memory: solution.value!.memory,
-    disks: [
-      {
-        name: 'data0',
-        size: solution.value!.disk,
-        mountPoint: '/var/lib/docker',
-      },
-    ],
-    flist: 'https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist',
-    entryPoint: '/sbin/zinit init',
-    farmId: farm.value!.farmID,
-    farmName: farm.value!.name,
-    planetary: false,
-    publicIpv4: true,
-    envs: [
-      { key: 'SWM_NODE_MODE', value: 'worker' },
-      { key: 'PUBLIC_KEY', value: props.master.env.PUBLIC_KEY },
-    ],
-    rootFilesystemSize: rootFs(solution.value!.cpu, solution.value!.memory),
-  })
-    .then((data) => {
-      caproverData.value = data
-      deployedDialog.value = true
-      layout.setStatus(
-        'success',
-        `Successfully add a new worker to Caprover('${props.master.name}') Instance.`
-      )
+  try {
+    const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
+
+    await layout.validateBalance(grid)
+
+    const vm = await addMachine(grid!, {
+      name: worker.value.name,
+      deploymentName: props.master.name,
+      cpu: worker.value.solution!.cpu,
+      memory: worker.value.solution!.memory,
+      disks: [
+        {
+          name: 'data0',
+          size: worker.value.solution!.disk,
+          mountPoint: '/var/lib/docker',
+        },
+      ],
+      flist: 'https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist',
+      entryPoint: '/sbin/zinit init',
+      farmId: worker.value.farm!.farmID,
+      farmName: worker.value.farm!.name,
+      country: worker.value.farm!.country,
+      planetary: true,
+      publicIpv4: true,
+      envs: [
+        { key: 'SWM_NODE_MODE', value: 'worker' },
+        { key: 'PUBLIC_KEY', value: props.master.env.PUBLIC_KEY },
+      ],
+      rootFilesystemSize: rootFs(worker.value.solution!.cpu, worker.value.solution!.memory),
     })
-    .catch((error) => {
-      const e = typeof error === 'string' ? error : error.message
-      layout.setStatus('failed', e)
-    })
+
+    caproverData.value = vm
+    deployedDialog.value = true
+    layout.setStatus(
+      'success',
+      `Successfully add a new worker to Caprover('${props.master.name}') Instance.`
+    )
+  } catch (e) {
+    layout.setStatus('failed', normalizeError(e, 'Failed to deploy a caprover worker.'))
+  }
 }
 
 async function onDelete(cb: (workers: any[]) => void) {
@@ -201,15 +185,14 @@ async function onDelete(cb: (workers: any[]) => void) {
 <script lang="ts">
 import ManageWorkerDialog from './manage_worker_dialog.vue'
 import ListTable from '../components/list_table.vue'
-import SelectSolutionFlavor from './select_solution_flavor.vue'
-import SelectFarm from './select_farm.vue'
+import CaproverWorker, { createWorker } from '../components/caprover_worker.vue'
+import { normalizeError } from '../utils/helpers'
 
 export default {
   name: 'ManageCaproverWorkerDialog',
   components: {
     ManageWorkerDialog,
-    SelectSolutionFlavor,
-    SelectFarm,
+    CaproverWorker,
     ListTable,
   },
 }

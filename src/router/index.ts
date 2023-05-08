@@ -19,6 +19,11 @@ const router = createRouter({
       meta: { title: 'Kubernetes' },
     },
     {
+      path: '/caprover',
+      component: () => import('../views/caprover_view.vue'),
+      meta: { title: 'Caprover' },
+    },
+    {
       path: '/peertube',
       component: () => import('../views/peertube_view.vue'),
       meta: { title: 'Peertube' },
@@ -36,7 +41,7 @@ const router = createRouter({
     {
       path: '/discourse',
       component: () => import('../views/discourse_view.vue'),
-      meta: { title: 'Discourse'}
+      meta: { title: 'Discourse' },
     },
     {
       path: '/taiga',
@@ -52,6 +57,31 @@ const router = createRouter({
       path: '/presearch',
       component: () => import('../views/presearch_view.vue'),
       meta: { title: 'Presearch' },
+    },
+    {
+      path: '/subsquid',
+      component: () => import('../views/subsquid_view.vue'),
+      meta: { title: 'Subsquid' },
+    },
+    {
+      path: '/casperlabs',
+      component: () => import('../views/casperlabs_view.vue'),
+      meta: { title: 'Casperlabs' },
+    },
+    {
+      path: '/nodepilot',
+      component: () => import('../views/node_pilot.vue'),
+      meta: { title: 'Node Pilot' },
+    },
+    {
+      path: '/wordpress',
+      component: () => import('../views/wordpress_view.vue'),
+      meta: { title: 'Wordpress' },
+    },
+    {
+      path: '/umbrel',
+      component: () => import('../views/umbrel_view.vue'),
+      meta: { title: 'Umbrel' },
     },
     {
       path: '/contractslist',

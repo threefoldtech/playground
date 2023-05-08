@@ -311,10 +311,15 @@
               "
             />
             <IconActionBtn
-              tooltip="PreviewK8SWorker"
+              tooltip="Visit"
               color="info"
               icon="mdi-web"
-              :href="'https://' + item.value[0].publicIP.ip.slice(0, -3)"
+              :href="
+                'http://' +
+                (item.value[0].publicIP?.ip
+                  ? item.value[0].publicIP.ip.slice(0, -3)
+                  : '[' + item.value[0].planetary + ']')
+              "
             />
           </template>
 
@@ -362,13 +367,13 @@
               tooltip="Preview"
               color="info"
               icon="mdi-web"
-              :href="item.value[0].env.WP_URL"
+              :href="'https://' + item.value[0].env.WP_URL"
             />
             <IconActionBtn
               tooltip="Admin Panel"
               color="secondary"
               icon="mdi-view-dashboard"
-              :href="item.value[0].env.WP_URL + '/wp-admin'"
+              :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
             />
           </template>
         </VmDeploymentTable>
@@ -452,7 +457,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, type Ref, inject, getCurrentInstance, onUnmounted } from 'vue'
+import { ref, watch, type Ref, getCurrentInstance, onUnmounted } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid, updateGrid } from '../utils/grid'
 import { deleteDeployment } from '../utils/delete_deployment'
