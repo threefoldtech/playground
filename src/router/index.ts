@@ -59,6 +59,11 @@ const router = createRouter({
       meta: { title: 'Subsquid' },
     },
     {
+      path: '/casperlabs',
+      component: () => import('../views/casperlabs_view.vue'),
+      meta: { title: 'Casperlabs' },
+    },
+    {
       path: '/nodepilot',
       component: () => import('../views/node_pilot.vue'),
       meta: { title: 'Node Pilot' },
