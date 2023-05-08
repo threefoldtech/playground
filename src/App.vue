@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer width="280" permanent>
+    <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar">
       <v-list>
         <v-list-item>
           <v-img src="/images/logoTF.png" />
@@ -39,11 +39,31 @@
     <v-main>
       <DeploymentListManager>
         <v-container fluid>
-          <DisclaimerToolbar />
+          <div class="d-flex align-center">
+            <v-btn
+              color="primary"
+              @click="openSidebar = true"
+              icon="mdi-menu"
+              variant="tonal"
+              class="mr-2"
+              v-if="!permanent"
+            />
+            <div :style="{ width: '100%' }">
+              <DisclaimerToolbar />
+            </div>
+          </div>
           <div class="my-4 d-flex justify-end">
             <ProfileManager />
           </div>
-          <router-view />
+          <div :style="{ position: 'relative' }">
+            <router-view v-slot="{ Component }">
+              <transition name="fade">
+                <div :key="$route.path">
+                  <component :is="Component"></component>
+                </div>
+              </transition>
+            </router-view>
+          </div>
         </v-container>
       </DeploymentListManager>
     </v-main>
@@ -51,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -94,6 +114,9 @@ const routes: AppRoute[] = [
 
 // eslint-disable-next-line no-undef
 const network = process.env.NETWORK as string
+
+const permanent = window.innerWidth > 980
+const openSidebar = ref(permanent)
 </script>
 
 <script lang="ts">
@@ -127,5 +150,21 @@ export default {
   font-weight: bold;
   color: #0d47a1;
   cursor: pointer;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+
+  transition: opacity 1s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
