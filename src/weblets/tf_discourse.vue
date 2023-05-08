@@ -1,54 +1,78 @@
 <template>
   <weblet-layout ref="layout">
-
     <template #title> Deploy a Discourse Instance </template>
-    <template #subtitle>Discourse is the 100% open source discussion platform built for the next decade of the Internet.
-      Use it as a mailing list, discussion forum, long-form chat room, and more!
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_discourse.html" class="app-link">
+    <template #subtitle>
+      Discourse is the 100% open source discussion platform built for the next decade of the
+      Internet. Use it as a mailing list, discussion forum, long-form chat room, and more!
+      <a
+        target="_blank"
+        href="https://manual.grid.tf/weblets/weblets_discourse.html"
+        class="app-link"
+      >
         Quick start documentation
       </a>
     </template>
 
-    <d-tabs :tabs="[
-      { title: 'Config', value: 'config' },
-      { title: 'Mail Server', value: 'mail' },
-    ]" ref="tabs">
+    <d-tabs
+      :tabs="[
+        { title: 'Config', value: 'config' },
+        { title: 'Mail Server', value: 'mail' },
+      ]"
+      ref="tabs"
+    >
       <template #config>
-        <form-validator v-model="valid">
-          <input-validator :value="name" :rules="[
+        <input-validator
+          :value="name"
+          :rules="[
             validators.required('Name is required.'),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
-          ]">
-            <template #default="{ props }">
-              <v-text-field label="Name" v-model="name" v-bind="props" />
-            </template>
-          </input-validator>
-          <input-validator :value="developerEmail" :rules="[
+          ]"
+        >
+          <template #default="{ props }">
+            <v-text-field label="Name" v-model="name" v-bind="props" />
+          </template>
+        </input-validator>
+        <input-validator
+          :value="email"
+          :rules="[
             validators.required('Email is required.'),
-            validators.required('Please provide a valid email address.'),
-          ]">
-            <template #default="{ props }">
-              <v-text-field label="Email" placeholder="This email will be used to login to your instance."
-                v-model="developerEmail" v-bind="props" />
-            </template>
-          </input-validator>
-          <SelectSolutionFlavor v-model="solution" />
-          <SelectGatewayNode v-model="gateway" />
-          <SelectFarm :filters="{
+            validators.isEmail('Please provide a valid email address.'),
+          ]"
+        >
+          <template #default="{ props }">
+            <v-text-field
+              label="Email"
+              placeholder="This email will be used to login to your instance."
+              v-model="email"
+              v-bind="props"
+            />
+          </template>
+        </input-validator>
+
+        <SelectSolutionFlavor v-model="solution" />
+        <SelectGatewayNode v-model="gateway" />
+        <SelectFarm
+          :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: solution?.disk,
-          }" v-model="farm" />
-        </form-validator>
+            ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+            publicIp: false,
+          }"
+          v-model="farm"
+        />
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true" />
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+          Discourse needs SMTP service so please configure these settings properly.
+        </SmtpServer>
       </template>
     </d-tabs>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid">
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -64,21 +88,22 @@ import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 import { deployVM } from '../utils/deploy_vm'
-import TweetNACL from "tweetnacl";
+import TweetNACL from 'tweetnacl'
 import { Buffer } from 'buffer'
+import rootFs from '../utils/root_fs'
+
 const layout = ref()
-const valid = ref(false)
 const tabs = ref()
 const profileManager = useProfileManager()
+
 const name = ref('DC' + generateString(9))
-const developerEmail = ref('')
+const email = ref('')
 const solution = ref() as Ref<SolutionFlavor>
 const gateway = ref() as Ref<GatewayNode>
 const farm = ref() as Ref<Farm>
 const smtp = ref(createSMTPServer())
 
 async function deploy() {
-
   layout.value.setStatus('deploy')
 
   const subdomain = getSubdomain({
@@ -108,7 +133,7 @@ async function deploy() {
               mountPoint: '/var/lib/docker',
             },
           ],
-          flist: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
+          flist: 'https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist',
           entryPoint: '/sbin/zinit init',
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
           farmId: farm.value.farmID,
@@ -118,14 +143,14 @@ async function deploy() {
           envs: [
             { key: 'SSH_KEY', value: profileManager.profile!.ssh },
             { key: 'DISCOURSE_HOSTNAME', value: domain },
-            { key: 'DISCOURSE_DEVELOPER_EMAILS', value: developerEmail.value },
+            { key: 'DISCOURSE_DEVELOPER_EMAILS', value: email.value },
             { key: 'DISCOURSE_SMTP_ADDRESS', value: smtp.value.hostname },
             { key: 'DISCOURSE_SMTP_PORT', value: smtp.value.port.toString() },
-            { key: 'DISCOURSE_SMTP_ENABLE_START_TLS', value: smtp.value.tls ? "true" : "false" },
+            { key: 'DISCOURSE_SMTP_ENABLE_START_TLS', value: smtp.value.tls ? 'true' : 'false' },
             { key: 'DISCOURSE_SMTP_USER_NAME', value: smtp.value.username },
             { key: 'DISCOURSE_SMTP_PASSWORD', value: smtp.value.password },
             { key: 'THREEBOT_PRIVATE_KEY', value: generatePubKey() },
-            { key: 'FLASK_SECRET_KEY', value: generateString(8) }
+            { key: 'FLASK_SECRET_KEY', value: generateString(8) },
           ],
         },
       ],
@@ -165,17 +190,17 @@ async function deploy() {
     layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a discourse instance.'))
   }
 }
-function generatePubKey(): string {
-  const keypair = TweetNACL.box.keyPair();
-  return Buffer.from(keypair.publicKey).toString("base64");
-}
 
+function generatePubKey(): string {
+  const keypair = TweetNACL.box.keyPair()
+  return Buffer.from(keypair.publicKey).toString('base64')
+}
 </script>
+
 <script lang="ts">
 import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
 import SelectGatewayNode from '../components/select_gateway_node.vue'
 import SelectFarm from '../components/select_farm.vue'
-import rootFs from '@/utils/root_fs'
 import SmtpServer, { createSMTPServer } from '../components/smtp_server.vue'
 
 export default {

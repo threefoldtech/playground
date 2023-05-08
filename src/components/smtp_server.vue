@@ -1,5 +1,5 @@
 <template>
-  <v-alert variant="tonal" type="warning" :class="{'mb-2':persistent}">
+  <v-alert variant="tonal" type="warning" :class="{ 'mb-4': persistent }">
     <slot v-if="$slots.default"></slot>
     <p v-else>Configure your SMTP Server.</p>
   </v-alert>
