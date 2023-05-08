@@ -1,5 +1,5 @@
 <template>
-  <TFUmbrel />
+  <TfUmbrel />
 
   <div class="mt-4">
     <TfDeploymentList :project-name="name" />
@@ -7,14 +7,14 @@
 </template>
 
 <script lang="ts">
-import TFUmbrel from '../weblets/tf_umbrel.vue'
+import TfUmbrel from '../weblets/tf_umbrel.vue'
 import TfDeploymentList from '../weblets/tf_deployment_list.vue'
 import { ProjectName } from '../types'
 
 export default {
   name: 'UmbrelView',
   components: {
-    TFUmbrel,
+    TfUmbrel,
     TfDeploymentList,
   },
   setup() {
