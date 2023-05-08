@@ -54,9 +54,14 @@ const router = createRouter({
       meta: { title: 'Presearch' },
     },
     {
+      path: '/subsquid',
+      component: () => import('../views/subsquid_view.vue'),
+      meta: { title: 'Subsquid' },
+    },
+    {
       path: '/nodepilot',
       component: () => import('../views/node_pilot.vue'),
-      meta: { title: 'Node Pilot' }
+      meta: { title: 'Node Pilot' },
     },
     {
       path: '/contractslist',
