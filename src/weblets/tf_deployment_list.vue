@@ -367,13 +367,13 @@
               tooltip="Preview"
               color="info"
               icon="mdi-web"
-              :href="item.value[0].env.WP_URL"
+              :href="'https://' + item.value[0].env.WP_URL"
             />
             <IconActionBtn
               tooltip="Admin Panel"
               color="secondary"
               icon="mdi-view-dashboard"
-              :href="item.value[0].env.WP_URL + '/wp-admin'"
+              :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
             />
           </template>
         </VmDeploymentTable>

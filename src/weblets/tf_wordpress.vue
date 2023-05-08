@@ -2,8 +2,8 @@
   <weblet-layout ref="layout">
     <template #title>Deploy a Wordpress Instance </template>
     <template #subtitle>
-      WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over
-      43.3% of all the websites on the Internet.
+      WordPress is the simplest, most popular way to create your own website or blog. In fact,
+      WordPress powers over 43.3% of all the websites on the Internet.
       <a
         target="_blank"
         href="https://manual.grid.tf/weblets/weblets_wordpress.html"
@@ -40,12 +40,11 @@
         </template>
       </input-validator>
 
-      
       <password-input-wrapper>
         <template #default="{ props }">
           <input-validator
-          :value="password"
-          :rules="[
+            :value="password"
+            :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password minLength is 6 chars.', 6),
               validators.maxLength('Password maxLength is 15 chars.', 15),
@@ -61,7 +60,7 @@
           </input-validator>
         </template>
       </password-input-wrapper>
-      
+
       <input-validator
         :value="email"
         :rules="[
@@ -78,10 +77,18 @@
           />
         </template>
       </input-validator>
-      
+
       <SelectSolutionFlavor v-model="solution" />
       <SelectGatewayNode v-model="gateway" />
-      <SelectFarm v-model="farm" />
+      <SelectFarm
+        :filters="{
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          ssd: solution?.disk,
+          publicIp: false,
+        }"
+        v-model="farm"
+      />
     </form-validator>
 
     <template #footer-actions>
@@ -178,11 +185,11 @@ async function deploy() {
 
     layout.value.setStatus('success', 'Successfully deployed a Wordpress instance.')
     layout.value.openDialog(vm, {
-      SSH_KEY: domain,
-      MYSQL_USER: username.value,
-      MYSQL_PASSWORD: password.value,
-      ADMIN_EMAIL: email.value,
-      WP_URL: domain,
+      SSH_KEY: 'Public SSH Key',
+      MYSQL_USER: 'Mysql User',
+      MYSQL_PASSWORD: 'Mysql Password',
+      ADMIN_EMAIL: 'Admin Email',
+      WP_URL: 'WP URL',
     })
   } catch (e) {
     layout.value.setStatus('deploy', 'Rollbacking back due to fail to deploy gateway...')
