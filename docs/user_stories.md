@@ -182,6 +182,29 @@
     - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
     - User can access them via SSH command which is explained in the documentation. 
 ---
+## Scenario 22
+
+    - As I user I want to know what's domain and password used for in CapRover
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+    - //TODO:
+---
+## Scenario 23
+
+    - As I user I want to know what's leader and workers in CapRover
+### Acceptance Criteria
+
+    - //TODO:
+---
+## Scenario 24
+
+    - As I user I want to know what's Subsquid
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it and how to add the 'Websocket Endpoint'.
+---
+
 
 
 
