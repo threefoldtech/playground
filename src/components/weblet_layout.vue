@@ -122,7 +122,7 @@ defineExpose({
 
     message.value = m ? m : 'Preparing to deploy...'
     status.value = s
-
+    // Should remove auto loadDeployments cause it will cause bugs
     if (status.value === 'success') {
       loadDeployments()
     }
