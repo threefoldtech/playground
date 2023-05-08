@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer width="280" permanent>
+    <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar">
       <v-list>
         <v-list-item>
           <v-img src="/images/logoTF.png" />
@@ -39,7 +39,19 @@
     <v-main>
       <DeploymentListManager>
         <v-container fluid>
-          <DisclaimerToolbar />
+          <div class="d-flex align-center">
+            <v-btn
+              color="primary"
+              @click="openSidebar = true"
+              icon="mdi-menu"
+              variant="tonal"
+              class="mr-2"
+              v-if="!permanent"
+            />
+            <div :style="{ width: '100%' }">
+              <DisclaimerToolbar />
+            </div>
+          </div>
           <div class="my-4 d-flex justify-end">
             <ProfileManager />
           </div>
@@ -51,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -94,6 +106,9 @@ const routes: AppRoute[] = [
 
 // eslint-disable-next-line no-undef
 const network = process.env.NETWORK as string
+
+const permanent = window.innerWidth > 980
+const openSidebar = ref(permanent)
 </script>
 
 <script lang="ts">
