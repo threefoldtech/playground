@@ -168,7 +168,7 @@ async function deploy() {
     await deployGatewayName(grid!, {
       name: subdomain,
       nodeId: gateway.value.id,
-      backends: [`http://[${vm[0].planetary}]:9000`],
+      backends: [`http://[${vm[0].planetary}]:88`],
     })
 
     layout.value.setStatus('success', 'Successfully deployed a discourse instance.')
