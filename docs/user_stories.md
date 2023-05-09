@@ -1,15 +1,15 @@
 # **User Stories**
 
-## Scenario 1
+## LogIn
 
-    - As a user I should be able to login easily
+    - As a user I should be able to login easily using TfChain mnemonic 
 
 ### Acceptance Criteria
 
-    - User can login easily by adding his mnemonics, then click on 'activate' button. 
-    - If user don't have an account, click on 'DON"T HAVE ACCOUNT? CREATE ONE' button to create an account and mnemonics will be generated automatically, then user can add or generate SSH Keys.
+    - User can login easily by adding his mnemonic, then click on 'activate' button. 
+    - If user don't have an account, click on 'DON"T HAVE ACCOUNT? CREATE ONE' button to create an account and mnemonic will be generated automatically, then user can add or generate SSH Keys.
 ---
-## Scenario 2
+## Logout
 
     - As a user I should be able to logout easily from the system
 
@@ -17,7 +17,7 @@
 
     - User can logout easily from profile manager. 
 ---
-## Scenario 3
+## SSH Key
 
     - As a user I should be able to update or generate new SSK Key
 
@@ -25,41 +25,52 @@
 
     - User can update its SSH Key from profile manager after activating profile, by clicking on 'UPDATE PUBLIC SSH KEY' button.
     - User can also generate new SSH Key after activating profile, by clicking on 'GENERATE SSH KEYS' button.
+    - If user added the same SSH Key, it won't update.
 ---
-## Scenario 4
+## TFT Wallet
+
+    - As a user I would like to know how to fund my wallet
+
+### Acceptance Criteria
+
+    - The user can fund its wallet from 'ThreeFold Connect' mobile application.
+    - These funds will reflect on TfChain.
+---
+## Grid Deployment
 
     - As a user I expect to know easily how to deploy on grid
 
 ### Acceptance Criteria
 
-    - For all kinds of deployments, there will be 'Quick start documentation' refers to manual of TF Chain, which document single detail about all deployments.
+    - For all kinds of deployments, there will be 'Quick start documentation' refers to manual of TFGrid https://manual.grid.tf , which document single detail about all deployments.
 ---
-## Scenario 5
+## Deployment Cost
 
     - As a user I expect to know the calculations of all kind of deployments from my TFT Balance
 
 ### Acceptance Criteria
-    - TODO
+    - Deployment cost should be available to user before deploying.
 ---
-## Scenario 6
+## Deployment Node
 
     - As I user I expect to choose node for deploying easily
 
 ### Acceptance Criteria
 
     - When deploying, there's 'Farm Filter' filter farms to choose farm with available nodes.
-    - User won't have to think about which farm/node to choose. 
-    - User will just choose Country and Farm Name from the drop-down list, then click on 'DEPLOY' button.
+    - User won't have to think about which node to choose. 
+    - User will just choose Country and Farm from the drop-down list, then click on 'DEPLOY' button.
 ---
-## Scenario 7
+## Issues Tracker is linked 
 
     - As I user I would like to know what to do if I faced any issue
 ### Acceptance Criteria
 
     - User can add issues from the 'Disclaimer' part.
-    - Applying for issues in github and the developers will solve them
+    - Applying for issues in github and the developers will solve them.
+    - There's also a live chat at the bottom for any issue.
 ---
-## Scenario 8
+## Full Virtual Machine Deployment
 
     - As a user I expect to know deploy Full Virtual machine easily with all its configurations.
 
@@ -71,7 +82,15 @@
     - All previous deployments will be listed at the bottom. 
 
 ---
-## Scenario 9
+## Full Virtual Machine Deployment
+
+    - As a user I should add more disks easily to Full Virtual machine
+
+### Acceptance Criteria
+
+    - From the 'DISKS' section above, the user can add many disks with the virtual machine.
+---
+## Full Virtual Machine Logs
 
     - As a user I expect to get all details about Full Virtual machine after deployment
 
@@ -79,9 +98,9 @@
 
     - After deployment, all details of the deployed virtual machine will be shown to user.
     - Also, list of all deployments available at the bottom to view details at anytime.
-    - User can also view all deployments/contracts from 'Contracts' and 'Deployments' in 'My Account'.
+    - User can also view all deployments/contracts from 'Contracts' and 'Deployments' in 'My Account' section.
 ---
-## Scenario 10
+## Deployment Cancellation
 
     - As a user I expect to cancel any of my deployments anytime
 
@@ -90,7 +109,7 @@
     - After deployment, user can delete all deployments or any specific deployment from the 'Deployment List' at the bottom.
     - User can also delete them from 'Contracts' and 'Deployments' in 'My Account'.
 ---
-## Scenario 11
+## Full Virtual Machine VS Micro Virtual Machine
 
     - As I user I expect to know the difference between Full Virtual Machine and Micro Virtual Machine
 
@@ -98,7 +117,7 @@
 
     - From 'Quick start documentation' that refers to manual of TF Chain, documents all information about their differences and similarities.
 ---
-## Scenario 12
+## Adding more configurations to Micro Virtual Machine
 
     - As I user I expect to add or delete 'ENVIRONMENT VARIABLES' and 'DISKS' to Micro Virtual Machine
 
@@ -107,30 +126,30 @@
     - From 'ENVIRONMENT VARIABLES' user can add, modify, or delete environment variables to micro virtual machine.
     - From 'DISKS' user can add many disks with the micro virtual machine. 
 ---
-## Scenario 13
+## Kubernetes Deployment
 
     - As I user I expect to deploy Kubernetes Cluster easily with many workers 
 ### Acceptance Criteria
 
     - User can deploy Kubernetes Cluster easily with all its configurations for both master and workers 
 ---
-## Scenario 14
+## Kubernetes Deployment with many workers
 
     - As I user I expect to deploy Kubernetes Cluster with many workers, each on different node
 ### Acceptance Criteria
 
-    - TODO
+    - Custer machines should be deployed on different nodes on the farm if possible.
 ---
-## Scenario 15
+## User Contracts and Deployments
 
     - As I user I should be able to view all of my contracts and deployments
 ### Acceptance Criteria
 
-    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in 'My Account'.
+    - User can view all contracts and deployments from 'Contracts' and 'Deployments' in 'My Account' section.
     - User can also view details of any contract/deployment and delete any of them. 
-    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button 
+    - If there's any problem, user can refresh contracts/deployments from 'Refresh' button in the UI.
 ---
-## Scenario 16
+## Peertube Deployment
 
     - As I user expect to know what's Peertube and how to deploy it
 ### Acceptance Criteria
@@ -138,7 +157,7 @@
     - User can learn all about the deployment on peertube from the 'Quick start documentation', that explains all about it.
     - All previous deployments of peertube will be listed at the bottom in the 'Deployment List (Peertube)'.  
 ---
-## Scenario 17
+## Mattermost Deployment
 
     - As I user expect to know what's Mattermost and how to deploy it
 ### Acceptance Criteria
@@ -147,7 +166,7 @@
     - All previous deployments of mattermost will be listed at the bottom in the 'Deployment List (mattermost)'. 
     - User can visit all mattermost instances from deployments list 
 ---
-## Scenario 18
+## Funkwhale Deployment
 
     - As I user expect to know what's Funkwhale and how to deploy it
 ### Acceptance Criteria
@@ -156,7 +175,7 @@
     - All previous deployments of Funkwhale will be listed at the bottom in the 'Deployment List (Funkwhale)'. 
     - User can visit all Funkwhale instances from deployments list and use it 
 ---
-## Scenario 19
+## Taiga Deployment
 
     - As I user expect to know what's Taiga and how to deploy it
 ### Acceptance Criteria
@@ -165,7 +184,7 @@
     - All previous deployments of Taiga will be listed at the bottom in the 'Deployment List (Taiga)'. 
     - User can visit all Taiga instances from deployments list and use it 
 ---
-## Scenario 20
+## Owncloud Deployment
 
     - As I user expect to know what's Owncloud and how to deploy it
 ### Acceptance Criteria
@@ -174,7 +193,7 @@
     - All previous deployments of Owncloud will be listed at the bottom in the 'Deployment List (Owncloud)'. 
     - User can visit all Owncloud instances from deployments list and use it 
 ---
-## Scenario 21
+## Deployments Access
 
     - As I user I want to know how to access my deployments 
 ### Acceptance Criteria
@@ -182,22 +201,22 @@
     - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
     - User can access them via SSH command which is explained in the documentation. 
 ---
-## Scenario 22
+## CapRover Deployment Configuration
 
     - As I user I want to know what's domain and password used for in CapRover
 ### Acceptance Criteria
 
     - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
-    - //TODO:
+    - User should pick domain name from 'GoDaddy.com' or 'Name.com' 
 ---
-## Scenario 23
+## CapRover Deployment Configuration
 
     - As I user I want to know what's leader and workers in CapRover
 ### Acceptance Criteria
 
-    - //TODO:
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it and how to add the 'Websocket Endpoint'.
 ---
-## Scenario 24
+## Subsquid Deployment
 
     - As I user I want to know what's Subsquid
 ### Acceptance Criteria
@@ -206,8 +225,4 @@
 ---
 
 
-
-
-
-
-
+//TODO: execution of what in quick start documentation
