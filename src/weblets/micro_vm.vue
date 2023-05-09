@@ -36,7 +36,7 @@
 
         <SelectVmImage :images="images" v-model="flist" />
 
-        <RootFsSize v-model="rootFsSize" />
+        <RootFsSize :cpu="cpu" :memory="memory" v-model.number="rootFsSize" />
 
         <input-validator
           :value="cpu"
