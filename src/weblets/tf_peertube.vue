@@ -88,8 +88,9 @@ import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
 import { deployVM } from '../utils/deploy_vm'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const valid = ref(false)
 const profileManager = useProfileManager()
 
@@ -116,7 +117,7 @@ async function deploy() {
   try {
     grid = await getGrid(profileManager.profile!, ProjectName.Peertube)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     vm = await deployVM(grid!, {
       name: name.value,
@@ -162,6 +163,7 @@ async function deploy() {
       backends: [`http://[${vm[0].planetary}]:9000`],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a peertube instance.')
     layout.value.openDialog(vm, {
       SSH_KEY: 'Public SSH Key',

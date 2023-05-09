@@ -98,8 +98,9 @@ import { getGrid } from '../utils/grid'
 import rootFs from '../utils/root_fs'
 import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const tabs = ref()
 const profileManager = useProfileManager()
 
@@ -120,7 +121,7 @@ async function deploy() {
   try {
     const grid = await getGrid(profileManager.profile!)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -158,6 +159,7 @@ async function deploy() {
       ],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a Presearch instance.')
     layout.value.openDialog(vm, {
       SSH_KEY: 'Public SSH Key',

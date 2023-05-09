@@ -108,9 +108,10 @@ import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
 import { deployVM, type Env, type Machine } from '../utils/deploy_vm'
 import { normalizeError } from '../utils/helpers'
+import { useLayout } from '../components/weblet_layout.vue'
 
+const layout = useLayout()
 const tabs = ref()
-const layout = ref()
 const profileManager = useProfileManager()
 
 const domain = ref('')
@@ -124,7 +125,7 @@ async function deploy() {
   try {
     const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     const vm = await deployVM(grid!, {
       name: leader.value.name,
@@ -146,6 +147,7 @@ async function deploy() {
       ],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a caprover instance.')
     layout.value.openDialog(vm, {
       SWM_NODE_MODE: 'Swarm Node Mode',

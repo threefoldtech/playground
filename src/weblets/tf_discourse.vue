@@ -91,8 +91,9 @@ import { deployVM } from '../utils/deploy_vm'
 import TweetNACL from 'tweetnacl'
 import { Buffer } from 'buffer'
 import rootFs from '../utils/root_fs'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const tabs = ref()
 const profileManager = useProfileManager()
 
@@ -118,7 +119,7 @@ async function deploy() {
 
   try {
     grid = await getGrid(profileManager.profile!, ProjectName.Discourse)
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     vm = await deployVM(grid!, {
       name: name.value,
@@ -171,6 +172,7 @@ async function deploy() {
       backends: [`http://[${vm[0].planetary}]:88`],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a discourse instance.')
     layout.value.openDialog(vm, {
       SSH_KEY: 'Public SSH Key',

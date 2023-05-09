@@ -80,8 +80,9 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
 import { type Farm, ProjectName } from '../types'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const valid = ref(false)
 const profileManager = useProfileManager()
 
@@ -96,7 +97,7 @@ async function deploy() {
   try {
     const grid = await getGrid(profileManager.profile!, ProjectName.NodePilot)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -129,6 +130,7 @@ async function deploy() {
       ],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a node pilot instance.')
     layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
   } catch (e) {

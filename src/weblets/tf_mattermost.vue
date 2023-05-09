@@ -69,8 +69,9 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { deployVM } from '../utils/deploy_vm'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const tabs = ref()
 const profileManager = useProfileManager()
 
@@ -97,7 +98,7 @@ async function deploy() {
   try {
     grid = await getGrid(profileManager.profile!, ProjectName.Mattermost)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     vm = await deployVM(grid!, {
       name: name.value,
@@ -151,6 +152,7 @@ async function deploy() {
       backends: [`http://[${vm[0].planetary}]:8000`],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a mattermost instance.')
     layout.value.openDialog(vm, {
       DB_PASSWORD: 'Database Password',
