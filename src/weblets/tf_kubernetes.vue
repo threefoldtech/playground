@@ -1,8 +1,8 @@
 <template>
   <weblet-layout ref="layout">
     <template #title>Deploy a Kubernetes</template>
-    <template #subtitle
-      >Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters
+    <template #subtitle>
+      Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters
       can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that
       uses only half of the memory footprint. It is packaged as a single binary and made more
       lightweight to run workloads in resource-constrained locations (fits e.g. IoT, edge, ARM
@@ -85,11 +85,11 @@ import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { deployK8s } from '../utils/deploy_k8s'
 import * as validators from '../utils/validators'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const profileManager = useProfileManager()
-
-const layout = ref()
+const layout = useLayout()
 const tabs = ref()
+const profileManager = useProfileManager()
 
 const name = ref('K8S' + generateString(8))
 const clusterToken = ref(generateString(10))
@@ -100,31 +100,35 @@ function addWorker() {
   workers.value.push(createWorker())
 }
 
-const loading = ref(false)
 async function deploy() {
-  loading.value = true
-  const grid = await getGrid(profileManager.profile!)
-  deployK8s(grid!, {
-    name: name.value,
-    clusterToken: clusterToken.value,
-    master: master.value!,
-    workers: workers.value!,
-    sshKey: profileManager.profile!.ssh,
-  })
-    .then((vm) => {
-      layout.value.setStatus('success', 'Successfully deployed a Kubernetes cluster.')
-      layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+  layout.value.setStatus('deploy')
+
+  try {
+    const grid = await getGrid(profileManager.profile!)
+
+    await layout.value.validateBalance(grid!)
+
+    const k8s = await deployK8s(grid!, {
+      name: name.value,
+      clusterToken: clusterToken.value,
+      master: master.value!,
+      workers: workers.value,
+      sshKey: profileManager.profile!.ssh,
     })
-    .catch((error) => {
-      const e = typeof error === 'string' ? error : error.message
-      layout.value.setStatus('failed', e)
-    })
+
+    layout.value.reloadDeploymentsList()
+    layout.value.setStatus('success', 'Successfully deployed a Kubernetes cluster.')
+    layout.value.openDialog(k8s, { SSH_KEY: 'Public SSH Key' })
+  } catch (e) {
+    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy kubernetes cluster.'))
+  }
 }
 </script>
 
 <script lang="ts">
 import K8SWorker from '../components/k8s_worker.vue'
 import ExpandableLayout from '../components/expandable_layout.vue'
+import { normalizeError } from '../utils/helpers'
 
 export default {
   name: 'TfKubernetes',

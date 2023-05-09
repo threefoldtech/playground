@@ -29,6 +29,7 @@
         :loading="loading"
         :deleting="deleting"
         v-model="selectedContracts"
+        no-data-text="No contracts found on this account."
       >
         <template #[`item.state`]="{ item }">
           <v-chip :color="getStateColor(item.value.state)">

@@ -67,8 +67,6 @@ import { useProfileManager } from '../stores'
 import { events, type GridClient } from '@threefold/grid_client'
 import { loadBalance } from '../utils/grid'
 
-export type WebletStatus = 'deploy' | 'success' | 'failed'
-
 const props = defineProps({
   disableAlerts: {
     type: Boolean,
@@ -122,10 +120,6 @@ defineExpose({
 
     message.value = m ? m : 'Preparing to deploy...'
     status.value = s
-    // Should remove auto loadDeployments cause it will cause bugs
-    if (status.value === 'success') {
-      loadDeployments()
-    }
   },
 
   openDialog(data?: any, envs?: { [key: string]: string | boolean } | false, json?: boolean) {
@@ -136,7 +130,7 @@ defineExpose({
 
   status: computed(() => status.value),
 
-  loadDeployments,
+  reloadDeploymentsList,
 })
 
 function reset() {
@@ -146,7 +140,7 @@ function reset() {
 }
 
 const deploymentListManager = useDeploymentListManager()
-function loadDeployments() {
+function reloadDeploymentsList() {
   deploymentListManager?.load()
 }
 
@@ -163,8 +157,24 @@ watch(
 </script>
 
 <script lang="ts">
+import type { Ref, ComputedRef } from 'vue'
 import DeploymentDataDialog from './deployment_data_dialog.vue'
 import { useDeploymentListManager } from './deployment_list_manager.vue'
+import type { Balance } from '../utils/grid'
+
+export type WebletStatus = 'deploy' | 'success' | 'failed'
+
+export interface WebletLayout {
+  validateBalance(grid: GridClient, min?: number): Promise<Balance>
+  setStatus(status: WebletStatus, message?: string): void
+  openDialog(data: any, envs?: { [key: string]: string | boolean } | false, json?: boolean): void
+  status: ComputedRef<WebletStatus>
+  reloadDeploymentsList(): void
+}
+
+export function useLayout() {
+  return ref() as Ref<WebletLayout>
+}
 
 export default {
   name: 'WebletLayout',
