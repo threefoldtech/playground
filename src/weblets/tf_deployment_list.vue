@@ -300,6 +300,23 @@
             />
           </template>
 
+          <template #Algorand-actions="{ item }">
+            <IconActionBtn
+              tooltip="Show Details"
+              icon="mdi-information-outline"
+              @click="
+                layout.openDialog(item?.value, {
+                  SSH_KEY: 'Public SSH Key',
+                  NETWORK: 'Network',
+                  NODE_TYPE: 'Node Type',
+                  ACCOUNT_MNEMONICS: 'Account Mnemonics',
+                  FIRST_ROUND: 'First Round',
+                  LAST_ROUND: 'Last Round',
+                })
+              "
+            />
+          </template>
+
           <template #NodePilot-actions="{ item }">
             <IconActionBtn
               tooltip="Show Details"
