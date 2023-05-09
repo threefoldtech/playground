@@ -12,7 +12,7 @@ import TfDeploymentList from '../weblets/tf_deployment_list.vue'
 import { ProjectName } from '../types'
 
 export default {
-  name: 'CaproverView',
+  name: 'AlgorandView',
   components: {
     TfAlgorand,
     TfDeploymentList,
