@@ -1,3 +1,4 @@
+import { NodePicker } from './node_picker'
 import {
   type GridClient,
   type FilterOptions,
@@ -11,12 +12,19 @@ import type { K8SWorker } from '../types'
 import { createNetwork } from './deploy_helpers'
 
 export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
+  const nodePicker = new NodePicker()
   const k8s = new K8SModel()
   k8s.name = options.name
   k8s.secret = options.clusterToken
+
+  const workers = await Promise.all([
+    createWorker(grid, options.master, nodePicker),
+    Promise.all(options.workers.map((worker) => createWorker(grid, worker, nodePicker))),
+  ])
+
   k8s.network = createNetwork({ addAccess: true })
-  k8s.masters = [await createWorker(grid, options.master)]
-  k8s.workers = await Promise.all(options.workers.map(createWorker.bind(undefined, grid)))
+  k8s.masters = [workers[0]]
+  k8s.workers = workers[1]
   k8s.metadata = options.metadata
   k8s.description = options.description
   k8s.ssh_key = options.sshKey
@@ -28,7 +36,7 @@ export function loadK8S(grid: GridClient, name: string) {
   return grid.k8s.getObj(name)
 }
 
-async function createWorker(grid: GridClient, data: K8SWorker) {
+async function createWorker(grid: GridClient, data: K8SWorker, nodePicker: NodePicker) {
   const filters: FilterOptions = {
     cru: data.cpu,
     mru: Math.round(data.memory / 1024),
@@ -42,7 +50,7 @@ async function createWorker(grid: GridClient, data: K8SWorker) {
 
   const worker = new KubernetesNodeModel()
   worker.name = data.name
-  worker.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId
+  worker.node_id = await nodePicker.pick(await grid.capacity.filterNodes(filters))
   worker.cpu = data.cpu
   worker.disk_size = data.diskSize
   worker.memory = data.memory
