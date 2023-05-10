@@ -31,6 +31,10 @@
         v-model="selectedContracts"
         no-data-text="No contracts found on this account."
       >
+        <template #[`item.index`]="{ item }">
+          {{ contracts.indexOf(item.value) + 1 }}
+        </template>
+
         <template #[`item.state`]="{ item }">
           <v-chip :color="getStateColor(item.value.state)">
             {{ item.value.state }}
@@ -41,14 +45,16 @@
           <v-btn
             color="secondary"
             variant="tonal"
-            @click="onShowDetails(item.value.contractId)"
+            @click="
+              item.value.type !== 'name'
+                ? onShowDetails(item.value.contractId)
+                : layout.openDialog(item.value, false, true)
+            "
             :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
             :loading="loadingContractId == item.value.contractId"
-            v-if="item.value.type !== 'name'"
           >
             Show Details
           </v-btn>
-          <p v-else>-</p>
         </template>
       </ListTable>
     </template>
@@ -105,6 +111,8 @@ const contracts = ref<NormalizedContract[]>([])
 const loading = ref(false)
 const selectedContracts = ref<NormalizedContract[]>([])
 const headers: VDataTableHeader = [
+  { title: '#', key: 'index' },
+  { title: 'PLACEHOLDER', key: 'data-table-select' },
   { title: 'ID', key: 'contractId' },
   { title: 'Type', key: 'type' },
   { title: 'State', key: 'state' },
