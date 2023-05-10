@@ -1,4 +1,3 @@
-import type { ProjectName } from '@/types'
 import { SolutionCode } from '@/types'
 import { type GridClient, type FilterOptions, GatewayNameModel } from '@threefold/grid_client'
 
