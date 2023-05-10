@@ -94,8 +94,10 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.NodePilot.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.NodePilot)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

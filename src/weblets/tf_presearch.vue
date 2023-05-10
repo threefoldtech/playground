@@ -91,7 +91,7 @@
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
 import { generateString } from '@threefold/grid_client'
-import type { Farm } from '../types'
+import { type Farm, ProjectName } from '../types'
 import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
@@ -118,8 +118,10 @@ const publicRestoreKey = ref('')
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Presearch.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

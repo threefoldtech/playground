@@ -1,4 +1,3 @@
-import type { ProjectName } from '@/types'
 import { SolutionCode } from '@/types'
 import { type GridClient, type FilterOptions, GatewayNameModel } from '@threefold/grid_client'
 
@@ -13,7 +12,7 @@ export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, 
 
 export interface GetHostnameOptions {
   deploymentName: string
-  projectName: ProjectName
+  projectName: string
   twinId: number
 }
 export function getSubdomain(options: GetHostnameOptions) {

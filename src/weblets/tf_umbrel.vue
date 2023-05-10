@@ -104,8 +104,10 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Umbrel.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.Umbrel)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

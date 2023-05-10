@@ -253,8 +253,10 @@ function addDisk() {
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.VM.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.VM)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

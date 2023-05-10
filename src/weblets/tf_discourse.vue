@@ -107,9 +107,11 @@ const smtp = ref(createSMTPServer())
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Discourse.toLowerCase()
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Discourse,
+    projectName,
     twinId: profileManager.profile!.twinId,
   })
 
@@ -118,7 +120,7 @@ async function deploy() {
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Discourse)
+    grid = await getGrid(profileManager.profile!, projectName)
     await layout.value.validateBalance(grid!)
 
     vm = await deployVM(grid!, {
