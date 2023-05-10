@@ -6,7 +6,7 @@
           <v-img src="/images/logoTF.png" />
         </v-list-item>
         <v-list-item>
-          <v-card color="primary">
+          <v-card color="primary" variant="tonal">
             <v-card-text class="text-center">{{ network.toLocaleUpperCase() }}NET</v-card-text>
           </v-card>
         </v-list-item>
