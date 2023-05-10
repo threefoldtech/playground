@@ -1,4 +1,10 @@
 <template>
+  <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+    Failed to load <strong>{{ count - items.length }}</strong> deployment{{
+      count - items.length > 1 ? 's' : ''
+    }}.
+  </v-alert>
+
   <ListTable
     :headers="[
       { title: '#', key: 'index' },
@@ -70,7 +76,7 @@
 import { ref, onMounted } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid, updateGrid } from '../utils/grid'
-import { loadVms } from '../utils/load_deployment'
+import { loadVms, mergeLoadedDeployments } from '../utils/load_deployment'
 
 const profileManager = useProfileManager()
 
@@ -81,8 +87,9 @@ const props = defineProps<{
 }>()
 defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
 
-const items = ref<any[]>([])
 const loading = ref(false)
+const count = ref<number>()
+const items = ref<any[]>([])
 
 onMounted(loadDeployments)
 async function loadDeployments() {
@@ -94,13 +101,18 @@ async function loadDeployments() {
   const filter =
     props.projectName === ProjectName.VM
       ? undefined
-      : ([vm]: [{ flist: string }]) => vm.flist.includes(props.projectName.toLowerCase())
+      : ([vm]: [{ flist: string }]) =>
+          vm.flist.replace(/-/g, '').includes(props.projectName.toLowerCase())
 
   const chunk3 =
     props.projectName === ProjectName.Fullvm
-      ? []
+      ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: '' }), { filter })
-  items.value = chunk1.concat(chunk2).concat(chunk3)
+  const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any)
+
+  count.value = vms.count
+  items.value = vms.items
+
   loading.value = false
 }
 
