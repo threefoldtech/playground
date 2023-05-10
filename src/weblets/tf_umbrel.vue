@@ -88,8 +88,9 @@ import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployVM } from '../utils/deploy_vm'
 import rootFs from '../utils/root_fs'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const valid = ref(false)
 const profileManager = useProfileManager()
 
@@ -106,7 +107,7 @@ async function deploy() {
   try {
     const grid = await getGrid(profileManager.profile!, ProjectName.Umbrel)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -142,6 +143,8 @@ async function deploy() {
         },
       ],
     })
+
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed an Umbrel instance.')
     layout.value.openDialog(vm, {
       SSH_KEY: 'Public SSH Key',

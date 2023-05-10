@@ -28,7 +28,7 @@ export interface DeployGatewayNameOptions {
   name: string
   nodeId: number
   tlsPassthrough?: boolean
-  backends: (`http://${string}:${number}` | `https://${string}:${number}`)[]
+  backends: `http://${string}`[]
 }
 export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
   const gateway = new GatewayNameModel()

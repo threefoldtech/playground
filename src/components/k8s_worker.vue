@@ -73,7 +73,11 @@
   <v-switch label="Public IPv6" inset color="primary" v-model="$props.modelValue.ipv6" />
   <v-switch label="Planetary Network" inset color="primary" v-model="$props.modelValue.planetary" />
 
-  <RootFsSize v-model="$props.modelValue.rootFsSize" />
+  <RootFsSize
+    :cpu="$props.modelValue.cpu"
+    :memory="$props.modelValue.memory"
+    v-model.number="$props.modelValue.rootFsSize"
+  />
 
   <SelectFarm
     :filters="{

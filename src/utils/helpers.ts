@@ -7,7 +7,7 @@ export function downloadAsFile(name: string, data: string) {
   a.remove()
 }
 
-export function normalizeError(error: unknown, fallbackError: string): string {
+export function normalizeError(error: any, fallbackError: string): string {
   return typeof error === 'string'
     ? error
     : error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'

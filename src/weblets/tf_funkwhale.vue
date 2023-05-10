@@ -100,8 +100,9 @@ import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 import { deployVM } from '../utils/deploy_vm'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const valid = ref(false)
 const profileManager = useProfileManager()
 
@@ -129,7 +130,7 @@ async function deploy() {
   try {
     grid = await getGrid(profileManager.profile!, ProjectName.Funkwhale)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     vm = await deployVM(grid!, {
       name: name.value,
@@ -171,9 +172,10 @@ async function deploy() {
     await deployGatewayName(grid!, {
       name: subdomain,
       nodeId: gateway.value.id,
-      backends: [`http://[${vm[0].planetary}]:9000`],
+      backends: [`http://[${vm[0].planetary}]:80/`],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a funkwhale instance.')
     layout.value.openDialog(vm, {
       FUNKWHALE_HOSTNAME: 'Funkwhale Hostname',
