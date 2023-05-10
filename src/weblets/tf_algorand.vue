@@ -237,7 +237,7 @@ async function deploy() {
 
 function customAccountValidation(value: string) {
   if (value.split(' ').length !== 25) {
-    return { message: 'Mnemonics must have 25 words sprated by spaces.' }
+    return { message: 'Mnemonics must have 25 words separated by spaces.' }
   }
 }
 
