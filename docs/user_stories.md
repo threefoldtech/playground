@@ -70,6 +70,14 @@
     - Applying for issues in github and the developers will solve them.
     - There's also a live chat at the bottom for any issue.
 ---
+## Deployments Access
+
+    - As I user I want to know how to access my deployments 
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+    - User can access them via SSH command which is explained in the documentation. 
+---
 ## Full Virtual Machine Deployment
 
     - As a user I expect to know deploy Full Virtual machine easily with all its configurations.
@@ -117,7 +125,7 @@
 
     - From 'Quick start documentation' that refers to manual of TF Chain, documents all information about their differences and similarities.
 ---
-## Adding more configurations to Micro Virtual Machine
+## Adding Configurations to Micro Virtual Machine
 
     - As I user I expect to add or delete 'ENVIRONMENT VARIABLES' and 'DISKS' to Micro Virtual Machine
 
@@ -149,58 +157,6 @@
     - User can also view details of any contract/deployment and delete any of them. 
     - If there's any problem, user can refresh contracts/deployments from 'Refresh' button in the UI.
 ---
-## Peertube Deployment
-
-    - As I user expect to know what's Peertube and how to deploy it
-### Acceptance Criteria
-
-    - User can learn all about the deployment on peertube from the 'Quick start documentation', that explains all about it.
-    - All previous deployments of peertube will be listed at the bottom in the 'Deployment List (Peertube)'.  
----
-## Mattermost Deployment
-
-    - As I user expect to know what's Mattermost and how to deploy it
-### Acceptance Criteria
-
-    - User can learn all about the deployment on Mattermost from the 'Quick start documentation', that explains all about it.
-    - All previous deployments of mattermost will be listed at the bottom in the 'Deployment List (mattermost)'. 
-    - User can visit all mattermost instances from deployments list 
----
-## Funkwhale Deployment
-
-    - As I user expect to know what's Funkwhale and how to deploy it
-### Acceptance Criteria
-
-    - User can learn all about the deployment on Funkwhale from the 'Quick start documentation', that explains all about it.
-    - All previous deployments of Funkwhale will be listed at the bottom in the 'Deployment List (Funkwhale)'. 
-    - User can visit all Funkwhale instances from deployments list and use it 
----
-## Taiga Deployment
-
-    - As I user expect to know what's Taiga and how to deploy it
-### Acceptance Criteria
-
-    - User can learn all about the deployment on Taiga from the 'Quick start documentation', that explains all about it.
-    - All previous deployments of Taiga will be listed at the bottom in the 'Deployment List (Taiga)'. 
-    - User can visit all Taiga instances from deployments list and use it 
----
-## Owncloud Deployment
-
-    - As I user expect to know what's Owncloud and how to deploy it
-### Acceptance Criteria
-
-    - User can learn all about the deployment on Owncloud from the 'Quick start documentation', that explains all about it.
-    - All previous deployments of Owncloud will be listed at the bottom in the 'Deployment List (Owncloud)'. 
-    - User can visit all Owncloud instances from deployments list and use it 
----
-## Deployments Access
-
-    - As I user I want to know how to access my deployments 
-### Acceptance Criteria
-
-    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
-    - User can access them via SSH command which is explained in the documentation. 
----
 ## CapRover Deployment Configuration
 
     - As I user I want to know what's domain and password used for in CapRover
@@ -214,15 +170,202 @@
     - As I user I want to know what's leader and workers in CapRover
 ### Acceptance Criteria
 
-    - User can learn all about deployments from the 'Quick start documentation', that explains all about it and how to add the 'Websocket Endpoint'.
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+---
+## Peertube Deployment
+
+    - As I user expect to know what's Peertube and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on peertube from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of peertube will be listed at the bottom in the 'Deployment List (Peertube)'.  
+---
+## Accessing Peertube Instance
+
+    - As I user expect to know access peertube after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of peertube from 'Deployment List (Peertube)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to peertube instance with the deployment data.
+---
+## Funkwhale Deployment
+
+    - As I user expect to know what's Funkwhale and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Funkwhale from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of Funkwhale will be listed at the bottom in the 'Deployment List (Funkwhale)'. 
+    - User can visit all Funkwhale instances from deployments list and use it 
+---
+## Accessing Funkwhale Instance
+
+    - As I user expect to know access Funkwhale after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Funkwhale from 'Deployment List (Funkwhale)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to funkwhale instance with the deployment data.
+---    
+## Mattermost Deployment
+
+    - As I user expect to know what's Mattermost and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Mattermost from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of mattermost will be listed at the bottom in the 'Deployment List (mattermost)'. 
+    - User can visit all mattermost instances from deployments list 
+---
+## Mattermost Configurations 
+
+    - As I user I want to configure mattermost instance with SMPT server
+### Acceptance Criteria
+
+    - User can configure its mattermost instance with SMTP server, by clicking on 'SMTP SERVER' and fill the data.
+---
+## Accessing Mattermost Instance
+
+    - As I user expect to know access Mattermost after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Mattermost from 'Deployment List (Mattermost)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to mattermost instance with the deployment data.
+--- 
+## Discourse Deployment
+
+    - As I user expect to know what's Discourse and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Discourse from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of discourse will be listed at the bottom in the 'Deployment List (mattermost)'. 
+    - User can visit all discourse instances from deployments list 
+---
+## Accessing Discourse Instance
+
+    - As I user expect to know access Discourse after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Discourse from 'Deployment List (Discourse)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to discourse instance with the deployment data.
+--- 
+## Taiga Deployment
+
+    - As I user expect to know what's Taiga and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Taiga from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of Taiga will be listed at the bottom in the 'Deployment List (Taiga)'. 
+    - User can visit all Taiga instances from deployments list and use it 
+---
+## Taiga Configurations 
+
+    - As I user I want to configure Taiga instance with SMPT server
+### Acceptance Criteria
+
+    - User can configure its Taiga instance with SMTP server, by clicking on 'SMTP SERVER' and fill the data.
+---
+## Accessing Taiga Instance
+
+    - As I user expect to know access Taiga after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Taiga from 'Deployment List (Taiga)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to Taiga instance with the deployment data.
+--- 
+## Owncloud Deployment
+
+    - As I user expect to know what's Owncloud and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on Owncloud from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of Owncloud will be listed at the bottom in the 'Deployment List (Owncloud)'. 
+    - User can visit all Owncloud instances from deployments list and use it 
+---
+## Owncloud Configurations 
+
+    - As I user I want to configure Owncloud instance with SMPT server
+### Acceptance Criteria
+
+    - User can configure its Owncloud instance with SMTP server, by clicking on 'SMTP SERVER' and fill the data.
+---
+## Accessing Owncloud Instance
+
+    - As I user expect to know access Owncloud after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Owncloud from 'Deployment List (Owncloud)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to Owncloud instance with the deployment data.
+--- 
+## Presearch Deployment
+
+    - As user I expect to know what's Presearch and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about the deployment on presearch from the 'Quick start documentation', that explains all about it.
+    - All previous deployments of presearch will be listed at the bottom in the 'Deployment List (presearch)'. 
+    - User can visit all presearch instances from deployments list and use it 
+---
+## Presearch History
+
+    - As user I want to restore previous node of my presearch instance
+### Acceptance Criteria
+
+    - User can fill the 'Restore' section with restore key field to get previous node.
 ---
 ## Subsquid Deployment
 
     - As I user I want to know what's Subsquid
 ### Acceptance Criteria
 
-    - User can learn all about deployments from the 'Quick start documentation', that explains all about it and how to add the 'Websocket Endpoint'.
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
 ---
+## Accessing Subsquid Instance
 
+    - As I user expect to know access Subsquid after deployment
+### Acceptance Criteria
 
-//TODO: execution of what in quick start documentation
+    - User can visit its deployment instance of Subsquid from 'Deployment List (Subsquid)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to subsquid instance with the deployment data.
+--- 
+## Casperlabs Deployment
+
+    - As I user I want to know what's Casperlabs
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+---
+## Accessing Casperlabs Instance
+
+    - As I user expect to know access casperlabs after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Casperlabs from 'Deployment List (Casperlabs)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to casperlabs instance with the deployment data.
+--- 
+## Node Pilot Deployment
+
+    - As I user I want to know what's Node Pilot
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+---
+## Wordpress Deployment
+
+    - As I user I want to know what's Wordpress
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+---
+## Accessing Wordpress Instance
+
+    - As I user expect to know access wordpress after deployment
+### Acceptance Criteria
+
+    - User can visit its deployment instance of Wordpress from 'Deployment List (Wordpress)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
+    - User can login easily to wordpress instance with the deployment data.
+--- 
+## Umbrel Deployment
+
+    - As I user I want to know what's Umbrel and how to deploy it
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+---
