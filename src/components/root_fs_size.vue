@@ -2,19 +2,16 @@
   <div class="d-flex">
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
-        :value="$props.modelValue"
-        :rules="[
-          validators.required('Root File System is required.'),
-          validators.isInt('Root File System must be a valid integer.'),
-          validators.max('Root File System max is 2GB.', 2)
-        ]"
+        :value="value"
+        :rules="[validators.required('Root File System is required.'), dynamicValidateRootFs]"
+        ref="input"
       >
         <template #default="{ props }">
           <v-text-field
             label="Root File System (GB)"
             type="number"
             :disabled="!edit"
-            v-model.number="$props.modelValue"
+            v-model.number="value"
             v-bind="props"
           />
         </template>
@@ -30,16 +27,39 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import * as validators from '../utils/validators'
+import rootFs from '../utils/root_fs'
 
-defineProps<{ modelValue: number }>()
+const props = defineProps<{ cpu?: number; memory?: number; modelValue?: number }>()
+const emits = defineEmits<{ (event: 'update:model-value', value: number): void }>()
+
+const input = ref()
+
+const value = ref(rootFs(props.cpu ?? 0, props.memory ?? 0))
+watch(value, (value) => emits('update:model-value', value), { immediate: true })
 
 const edit = ref(false)
+
+watch(
+  () => [edit.value, props.cpu || 0, props.memory || 0] as const,
+  async ([edit, cpu, memory]) => {
+    await input.value.validate(value.value)
+
+    if (!edit) {
+      value.value = rootFs(cpu, memory)
+    }
+  }
+)
+
+function dynamicValidateRootFs(value: string) {
+  const min = rootFs(props.cpu ?? 0, props.memory ?? 0)
+  return validators.min(`Root File System min value is ${min}GB.`, min)(value)
+}
 </script>
 
 <script lang="ts">
 export default {
-  name: 'RootFsSize'
+  name: 'RootFsSize',
 }
 </script>

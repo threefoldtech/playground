@@ -1,5 +1,5 @@
 <template>
-  <TfKubernetes />
+  <TfDiscourse />
 
   <div class="mt-4">
     <TfDeploymentList :project-name="name" />
@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import TfKubernetes from '../weblets/tf_kubernetes.vue'
 import TfDeploymentList from '../weblets/tf_deployment_list.vue'
+import TfDiscourse from '../weblets/tf_discourse.vue'
 import { ProjectName } from '../types'
 
 export default {
-  name: 'KubernetesView',
+  name: 'DiscourseView',
   components: {
-    TfKubernetes,
     TfDeploymentList,
+    TfDiscourse,
   },
   setup() {
-    return { name: ProjectName.Kubernetes }
+    return { name: ProjectName.Discourse }
   },
 }
 </script>

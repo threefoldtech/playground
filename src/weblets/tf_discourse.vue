@@ -1,11 +1,12 @@
 <template>
   <weblet-layout ref="layout">
-    <template #title>Deploy a Mattermost Instance </template>
+    <template #title> Deploy a Discourse Instance </template>
     <template #subtitle>
-      Mattermost A single point of collaboration. Designed specifically for digital operations.
+      Discourse is the 100% open source discussion platform built for the next decade of the
+      Internet. Use it as a mailing list, discussion forum, long-form chat room, and more!
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost"
+        href="https://manual.grid.tf/weblets/weblets_discourse.html"
         class="app-link"
       >
         Quick start documentation
@@ -14,12 +15,12 @@
 
     <d-tabs
       :tabs="[
-        { title: 'Base', value: 'base' },
-        { title: 'SMTP Server', value: 'smtp' },
+        { title: 'Config', value: 'config' },
+        { title: 'Mail Server', value: 'mail' },
       ]"
       ref="tabs"
     >
-      <template #base>
+      <template #config>
         <input-validator
           :value="name"
           :rules="[
@@ -32,6 +33,22 @@
             <v-text-field label="Name" v-model="name" v-bind="props" />
           </template>
         </input-validator>
+        <input-validator
+          :value="email"
+          :rules="[
+            validators.required('Email is required.'),
+            validators.isEmail('Please provide a valid email address.'),
+          ]"
+        >
+          <template #default="{ props }">
+            <v-text-field
+              label="Email"
+              placeholder="This email will be used to login to your instance."
+              v-model="email"
+              v-bind="props"
+            />
+          </template>
+        </input-validator>
 
         <SelectSolutionFlavor v-model="solution" />
         <SelectGatewayNode v-model="gateway" />
@@ -39,18 +56,19 @@
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: solution?.disk,
+            ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
             publicIp: false,
           }"
           v-model="farm"
         />
       </template>
 
-      <template #smtp>
-        <SmtpServer v-model="smtp" />
+      <template #mail>
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+          Discourse needs SMTP service so please configure these settings properly.
+        </SmtpServer>
       </template>
     </d-tabs>
-
     <template #footer-actions>
       <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid">
         Deploy
@@ -61,25 +79,29 @@
 
 <script lang="ts" setup>
 import { generateString, type GridClient } from '@threefold/grid_client'
-import { type Ref, ref } from 'vue'
-import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
-import * as validators from '../utils/validators'
+import { ref, type Ref } from 'vue'
+import type { solutionFlavor as SolutionFlavor, GatewayNode, Farm } from '../types'
 import { ProjectName } from '../types'
-import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import { deployVM } from '../utils/deploy_vm'
+import { useProfileManager } from '../stores'
+import * as validators from '../utils/validators'
+import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
+import { deployVM } from '../utils/deploy_vm'
+import TweetNACL from 'tweetnacl'
+import { Buffer } from 'buffer'
+import rootFs from '../utils/root_fs'
 import { useLayout } from '../components/weblet_layout.vue'
 
 const layout = useLayout()
 const tabs = ref()
 const profileManager = useProfileManager()
 
-const name = ref('MM' + generateString(9))
+const name = ref('DC' + generateString(9))
+const email = ref('')
 const solution = ref() as Ref<SolutionFlavor>
 const gateway = ref() as Ref<GatewayNode>
 const farm = ref() as Ref<Farm>
-
 const smtp = ref(createSMTPServer())
 
 async function deploy() {
@@ -87,17 +109,16 @@ async function deploy() {
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Mattermost,
+    projectName: ProjectName.Discourse,
     twinId: profileManager.profile!.twinId,
   })
-  const domain = subdomain + '.' + gateway.value.domain
 
+  const domain = subdomain + '.' + gateway.value.domain
   let grid: GridClient | null
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Mattermost)
-
+    grid = await getGrid(profileManager.profile!, ProjectName.Discourse)
     await layout.value.validateBalance(grid!)
 
     vm = await deployVM(grid!, {
@@ -113,7 +134,7 @@ async function deploy() {
               mountPoint: '/var/lib/docker',
             },
           ],
-          flist: 'https://hub.grid.tf/tf-official-apps/mattermost-latest.flist',
+          flist: 'https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist',
           entryPoint: '/sbin/zinit init',
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
           farmId: farm.value.farmID,
@@ -122,17 +143,15 @@ async function deploy() {
           planetary: true,
           envs: [
             { key: 'SSH_KEY', value: profileManager.profile!.ssh },
-            { key: 'DB_PASSWORD', value: generateString(12) },
-            { key: 'SITE_URL', value: 'https://' + domain },
-            { key: 'MATTERMOST_DOMAIN', value: domain },
-            ...(smtp.value.enabled
-              ? [
-                  { key: 'SMTPUsername', value: smtp.value.username },
-                  { key: 'SMTPPassword', value: smtp.value.password },
-                  { key: 'SMTPServer', value: smtp.value.hostname },
-                  { key: 'SMTPPort', value: smtp.value.port.toString() },
-                ]
-              : []),
+            { key: 'DISCOURSE_HOSTNAME', value: domain },
+            { key: 'DISCOURSE_DEVELOPER_EMAILS', value: email.value },
+            { key: 'DISCOURSE_SMTP_ADDRESS', value: smtp.value.hostname },
+            { key: 'DISCOURSE_SMTP_PORT', value: smtp.value.port.toString() },
+            { key: 'DISCOURSE_SMTP_ENABLE_START_TLS', value: smtp.value.tls ? 'true' : 'false' },
+            { key: 'DISCOURSE_SMTP_USER_NAME', value: smtp.value.username },
+            { key: 'DISCOURSE_SMTP_PASSWORD', value: smtp.value.password },
+            { key: 'THREEBOT_PRIVATE_KEY', value: generatePubKey() },
+            { key: 'FLASK_SECRET_KEY', value: generateString(8) },
           ],
         },
       ],
@@ -140,35 +159,43 @@ async function deploy() {
   } catch (e) {
     return layout.value.setStatus(
       'failed',
-      normalizeError(e, 'Failed to deploy a mattermost instance.')
+      normalizeError(e, 'Failed to deploy a discourse instance.')
     )
   }
 
   try {
     layout.value.setStatus('deploy', 'Preparing to deploy gateway...')
+
     await deployGatewayName(grid!, {
       name: subdomain,
       nodeId: gateway.value.id,
-      backends: [`http://[${vm[0].planetary}]:8000`],
+      backends: [`http://[${vm[0].planetary}]:88`],
     })
 
     layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed a mattermost instance.')
+    layout.value.setStatus('success', 'Successfully deployed a discourse instance.')
     layout.value.openDialog(vm, {
-      DB_PASSWORD: 'Database Password',
-      SITE_URL: 'Site URL',
-      SMTPUsername: 'SMTP Username',
-      SMTPPassword: 'SMTP Password',
-      SMTPServer: 'SMTP Server',
-      SMTPPort: 'SMTP Port',
       SSH_KEY: 'Public SSH Key',
-      MATTERMOST_DOMAIN: 'Mattermost Domain',
+      DISCOURSE_HOSTNAME: 'Discourse Hostname',
+      DISCOURSE_DEVELOPER_EMAILS: 'Discourse Developer Emails',
+      DISCOURSE_SMTP_ADDRESS: 'Discourse SMTP Address',
+      DISCOURSE_SMTP_PORT: 'Discourse SMTP Port',
+      DISCOURSE_SMTP_ENABLE_START_TLS: 'Discourse SMTP Enable Start TLS',
+      DISCOURSE_SMTP_USER_NAME: 'Discourse SMTP Username',
+      DISCOURSE_SMTP_PASSWORD: 'Discourse SMTP Password',
+      THREEBOT_PRIVATE_KEY: 'Threebot Private Key',
+      FLASK_SECRET_KEY: 'Flask Secret Key',
     })
   } catch (e) {
     layout.value.setStatus('deploy', 'Rollbacking back due to fail to deploy gateway...')
     await rollbackDeployment(grid!, name.value)
-    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a mattermost instance.'))
+    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a discourse instance.'))
   }
+}
+
+function generatePubKey(): string {
+  const keypair = TweetNACL.box.keyPair()
+  return Buffer.from(keypair.publicKey).toString('base64')
 }
 </script>
 
@@ -177,11 +204,9 @@ import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
 import SelectGatewayNode from '../components/select_gateway_node.vue'
 import SelectFarm from '../components/select_farm.vue'
 import SmtpServer, { createSMTPServer } from '../components/smtp_server.vue'
-import { normalizeError } from '../utils/helpers'
-import rootFs from '../utils/root_fs'
 
 export default {
-  name: 'TfMattermost',
+  name: 'TfDiscourse',
   components: {
     SmtpServer,
     SelectSolutionFlavor,

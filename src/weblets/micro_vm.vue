@@ -36,7 +36,7 @@
 
         <SelectVmImage :images="images" v-model="flist" />
 
-        <RootFsSize v-model="rootFsSize" />
+        <RootFsSize :cpu="cpu" :memory="memory" v-model.number="rootFsSize" />
 
         <input-validator
           :value="cpu"
@@ -188,8 +188,9 @@ import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import * as validators from '../utils/validators'
+import { useLayout } from '../components/weblet_layout.vue'
 
-const layout = ref()
+const layout = useLayout()
 const tabs = ref()
 const profileManager = useProfileManager()
 
@@ -255,7 +256,7 @@ async function deploy() {
   try {
     const grid = await getGrid(profileManager.profile!, ProjectName.VM)
 
-    await layout.value.validateBalance(grid)
+    await layout.value.validateBalance(grid!)
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -282,6 +283,7 @@ async function deploy() {
       ],
     })
 
+    layout.value.reloadDeploymentsList()
     layout.value.setStatus('success', 'Successfully deployed a micro virtual machine.')
     layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
   } catch (e) {
