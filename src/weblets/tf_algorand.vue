@@ -175,8 +175,10 @@ watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Algorand.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.Algorand)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

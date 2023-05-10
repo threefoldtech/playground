@@ -122,8 +122,10 @@ const workers = ref<CW[]>([])
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Caprover.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.Caprover)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

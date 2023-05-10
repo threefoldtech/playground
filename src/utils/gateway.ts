@@ -13,7 +13,7 @@ export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, 
 
 export interface GetHostnameOptions {
   deploymentName: string
-  projectName: ProjectName
+  projectName: string
   twinId: number
 }
 export function getSubdomain(options: GetHostnameOptions) {
