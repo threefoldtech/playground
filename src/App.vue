@@ -3,7 +3,7 @@
     <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar" theme="dark">
       <v-list>
         <v-list-item>
-          <v-img src="/images/logoTF.png" />
+          <v-img :src="baseUrl + 'images/logoTF.png'" />
         </v-list-item>
         <v-list-item>
           <v-card color="primary" variant="tonal">
@@ -29,7 +29,7 @@
               <v-img
                 class="mr-4"
                 width="26"
-                :src="'/images/icons/' + item.icon"
+                :src="baseUrl + 'images/icons/' + item.icon"
                 :alt="item.title"
               />
             </template>
@@ -121,6 +121,8 @@ const network = process.env.NETWORK as string
 
 const permanent = window.innerWidth > 980
 const openSidebar = ref(permanent)
+
+const baseUrl = import.meta.env.BASE_URL
 </script>
 
 <script lang="ts">
