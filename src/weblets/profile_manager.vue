@@ -42,9 +42,6 @@
         </a>
         get started.
       </template>
-      <template #header-actions>
-        <v-btn color="error" variant="outlined" @click="openManager = false"> Close </v-btn>
-      </template>
 
       <v-tooltip
         text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
@@ -242,6 +239,7 @@
             Activate
           </v-btn>
         </template>
+        <v-btn color="error" variant="outlined" @click="openManager = false"> Close </v-btn>
       </template>
     </weblet-layout>
   </v-dialog>
