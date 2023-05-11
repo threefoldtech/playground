@@ -42,7 +42,7 @@
     </template>
   </ManageWorkerDialog>
 
-  <v-dialog v-if="caproverData" v-model="deployedDialog" persistent scrollable width="500px">
+  <v-dialog v-if="caproverData" v-model="deployedDialog" scrollable width="500px">
     <v-card>
       <v-card-title> <strong>Add your worker</strong> </v-card-title>
 
