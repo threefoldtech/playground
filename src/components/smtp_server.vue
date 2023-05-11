@@ -100,8 +100,6 @@
 </template>
 
 <script lang="ts" setup>
-import * as validators from '../utils/validators'
-
 defineProps<{
   modelValue: SMTPServer
   ssl?: boolean

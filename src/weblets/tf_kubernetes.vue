@@ -84,7 +84,6 @@ import type { K8SWorker as K8sWorker } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { deployK8s } from '../utils/deploy_k8s'
-import * as validators from '../utils/validators'
 import { useLayout } from '../components/weblet_layout.vue'
 
 const layout = useLayout()

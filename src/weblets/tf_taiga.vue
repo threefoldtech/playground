@@ -112,7 +112,6 @@
 import { generateString, type GridClient } from '@threefold/grid_client'
 import { type Ref, ref } from 'vue'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
-import * as validators from '../utils/validators'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'

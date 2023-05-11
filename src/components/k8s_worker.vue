@@ -91,8 +91,6 @@
 </template>
 
 <script lang="ts" setup>
-import * as validators from '../utils/validators'
-
 defineProps<{ modelValue: K8SWorker }>()
 </script>
 

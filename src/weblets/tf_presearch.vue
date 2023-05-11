@@ -96,7 +96,6 @@ import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import rootFs from '../utils/root_fs'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { useLayout } from '../components/weblet_layout.vue'
 

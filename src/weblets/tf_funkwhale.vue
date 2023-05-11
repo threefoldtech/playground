@@ -96,7 +96,6 @@ import type { solutionFlavor as SolutionFlavor, GatewayNode, Farm } from '../typ
 import { ProjectName } from '../types'
 import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 import { deployVM } from '../utils/deploy_vm'

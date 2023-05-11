@@ -187,7 +187,6 @@ import { type Farm, type Flist, ProjectName } from '../types'
 import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import * as validators from '../utils/validators'
 import { useLayout } from '../components/weblet_layout.vue'
 
 const layout = useLayout()

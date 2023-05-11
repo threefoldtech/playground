@@ -109,7 +109,7 @@
             :rules="[
               validators.required('Last round is required.'),
               validators.isInt('Last round must be a valid integer.'),
-              customLastRoundValidation,
+              customLastRoundValidation(validators),
             ]"
             #="{ props }"
             ref="lastRoundInput"
@@ -145,8 +145,7 @@
 <script lang="ts" setup>
 import { ref, type Ref, watch, computed } from 'vue'
 import { generateString } from '@threefold/grid_client'
-import { type Farm, ProjectName } from '../types'
-import * as validators from '../utils/validators'
+import { type Farm, ProjectName, type Validators } from '../types'
 import { useLayout } from '../components/weblet_layout.vue'
 import { deployVM } from '../utils/deploy_vm'
 import { getGrid } from '../utils/grid'
@@ -243,9 +242,11 @@ function customAccountValidation(value: string) {
   }
 }
 
-function customLastRoundValidation(value: string) {
-  const min = firstRound.value
-  return validators.min(`Last round must be greater than ${min}`, min + 1)(value)
+function customLastRoundValidation(validators: Validators) {
+  return (value: string) => {
+    const min = firstRound.value
+    return validators.min(`Last round must be greater than ${min}`, min + 1)(value)
+  }
 }
 </script>
 

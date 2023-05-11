@@ -247,7 +247,6 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, type Ref } from 'vue'
-import * as validators from '../utils/validators'
 import { validateMnemonic } from 'bip39'
 import {
   getGrid,

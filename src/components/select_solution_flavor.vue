@@ -49,7 +49,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue'
 import { ref, watch, computed } from 'vue'
-import * as validators from '../utils/validators'
 import type { solutionFlavor } from '../types'
 
 type Package = PropType<solutionFlavor>

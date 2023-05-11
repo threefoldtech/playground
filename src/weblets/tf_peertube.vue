@@ -82,7 +82,6 @@
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
 import { generateString, GridClient } from '@threefold/grid_client'
-import * as validators from '../utils/validators'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'

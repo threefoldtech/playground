@@ -78,7 +78,6 @@ import { generateString } from '@threefold/grid_client'
 import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import * as validators from '../utils/validators'
 import { type Farm, ProjectName } from '../types'
 import { useLayout } from '../components/weblet_layout.vue'
 

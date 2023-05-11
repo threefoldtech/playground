@@ -103,7 +103,6 @@
 import { ref } from 'vue'
 import { generateString } from '@threefold/grid_client'
 import { ProjectName, type CaproverWorker as CW } from '../types'
-import * as validators from '../utils/validators'
 import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
 import { deployVM, type Env, type Machine } from '../utils/deploy_vm'

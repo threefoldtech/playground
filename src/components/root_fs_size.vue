@@ -28,7 +28,6 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import * as validators from '../utils/validators'
 import rootFs from '../utils/root_fs'
 
 const props = defineProps<{ cpu?: number; memory?: number; modelValue?: number }>()

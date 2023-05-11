@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts" setup>
-import * as validators from '../utils/validators'
 import rootFs from '../utils/root_fs'
 
 defineProps<{ modelValue: CaproverWorker }>()

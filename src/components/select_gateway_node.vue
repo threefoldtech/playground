@@ -39,7 +39,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { loadGatewayNodes } from '../utils/gateway'
-import * as validators from '../utils/validators'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import type { GatewayNode } from '../types'

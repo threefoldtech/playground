@@ -33,7 +33,6 @@
 
 <script lang="ts" setup>
 import { type PropType, ref, watch } from 'vue'
-import * as validators from '../utils/validators'
 import type { Flist } from '../types'
 
 export interface VmImage {

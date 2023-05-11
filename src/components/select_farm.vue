@@ -30,7 +30,6 @@ import { useProfileManager } from '../stores/profile_manager'
 import { getGrid } from '../utils/grid'
 import { getFarms } from '../utils/get_farms'
 import type { Farm } from '../types'
-import * as validators from '../utils/validators'
 
 export interface Filters {
   publicIp?: boolean
