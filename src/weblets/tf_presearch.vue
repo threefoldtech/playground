@@ -30,10 +30,9 @@
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
 
         <input-validator
@@ -42,12 +41,11 @@
             validators.required('Presearch registration code is required.'),
             validators.equal('Presearch registration code must be 32 characters long.', 32),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <password-input-wrapper>
-              <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
-            </password-input-wrapper>
-          </template>
+          <password-input-wrapper>
+            <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
+          </password-input-wrapper>
         </input-validator>
 
         <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />

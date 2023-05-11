@@ -31,10 +31,9 @@
               pattern: /^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/,
             }),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Domain" v-model="domain" v-bind="props" autofocus />
-          </template>
+          <v-text-field label="Domain" v-model="domain" v-bind="props" autofocus />
         </input-validator>
 
         <v-alert type="warning" variant="tonal" class="mb-6">
@@ -56,25 +55,22 @@
           </p>
         </v-alert>
 
-        <password-input-wrapper>
-          <template #default="{ props }">
-            <input-validator
-              :value="password"
-              :rules="[
-                validators.required('Password is required.'),
-                validators.minLength('Password minLength is 6 chars.', 6),
-                validators.maxLength('Password maxLength is 15 chars.', 15),
-              ]"
-            >
-              <template #default="{ props: validationProps }">
-                <v-text-field
-                  label="Password"
-                  v-model="password"
-                  v-bind="{ ...props, ...validationProps }"
-                />
-              </template>
-            </input-validator>
-          </template>
+        <password-input-wrapper #="{ props }">
+          <input-validator
+            :value="password"
+            :rules="[
+              validators.required('Password is required.'),
+              validators.minLength('Password minLength is 6 chars.', 6),
+              validators.maxLength('Password maxLength is 15 chars.', 15),
+            ]"
+            #="{ props: validationProps }"
+          >
+            <v-text-field
+              label="Password"
+              v-model="password"
+              v-bind="{ ...props, ...validationProps }"
+            />
+          </input-validator>
         </password-input-wrapper>
       </template>
 
@@ -83,10 +79,8 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker">
-          <template #default="{ index }">
-            <CaproverWorker v-model="workers[index]" />
-          </template>
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
+          <CaproverWorker v-model="workers[index]" />
         </ExpandableLayout>
       </template>
     </d-tabs>

@@ -2,37 +2,36 @@
   <input-validator
     :value="$props.modelValue?.id"
     :rules="[validators.required('Gateway node is required.')]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-autocomplete
-        label="Select gateway Node"
-        placeholder="Please select a domain."
-        :items="items"
-        item-title="domain"
-        return-object
-        v-bind="props"
-        @update:model-value="$emit('update:model-value', $event)"
-        :loading="items.length === 0 && loading"
-        :disabled="items.length === 0 && loading"
-        :model-value="$props.modelValue"
-      >
-        <template v-slot:append-item v-if="page !== -1">
-          <div class="px-4 mt-4">
-            <v-btn
-              block
-              color="secondary"
-              variant="tonal"
-              rounded="large"
-              size="large"
-              @click="loadNextPage"
-              :loading="loading"
-            >
-              Load More Gateway Nodes
-            </v-btn>
-          </div>
-        </template>
-      </v-autocomplete>
-    </template>
+    <v-autocomplete
+      label="Select gateway Node"
+      placeholder="Please select a domain."
+      :items="items"
+      item-title="domain"
+      return-object
+      v-bind="props"
+      @update:model-value="$emit('update:model-value', $event)"
+      :loading="items.length === 0 && loading"
+      :disabled="items.length === 0 && loading"
+      :model-value="$props.modelValue"
+    >
+      <template v-slot:append-item v-if="page !== -1">
+        <div class="px-4 mt-4">
+          <v-btn
+            block
+            color="secondary"
+            variant="tonal"
+            rounded="large"
+            size="large"
+            @click="loadNextPage"
+            :loading="loading"
+          >
+            Load More Gateway Nodes
+          </v-btn>
+        </div>
+      </template>
+    </v-autocomplete>
   </input-validator>
 </template>
 

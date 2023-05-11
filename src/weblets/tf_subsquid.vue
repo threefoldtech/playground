@@ -21,10 +21,9 @@
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
+        <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
       <input-validator
@@ -33,10 +32,9 @@
           validators.required('Endpoint is required.'),
           validators.isURL('Please provide a valid endpoint.', { protocols: ['wss'] }),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="props" />
-        </template>
+        <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="props" />
       </input-validator>
 
       <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />

@@ -21,10 +21,9 @@
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
+        <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
       <input-validator
@@ -35,10 +34,9 @@
           validators.min('CPU min is 2 cores.', 2),
           validators.max('CPU max is 32 cores.', 32),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-        </template>
+        <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
       </input-validator>
 
       <input-validator
@@ -49,10 +47,9 @@
           validators.min('Minimum allowed memory is 256 MB.', 256),
           validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-        </template>
+        <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
       </input-validator>
 
       <SelectFarmId

@@ -6,10 +6,9 @@
       validators.maxLength('Name max length is 15 chars.', 15),
     ]"
     :value="$props.modelValue.name"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
-    </template>
+    <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
   </input-validator>
 
   <SelectSolutionFlavor v-model="$props.modelValue.solution" />

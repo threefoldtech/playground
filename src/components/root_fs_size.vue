@@ -3,18 +3,20 @@
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
         :value="value"
-        :rules="[validators.required('Root File System is required.'), dynamicValidateRootFs]"
+        :rules="[
+          validators.required('Root File System is required.'),
+          dynamicValidateRootFs(validators),
+        ]"
         ref="input"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field
-            label="Root File System (GB)"
-            type="number"
-            :disabled="!edit"
-            v-model.number="value"
-            v-bind="props"
-          />
-        </template>
+        <v-text-field
+          label="Root File System (GB)"
+          type="number"
+          :disabled="!edit"
+          v-model.number="value"
+          v-bind="props"
+        />
       </input-validator>
     </div>
 
@@ -29,6 +31,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import rootFs from '../utils/root_fs'
+import type { Validators } from '../types'
 
 const props = defineProps<{ cpu?: number; memory?: number; modelValue?: number }>()
 const emits = defineEmits<{ (event: 'update:model-value', value: number): void }>()
@@ -51,9 +54,11 @@ watch(
   }
 )
 
-function dynamicValidateRootFs(value: string) {
-  const min = rootFs(props.cpu ?? 0, props.memory ?? 0)
-  return validators.min(`Root File System min value is ${min}GB.`, min)(value)
+function dynamicValidateRootFs(validators: Validators) {
+  return (value: string) => {
+    const min = rootFs(props.cpu ?? 0, props.memory ?? 0)
+    return validators.min(`Root File System min value is ${min}GB.`, min)(value)
+  }
 }
 </script>
 

@@ -21,10 +21,9 @@
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
+        <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
       <input-validator
@@ -33,31 +32,27 @@
           validators.required('Email is required.'),
           validators.isEmail('Please provide a valid email address.'),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Admin Email" v-model="email" v-bind="props" />
-        </template>
+        <v-text-field label="Admin Email" v-model="email" v-bind="props" />
       </input-validator>
 
-      <password-input-wrapper>
-        <template #default="{ props }">
-          <input-validator
-            :value="password"
-            :rules="[
-              validators.required('Password is required.'),
-              validators.minLength('Password minLength is 6 chars.', 6),
-              validators.maxLength('Password maxLength is 15 chars.', 15),
-            ]"
-          >
-            <template #default="{ props: validatorProps }">
-              <v-text-field
-                label="Password"
-                v-model="password"
-                v-bind="{ ...props, ...validatorProps }"
-              />
-            </template>
-          </input-validator>
-        </template>
+      <password-input-wrapper #="{ props }">
+        <input-validator
+          :value="password"
+          :rules="[
+            validators.required('Password is required.'),
+            validators.minLength('Password minLength is 6 chars.', 6),
+            validators.maxLength('Password maxLength is 15 chars.', 15),
+          ]"
+          #="{ props: validatorProps }"
+        >
+          <v-text-field
+            label="Password"
+            v-model="password"
+            v-bind="{ ...props, ...validatorProps }"
+          />
+        </input-validator>
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
