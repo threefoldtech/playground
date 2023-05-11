@@ -72,7 +72,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="70%" persistent v-model="deletingDialog">
+  <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5">
         Are you sure you want to delete the following contracts?

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog scrollable width="80%" v-model="openManager" persistent>
+  <v-dialog scrollable width="80%" v-model="openManager">
     <template #activator="{ props }">
       <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
         <v-progress-circular
