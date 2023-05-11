@@ -1,7 +1,9 @@
 <template>
   <v-switch v-model="light" inset color="primary" prepend-icon="mdi-moon-waning-crescent">
     <template #label>
-      <v-icon icon="mdi-brightness-4" />
+      <v-badge color="red-accent-4" inline content="Experimental">
+        <v-icon icon="mdi-brightness-4" />
+      </v-badge>
     </template>
   </v-switch>
 </template>
