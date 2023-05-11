@@ -1,3 +1,4 @@
+import { NodePicker } from './node_picker'
 import {
   type GridClient,
   type FilterOptions,
@@ -13,10 +14,13 @@ import {
 import { createNetwork, type Network } from './deploy_helpers'
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
+  const nodePicker = new NodePicker()
   const vms = new MachinesModel()
   vms.name = options.name
   vms.network = createNetwork(options.network)
-  vms.machines = await Promise.all(options.machines.map(createMachine.bind(undefined, grid)))
+  vms.machines = await Promise.all(
+    options.machines.map((machine) => createMachine(grid, machine, nodePicker))
+  )
   vms.metadata = options.metadata
   vms.description = options.description
   await grid.machines.deploy(vms)
@@ -29,7 +33,11 @@ export async function loadVM(grid: GridClient, name: string) {
   return vm
 }
 
-async function createMachine(grid: GridClient, machine: Machine): Promise<MachineModel> {
+async function createMachine(
+  grid: GridClient,
+  machine: Machine,
+  nodePicker: NodePicker
+): Promise<MachineModel> {
   const filters: FilterOptions = {
     cru: machine.cpu,
     mru: Math.round(machine.memory / 1024),
@@ -44,7 +52,7 @@ async function createMachine(grid: GridClient, machine: Machine): Promise<Machin
 
   const vm = new MachineModel()
   vm.name = machine.name
-  vm.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId
+  vm.node_id = await nodePicker.pick(await grid.capacity.filterNodes(filters))
   vm.disks = createDisks(machine.disks)
   vm.public_ip = machine.publicIpv4 || false
   vm.public_ip6 = machine.publicIpv6 || false

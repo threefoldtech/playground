@@ -32,8 +32,8 @@
         :network="network"
         :type="type"
         v-model:cpu.number="cpu"
-        v-model:memory.nuv-model:cpu.number="memory"
-        v-model:storage.nuv-model:cpu.number="storage"
+        v-model:memory.number="memory"
+        v-model:storage.number="storage"
       >
         <v-select
           label="Network"
