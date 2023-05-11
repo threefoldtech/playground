@@ -9,6 +9,7 @@ export default defineConfig({
   build: {
     outDir: 'docs',
   },
+  base: '/playground/',
   plugins: [vue(), nodePolyfills()],
   resolve: {
     alias: {
