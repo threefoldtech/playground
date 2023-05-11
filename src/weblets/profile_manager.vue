@@ -47,27 +47,27 @@
       </template>
 
       <v-tooltip
-        text="Mnemonics are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonics or click the 'Create Account' button to create an account and generate mnemonics."
+        text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
         location="bottom"
         max-width="700px"
       >
         <template #activator="{ props: tooltipProps }">
           <password-input-wrapper>
             <template #default="{ props: passwordInputProps }">
-              <form-validator v-model="isValidMnemonics">
+              <form-validator v-model="isValidMnemonic">
                 <input-validator
-                  ref="mnemonicsInput"
-                  :value="mnemonics"
+                  ref="mnemonicInput"
+                  :value="mnemonic"
                   :rules="[
-                    validators.required('Mnemonics is required.'),
+                    validators.required('Mnemonic is required.'),
                     (v) =>
                       validateMnemonic(v)
                         ? undefined
-                        : { message: `Mnemonics doesn't seem to be valid.` },
+                        : { message: `Mnemonic doesn't seem to be valid.` },
                   ]"
                   :async-rules="[
-                    (mnemonics) =>
-                      getGrid({ mnemonics })
+                    (mnemonic) =>
+                      getGrid({ mnemonic })
                         .then(() => undefined)
                         .catch(() => ({ message: 'Failed to load grid for this user.' })),
                   ]"
@@ -75,10 +75,10 @@
                   <template #default="{ props: validationProps }">
                     <div v-bind="tooltipProps" v-show="!profileManager.profile">
                       <v-text-field
-                        label="Mnemonics"
-                        placeholder="Please insert your mnemonics"
+                        label="Mnemonic"
+                        placeholder="Please insert your mnemonic"
                         autofocus
-                        v-model="mnemonics"
+                        v-model="mnemonic"
                         v-bind="{ ...passwordInputProps, ...validationProps }"
                       />
                     </div>
@@ -94,9 +94,9 @@
         <password-input-wrapper>
           <template #default="{ props }">
             <v-text-field
-              label="Mnemonics"
+              label="Mnemonic"
               readonly
-              v-model="profileManager.profile.mnemonics"
+              v-model="profileManager.profile.mnemonic"
               v-bind="props"
               :disabled="activating || creatingAccount"
             />
@@ -226,7 +226,7 @@
           <v-btn
             color="secondary"
             variant="tonal"
-            :disabled="isValidMnemonics"
+            :disabled="isValidMnemonic"
             :loading="creatingAccount"
             @click="createNewAccount"
           >
@@ -235,9 +235,9 @@
           <v-btn
             color="primary"
             variant="tonal"
-            @click="activate(mnemonics)"
+            @click="activate(mnemonic)"
             :loading="activating"
-            :disabled="!isValidMnemonics || creatingAccount"
+            :disabled="!isValidMnemonic || creatingAccount"
           >
             Activate
           </v-btn>
@@ -266,9 +266,9 @@ import { downloadAsFile } from '../utils/helpers'
 const openManager = ref(true)
 const profileManager = useProfileManager()
 
-const mnemonics = ref('')
-const isValidMnemonics = ref(false)
-const mnemonicsInput = ref() as Ref<{ validate(value: string): Promise<boolean>; touch(): void }>
+const mnemonic = ref('')
+const isValidMnemonic = ref(false)
+const mnemonicInput = ref() as Ref<{ validate(value: string): Promise<boolean>; touch(): void }>
 
 const ssh = ref('')
 const balance = ref<Balance>()
@@ -290,15 +290,15 @@ watch(
 )
 
 function logout() {
-  sessionStorage.removeItem('mnemonics')
+  sessionStorage.removeItem('mnemonic')
   profileManager.clear()
 }
 
 const activating = ref(false)
-async function activate(mnemonics: string) {
+async function activate(mnemonic: string) {
   activating.value = true
-  sessionStorage.setItem('mnemonics', mnemonics)
-  const grid = await getGrid({ mnemonics })
+  sessionStorage.setItem('mnemonic', mnemonic)
+  const grid = await getGrid({ mnemonic })
   const profile = await loadProfile(grid!)
   ssh.value = profile.ssh
   profileManager.set(profile)
@@ -306,12 +306,12 @@ async function activate(mnemonics: string) {
 }
 
 onMounted(async () => {
-  const maybeMnemonics = sessionStorage.getItem('mnemonics')
-  if (!maybeMnemonics) return
-  mnemonics.value = maybeMnemonics
-  mnemonicsInput.value?.touch()
-  if (await mnemonicsInput.value?.validate(maybeMnemonics)) {
-    await activate(maybeMnemonics)
+  const maybeMnemonic = sessionStorage.getItem('mnemonic')
+  if (!maybeMnemonic) return
+  mnemonic.value = maybeMnemonic
+  mnemonicInput.value?.touch()
+  if (await mnemonicInput.value?.validate(maybeMnemonic)) {
+    await activate(maybeMnemonic)
     openManager.value = false
   }
 })
@@ -320,7 +320,7 @@ const creatingAccount = ref(false)
 async function createNewAccount() {
   creatingAccount.value = true
   const account = await createAccount()
-  mnemonics.value = account.mnemonic
+  mnemonic.value = account.mnemonic
   creatingAccount.value = false
 
   activate(account.mnemonic)
