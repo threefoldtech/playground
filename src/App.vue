@@ -3,7 +3,7 @@
     <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar">
       <v-list>
         <v-list-item>
-          <v-img src="/images/logoTF.png" />
+          <v-img src="/playground/images/logoTF.png" />
         </v-list-item>
         <v-list-item>
           <v-card color="primary" variant="tonal">
@@ -25,7 +25,7 @@
               <v-img
                 class="mr-4"
                 width="26"
-                :src="'/images/icons/' + item.icon"
+                :src="'/playground/images/icons/' + item.icon"
                 :alt="item.title"
               />
             </template>
