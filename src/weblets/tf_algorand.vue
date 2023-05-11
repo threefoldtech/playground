@@ -61,9 +61,9 @@
           <input-validator
             :value="account"
             :rules="[
-              validators.required('Mnemonics is required.'),
+              validators.required('Mnemonic is required.'),
               (value) => {
-                return validators.isAlpha('Mnemonics can contain only alphabetic characters.')(
+                return validators.isAlpha('Mnemonic can contain only alphabetic characters.')(
                   value.replace(/\s/g, '')
                 )
               },
@@ -72,8 +72,8 @@
             #="{ props }"
           >
             <v-text-field
-              label="Account Mnemonics"
-              placeholder="Algorand Account Mnemonics"
+              label="Account Mnemonic"
+              placeholder="Algorand Account Mnemonic"
               v-model.trim="account"
               v-bind="props"
               autofocus
@@ -228,7 +228,7 @@ async function deploy() {
       SSH_KEY: 'Public SSH Key',
       NETWORK: 'Network',
       NODE_TYPE: 'Node Type',
-      ACCOUNT_MNEMONICS: 'Account Mnemonics',
+      ACCOUNT_MNEMONICS: 'Account Mnemonic',
       FIRST_ROUND: 'First Round',
       LAST_ROUND: 'Last Round',
     })
@@ -239,7 +239,7 @@ async function deploy() {
 
 function customAccountValidation(value: string) {
   if (value.split(' ').length !== 25) {
-    return { message: 'Mnemonics must have 25 words separated by spaces.' }
+    return { message: 'Mnemonic must have 25 words separated by spaces.' }
   }
 }
 

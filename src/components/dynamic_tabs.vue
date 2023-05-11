@@ -2,7 +2,13 @@
   <v-tabs v-show="!hideTabs" v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
     <v-tab v-for="tab in tabs" :key="tab.value" :disabled="disabled">
       <v-icon :icon="tab.icon" class="mr-2" v-if="tab.icon" />
-      <img :src="tab.imgPath" height="20" class="mr-2" :alt="tab.title" v-else-if="tab.imgPath" />
+      <img
+        :src="baseUrl + tab.imgPath"
+        height="20"
+        class="mr-2"
+        :alt="tab.title"
+        v-else-if="tab.imgPath"
+      />
       {{ tab.title }}
       <v-chip color="error" v-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
     </v-tab>
@@ -63,6 +69,8 @@ defineExpose({
   valid,
   invalid,
 })
+
+const baseUrl = import.meta.env.BASE_URL
 </script>
 
 <script lang="ts">
