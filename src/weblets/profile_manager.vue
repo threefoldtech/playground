@@ -236,7 +236,7 @@
             :loading="activating"
             :disabled="!isValidMnemonic || creatingAccount"
           >
-            Activate
+            Login
           </v-btn>
         </template>
         <v-btn color="error" variant="outlined" @click="openManager = false"> Close </v-btn>
