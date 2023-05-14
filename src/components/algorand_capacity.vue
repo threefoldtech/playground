@@ -9,7 +9,7 @@
       :rules="[
         validators.required('CPU is required.'),
         validators.isInt('CPU must be a valid integer.'),
-        customCpuValidation,
+        customCpuValidation(validators),
       ]"
       #="{ props }"
       ref="cpuInput"
@@ -22,7 +22,7 @@
       :rules="[
         validators.required('Memory is required.'),
         validators.isInt('Memory must be a valid integer.'),
-        customMemoryValidation,
+        customMemoryValidation(validators),
       ]"
       #="{ props }"
       ref="memoryInput"
@@ -35,7 +35,7 @@
       :rules="[
         validators.required('Storage size is required.'),
         validators.isInt('Storage size must be a valid integer.'),
-        customStorageValidation,
+        customStorageValidation(validators),
       ]"
       #="{ props }"
       ref="storageInput"
@@ -52,7 +52,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import * as validators from '../utils/validators'
+import type { Validators } from '../types'
 
 const props = defineProps<{ network: string; type: string }>()
 const emits = defineEmits<{
@@ -91,35 +91,41 @@ watch(
   }
 )
 
-function customCpuValidation(value: string) {
-  const min = getMinCapacity(props.network, props.type)
-  const maybeError = validators.min(`CPU min is ${min.cpu} cores.`, min.cpu)(value)
-  return maybeError ? maybeError : validators.max('CPU max is 32 cores.', 32)(value)
+function customCpuValidation(validators: Validators) {
+  return (value: string) => {
+    const min = getMinCapacity(props.network, props.type)
+    const maybeError = validators.min(`CPU min is ${min.cpu} cores.`, min.cpu)(value)
+    return maybeError ? maybeError : validators.max('CPU max is 32 cores.', 32)(value)
+  }
 }
 
-function customMemoryValidation(value: string) {
-  const min = getMinCapacity(props.network, props.type)
-  const maybeError = validators.min(
-    `Minimum allowed memory is ${min.memory} GB.`,
-    min.memory
-  )(value)
-  return maybeError
-    ? maybeError
-    : validators.max('Maximum allowed memory is 256 GB.', 256 * 1024)(value)
+function customMemoryValidation(validators: Validators) {
+  return (value: string) => {
+    const min = getMinCapacity(props.network, props.type)
+    const maybeError = validators.min(
+      `Minimum allowed memory is ${min.memory} GB.`,
+      min.memory
+    )(value)
+    return maybeError
+      ? maybeError
+      : validators.max('Maximum allowed memory is 256 GB.', 256 * 1024)(value)
+  }
 }
 
-function customStorageValidation(value: string) {
-  const min = getMinCapacity(props.network, props.type)
-  const maybeError = validators.min(
-    `Minimum allowed storage size is ${min.storage} GB.`,
-    min.storage
-  )(value)
-  return maybeError
-    ? maybeError
-    : validators.max(
-        `Maximum allowed storage size is ${min.storage + 200} GB.`,
-        min.storage + 200
-      )(value)
+function customStorageValidation(validators: Validators) {
+  return (value: string) => {
+    const min = getMinCapacity(props.network, props.type)
+    const maybeError = validators.min(
+      `Minimum allowed storage size is ${min.storage} GB.`,
+      min.storage
+    )(value)
+    return maybeError
+      ? maybeError
+      : validators.max(
+          `Maximum allowed storage size is ${min.storage + 200} GB.`,
+          min.storage + 200
+        )(value)
+  }
 }
 
 function getMinCapacity(network: string, type: string) {

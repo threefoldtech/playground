@@ -1,4 +1,5 @@
 import type { App, Component } from 'vue'
+import * as validators from './utils/validators'
 
 import PasswordInputWrapper from './components/password_input_wrapper.vue'
 import WebletLayout from './components/weblet_layout.vue'
@@ -13,11 +14,20 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   CopyInputWrapper,
   DTabs,
   InputValidator,
-  FormValidator
+  FormValidator,
 }
 
-export function defineGlobalComponents(app: App<Element>) {
+export function defineGlobals(app: App<Element>): void {
+  defineGlobalComponents(app)
+  defineGlobalProps(app)
+}
+
+function defineGlobalComponents(app: App<Element>) {
   for (const key in GLOBAL_COMPONENTS) {
     app.component(key, GLOBAL_COMPONENTS[key])
   }
+}
+
+function defineGlobalProps(app: App<Element>) {
+  app.config.globalProperties.validators = validators
 }

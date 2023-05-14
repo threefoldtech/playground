@@ -22,42 +22,40 @@
       </v-btn>
     </template>
 
-    <template #default>
-      <ListTable
-        :headers="headers"
-        :items="contracts"
-        :loading="loading"
-        :deleting="deleting"
-        v-model="selectedContracts"
-        no-data-text="No contracts found on this account."
-      >
-        <template #[`item.index`]="{ item }">
-          {{ contracts.indexOf(item.value) + 1 }}
-        </template>
+    <ListTable
+      :headers="headers"
+      :items="contracts"
+      :loading="loading"
+      :deleting="deleting"
+      v-model="selectedContracts"
+      no-data-text="No contracts found on this account."
+    >
+      <template #[`item.index`]="{ item }">
+        {{ contracts.indexOf(item.value) + 1 }}
+      </template>
 
-        <template #[`item.state`]="{ item }">
-          <v-chip :color="getStateColor(item.value.state)">
-            {{ item.value.state }}
-          </v-chip>
-        </template>
+      <template #[`item.state`]="{ item }">
+        <v-chip :color="getStateColor(item.value.state)">
+          {{ item.value.state }}
+        </v-chip>
+      </template>
 
-        <template #[`item.actions`]="{ item }">
-          <v-btn
-            color="secondary"
-            variant="tonal"
-            @click="
-              item.value.type !== 'name'
-                ? onShowDetails(item.value.contractId)
-                : layout.openDialog(item.value, false, true)
-            "
-            :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
-            :loading="loadingContractId == item.value.contractId"
-          >
-            Show Details
-          </v-btn>
-        </template>
-      </ListTable>
-    </template>
+      <template #[`item.actions`]="{ item }">
+        <v-btn
+          color="secondary"
+          variant="tonal"
+          @click="
+            item.value.type !== 'name'
+              ? onShowDetails(item.value.contractId)
+              : layout.openDialog(item.value, false, true)
+          "
+          :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
+          :loading="loadingContractId == item.value.contractId"
+        >
+          Show Details
+        </v-btn>
+      </template>
+    </ListTable>
 
     <template #footer-actions>
       <v-btn

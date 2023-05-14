@@ -27,10 +27,9 @@
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
 
         <SelectSolutionFlavor v-model="solution" />
@@ -63,7 +62,6 @@
 import { generateString, type GridClient } from '@threefold/grid_client'
 import { type Ref, ref } from 'vue'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
-import * as validators from '../utils/validators'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'

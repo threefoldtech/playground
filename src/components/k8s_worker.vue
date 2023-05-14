@@ -6,10 +6,9 @@
       validators.minLength('Name minimum length is 2 chars.', 2),
       validators.maxLength('Name max length is 15 chars.', 15),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
-    </template>
+    <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
   </input-validator>
 
   <input-validator
@@ -20,15 +19,14 @@
       validators.min('CPU min is 2 cores.', 2),
       validators.max('CPU max is 32 cores.', 32),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field
-        label="CPU (vCores)"
-        type="number"
-        v-model.number="$props.modelValue.cpu"
-        v-bind="props"
-      />
-    </template>
+    <v-text-field
+      label="CPU (vCores)"
+      type="number"
+      v-model.number="$props.modelValue.cpu"
+      v-bind="props"
+    />
   </input-validator>
 
   <input-validator
@@ -39,15 +37,14 @@
       validators.min('Minimum allowed memory is 256 MB.', 256),
       validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field
-        label="Memory (MB)"
-        type="number"
-        v-model.number="$props.modelValue.memory"
-        v-bind="props"
-      />
-    </template>
+    <v-text-field
+      label="Memory (MB)"
+      type="number"
+      v-model.number="$props.modelValue.memory"
+      v-bind="props"
+    />
   </input-validator>
 
   <input-validator
@@ -58,15 +55,14 @@
       validators.min('Minimum allowed disk size is 1 GB.', 1),
       validators.max('Maximum allowed disk size is 10000 GB.', 10000),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field
-        label="Disk Size (GB)"
-        type="number"
-        v-model.number="$props.modelValue.diskSize"
-        v-bind="props"
-      />
-    </template>
+    <v-text-field
+      label="Disk Size (GB)"
+      type="number"
+      v-model.number="$props.modelValue.diskSize"
+      v-bind="props"
+    />
   </input-validator>
 
   <v-switch label="Public IPv4" inset color="primary" v-model="$props.modelValue.ipv4" />
@@ -91,8 +87,6 @@
 </template>
 
 <script lang="ts" setup>
-import * as validators from '../utils/validators'
-
 defineProps<{ modelValue: K8SWorker }>()
 </script>
 

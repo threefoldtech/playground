@@ -1,17 +1,15 @@
 <template>
-  <copy-input-wrapper :data="data">
-    <template #default="{ props }">
-      <v-textarea
-        variant="outlined"
-        :label="label"
-        :model-value="data"
-        v-bind="props"
-        no-resize
-        :rows="3"
-        v-if="textarea"
-      />
-      <v-text-field variant="outlined" :label="label" :model-value="data" v-bind="props" v-else />
-    </template>
+  <copy-input-wrapper :data="data" #="{ props }">
+    <v-textarea
+      variant="outlined"
+      :label="label"
+      :model-value="data"
+      v-bind="props"
+      no-resize
+      :rows="3"
+      v-if="textarea"
+    />
+    <v-text-field variant="outlined" :label="label" :model-value="data" v-bind="props" v-else />
   </copy-input-wrapper>
 </template>
 
@@ -21,6 +19,6 @@ defineProps<{ label: string; data: any; textarea?: boolean }>()
 
 <script lang="ts">
 export default {
-  name: 'CopyReadonlyInput'
+  name: 'CopyReadonlyInput',
 }
 </script>

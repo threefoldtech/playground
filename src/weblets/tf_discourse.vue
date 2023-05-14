@@ -28,10 +28,9 @@
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
         <input-validator
           :value="email"
@@ -39,15 +38,14 @@
             validators.required('Email is required.'),
             validators.isEmail('Please provide a valid email address.'),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field
-              label="Email"
-              placeholder="This email will be used to login to your instance."
-              v-model="email"
-              v-bind="props"
-            />
-          </template>
+          <v-text-field
+            label="Email"
+            placeholder="This email will be used to login to your instance."
+            v-model="email"
+            v-bind="props"
+          />
         </input-validator>
 
         <SelectSolutionFlavor v-model="solution" />
@@ -84,7 +82,6 @@ import type { solutionFlavor as SolutionFlavor, GatewayNode, Farm } from '../typ
 import { ProjectName } from '../types'
 import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 import { deployVM } from '../utils/deploy_vm'
