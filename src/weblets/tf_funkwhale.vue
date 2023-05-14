@@ -6,7 +6,7 @@
       that lets you listen and share music and audio within a decentralized, open network.
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_funkwhale"
+        href="https://manual.grid.tf/weblets/weblets_funkwhale.html"
         class="app-link"
       >
         Quick start documentation

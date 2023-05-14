@@ -5,7 +5,7 @@
       Mattermost A single point of collaboration. Designed specifically for digital operations.
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost"
+        href="https://manual.grid.tf/weblets/weblets_mattermost.html"
         class="app-link"
       >
         Quick start documentation
