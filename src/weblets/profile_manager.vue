@@ -35,7 +35,7 @@
         Please visit
         <a
           class="app-link"
-          href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
+          href="https://manual.grid.tf/weblets/weblets_profile_manager.html"
           target="_blank"
         >
           the manual
@@ -105,7 +105,7 @@
             Scan the QRcode using
             <a
               class="app-link"
-              href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
+              href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html"
               target="_blank"
             >
               ThreeFold Connect

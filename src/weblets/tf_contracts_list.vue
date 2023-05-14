@@ -4,7 +4,7 @@
     <template #subtitle>
       <a
         class="app-link"
-        href="https://library.threefold.me/info/manual/#/manual__tfchain_home"
+        href="https://manual.grid.tf/tfchain/tfchain_external_service_contract.html"
         target="_blank"
         >Quick start documentation</a
       >

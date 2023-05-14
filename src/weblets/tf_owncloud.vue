@@ -7,7 +7,7 @@
       <a
         target="_blank"
         class="app-link"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud"
+        href="https://manual.grid.tf/weblets/weblets_owncloud.html"
       >
         Quick start documentation
       </a>

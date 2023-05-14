@@ -6,7 +6,7 @@
       services.
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
+        href="https://manual.grid.tf/weblets/weblets_peertube.html"
         class="app-link"
       >
         Quick start documentation

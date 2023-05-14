@@ -5,7 +5,7 @@
       >Deploy a new micro virtual machine on the Threefold Grid
       <a
         class="app-link"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+        href="https://manual.grid.tf/weblets/weblets_vm.html"
         target="_blank"
       >
         Quick start documentation
