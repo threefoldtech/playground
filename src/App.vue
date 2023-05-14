@@ -7,7 +7,7 @@
         </v-list-item>
         <v-list-item>
           <v-card color="primary" variant="tonal">
-            <v-card-text class="text-center">{{ network.toLocaleUpperCase() }}NET</v-card-text>
+            <v-card-title class="text-center capitalize">{{ network }}net</v-card-title>
           </v-card>
         </v-list-item>
 
@@ -86,7 +86,7 @@ watch(
 
 const routes: AppRoute[] = [
   {
-    title: 'DEPLOYMENTS',
+    title: 'Deployments',
     items: [
       { title: 'Full Virtual Machine', icon: 'vm.png', route: '/' },
       { title: 'Micro Virtual Machine', icon: 'vm.png', route: '/vm' },
@@ -108,7 +108,7 @@ const routes: AppRoute[] = [
     ],
   },
   {
-    title: 'MY ACCOUNT',
+    title: 'My Account',
     items: [
       { title: 'Contracts', route: '/contractslist' },
       { title: 'Deployments', route: '/deployedlist' },
@@ -174,5 +174,9 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.capitalize{
+  text-transform: capitalize !important;
 }
 </style>
