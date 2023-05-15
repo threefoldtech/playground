@@ -5,7 +5,7 @@
       Mattermost A single point of collaboration. Designed specifically for digital operations.
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_mattermost"
+        href="https://manual.grid.tf/weblets/weblets_mattermost.html"
         class="app-link"
       >
         Quick start documentation
@@ -27,10 +27,9 @@
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
 
         <SelectSolutionFlavor v-model="solution" />
@@ -63,7 +62,6 @@
 import { generateString, type GridClient } from '@threefold/grid_client'
 import { type Ref, ref } from 'vue'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
-import * as validators from '../utils/validators'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
@@ -85,9 +83,11 @@ const smtp = ref(createSMTPServer())
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Mattermost.toLowerCase()
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Mattermost,
+    projectName,
     twinId: profileManager.profile!.twinId,
   })
   const domain = subdomain + '.' + gateway.value.domain
@@ -96,7 +96,7 @@ async function deploy() {
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Mattermost)
+    grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

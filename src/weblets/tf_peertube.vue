@@ -6,7 +6,7 @@
       services.
       <a
         target="_blank"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_peertube"
+        href="https://manual.grid.tf/weblets/weblets_peertube.html"
         class="app-link"
       >
         Quick start documentation
@@ -21,10 +21,9 @@
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
+        <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
       <input-validator
@@ -33,31 +32,27 @@
           validators.required('Email is required.'),
           validators.isEmail('Please provide a valid email address.'),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Admin Email" v-model="email" v-bind="props" />
-        </template>
+        <v-text-field label="Admin Email" v-model="email" v-bind="props" />
       </input-validator>
 
-      <password-input-wrapper>
-        <template #default="{ props }">
-          <input-validator
-            :value="password"
-            :rules="[
-              validators.required('Password is required.'),
-              validators.minLength('Password minLength is 6 chars.', 6),
-              validators.maxLength('Password maxLength is 15 chars.', 15),
-            ]"
-          >
-            <template #default="{ props: validatorProps }">
-              <v-text-field
-                label="Password"
-                v-model="password"
-                v-bind="{ ...props, ...validatorProps }"
-              />
-            </template>
-          </input-validator>
-        </template>
+      <password-input-wrapper #="{ props }">
+        <input-validator
+          :value="password"
+          :rules="[
+            validators.required('Password is required.'),
+            validators.minLength('Password minLength is 6 chars.', 6),
+            validators.maxLength('Password maxLength is 15 chars.', 15),
+          ]"
+          #="{ props: validatorProps }"
+        >
+          <v-text-field
+            label="Password"
+            v-model="password"
+            v-bind="{ ...props, ...validatorProps }"
+          />
+        </input-validator>
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
@@ -82,7 +77,6 @@
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
 import { generateString, GridClient } from '@threefold/grid_client'
-import * as validators from '../utils/validators'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
@@ -104,9 +98,11 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Peertube.toLowerCase()
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Peertube,
+    projectName,
     twinId: profileManager.profile!.twinId,
   })
   const domain = subdomain + '.' + gateway.value.domain
@@ -115,7 +111,7 @@ async function deploy() {
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Peertube)
+    grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

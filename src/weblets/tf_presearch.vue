@@ -30,10 +30,9 @@
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
 
         <input-validator
@@ -42,12 +41,11 @@
             validators.required('Presearch registration code is required.'),
             validators.equal('Presearch registration code must be 32 characters long.', 32),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <password-input-wrapper>
-              <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
-            </password-input-wrapper>
-          </template>
+          <password-input-wrapper>
+            <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
+          </password-input-wrapper>
         </input-validator>
 
         <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
@@ -91,12 +89,11 @@
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
 import { generateString } from '@threefold/grid_client'
-import type { Farm } from '../types'
+import { type Farm, ProjectName } from '../types'
 import { deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import rootFs from '../utils/root_fs'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { useLayout } from '../components/weblet_layout.vue'
 
@@ -118,8 +115,10 @@ const publicRestoreKey = ref('')
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Presearch.toLowerCase()
+
   try {
-    const grid = await getGrid(profileManager.profile!)
+    const grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

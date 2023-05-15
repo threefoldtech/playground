@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 export interface Profile {
-  mnemonics: string
+  mnemonic: string
   ssh: string
   twinId: number
   address: string
@@ -27,8 +27,8 @@ const useProfileManager = defineStore('profile-manager', {
     },
     clear() {
       this.profile = null
-    }
-  }
+    },
+  },
 })
 
 export { useProfileManager }

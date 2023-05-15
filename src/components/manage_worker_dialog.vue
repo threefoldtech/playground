@@ -1,7 +1,13 @@
 <template>
-  <v-dialog model-value scrollable width="70%" persistent>
+  <v-dialog
+    model-value
+    scrollable
+    width="70%"
+    :persistent="layout?.status === 'deploy' || deleting"
+    @update:model-value="$emit('close')"
+  >
     <weblet-layout ref="layout" @back="$emit('back')">
-      <template #title><slot name="title"></slot></template>
+      <template #title><slot name="title"></slot> </template>
 
       <template #header-actions>
         <v-btn-toggle
@@ -51,7 +57,7 @@
     </weblet-layout>
   </v-dialog>
 
-  <v-dialog width="50%" persistent v-model="deletingDialog">
+  <v-dialog width="50%" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5">
         Are you sure you want to delete the following workers?

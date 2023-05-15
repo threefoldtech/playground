@@ -7,7 +7,7 @@
       <a
         target="_blank"
         class="app-link"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_owncloud"
+        href="https://manual.grid.tf/weblets/weblets_owncloud.html"
       >
         Quick start documentation
       </a>
@@ -28,10 +28,9 @@
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
 
         <input-validator
@@ -41,31 +40,27 @@
             validators.minLength('Username minLength is 2 chars.', 2),
             validators.maxLength('Username maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Username" v-model="username" v-bind="props" />
-          </template>
+          <v-text-field label="Username" v-model="username" v-bind="props" />
         </input-validator>
 
-        <password-input-wrapper>
-          <template #default="{ props }">
-            <input-validator
-              :value="password"
-              :rules="[
-                validators.required('Password is required.'),
-                validators.minLength('Password minLength is 6 chars.', 6),
-                validators.maxLength('Password maxLength is 15 chars.', 15),
-              ]"
-            >
-              <template #default="{ props: validatorProps }">
-                <v-text-field
-                  label="Password"
-                  v-model="password"
-                  v-bind="{ ...props, ...validatorProps }"
-                />
-              </template>
-            </input-validator>
-          </template>
+        <password-input-wrapper #="{ props }">
+          <input-validator
+            :value="password"
+            :rules="[
+              validators.required('Password is required.'),
+              validators.minLength('Password minLength is 6 chars.', 6),
+              validators.maxLength('Password maxLength is 15 chars.', 15),
+            ]"
+            #="{ props: validatorProps }"
+          >
+            <v-text-field
+              label="Password"
+              v-model="password"
+              v-bind="{ ...props, ...validatorProps }"
+            />
+          </input-validator>
         </password-input-wrapper>
 
         <SelectSolutionFlavor v-model="solution" />
@@ -100,7 +95,6 @@
 import { generateString, type GridClient } from '@threefold/grid_client'
 import { type Ref, ref } from 'vue'
 import type { solutionFlavor as SolutionFlavor, Farm, GatewayNode } from '../types'
-import * as validators from '../utils/validators'
 import { ProjectName } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
@@ -124,9 +118,11 @@ const smtp = ref(createSMTPServer())
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Owncloud.toLowerCase()
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Owncloud,
+    projectName,
     twinId: profileManager.profile!.twinId,
   })
   const domain = subdomain + '.' + gateway.value.domain
@@ -135,7 +131,7 @@ async function deploy() {
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Owncloud)
+    grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

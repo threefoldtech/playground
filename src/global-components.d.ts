@@ -4,6 +4,7 @@ import CopyInputWrapper from './components/copy_input_wrapper.vue'
 import DTabs from './components/dynamic_tabs.vue'
 import InputValidator from './components/input_validator.vue'
 import FormValidator from './components/form_validator.vue'
+import type * as validators from './utils/validators'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
@@ -13,5 +14,9 @@ declare module '@vue/runtime-core' {
     DTabs: typeof DTabs
     InputValidator: typeof InputValidator
     FormValidator: typeof FormValidator
+  }
+
+  interface ComponentCustomProperties {
+    validators: typeof validators
   }
 }

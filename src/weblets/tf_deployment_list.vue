@@ -21,363 +21,378 @@
       destroy
       :hide-tabs="!!$props.projectName"
     >
-      <template #default>
-        <VmDeploymentTable
-          :projectName="tabs[activeTab].value"
-          v-model="selectedItems"
-          :deleting="deleting"
-          ref="table"
-        >
-          <template #Fullvm-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                })
-              "
-            />
-          </template>
+      <VmDeploymentTable
+        :projectName="tabs[activeTab].value"
+        v-model="selectedItems"
+        :deleting="deleting"
+        ref="table"
+      >
+        <template #Fullvm-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+              })
+            "
+          />
+        </template>
 
-          <template #VM-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                })
-              "
-            />
-          </template>
+        <template #VM-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+              })
+            "
+          />
+        </template>
 
-          <template #CapRover-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SWM_NODE_MODE: 'Swarm Node Mode',
-                  PUBLIC_KEY: 'Public SSH Key',
-                  CAPROVER_ROOT_DOMAIN: false,
-                  CAPTAIN_IMAGE_VERSION: 'Captain Image Version',
-                  DEFAULT_PASSWORD: 'Default Password',
-                  CAPTAIN_IS_DEBUG: 'Debug Mode',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Admin Panel"
-              color="info"
-              icon="mdi-view-dashboard"
-              :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
-            />
-            <IconActionBtn
-              icon="mdi-cog"
-              tooltip="Manage Workers"
-              color="secondary"
-              @click="dialog = item.value.deploymentName"
-            />
+        <template #CapRover-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SWM_NODE_MODE: 'Swarm Node Mode',
+                PUBLIC_KEY: 'Public SSH Key',
+                CAPROVER_ROOT_DOMAIN: false,
+                CAPTAIN_IMAGE_VERSION: 'Captain Image Version',
+                DEFAULT_PASSWORD: 'Default Password',
+                CAPTAIN_IS_DEBUG: 'Debug Mode',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Admin Panel"
+            color="info"
+            icon="mdi-view-dashboard"
+            :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
+          />
+          <IconActionBtn
+            icon="mdi-cog"
+            tooltip="Manage Workers"
+            color="secondary"
+            @click="dialog = item.value.deploymentName"
+          />
 
-            <ManageCaproverWorkerDialog
-              v-if="dialog === item.value.deploymentName"
-              :master="item.value[0]"
-              :data="item.value.slice(1)"
-              @close="dialog = undefined"
-              @update:caprover="item.value = $event"
-            />
-          </template>
+          <ManageCaproverWorkerDialog
+            v-if="dialog === item.value.deploymentName"
+            :master="item.value[0]"
+            :data="item.value.slice(1)"
+            @close="dialog = undefined"
+            @update:caprover="item.value = $event"
+          />
+        </template>
 
-          <template #Peertube-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  PEERTUBE_ADMIN_EMAIL: 'Peertube Admin Email',
-                  PT_INITIAL_ROOT_PASSWORD: 'Peertube Initial Root Password',
-                  PEERTUBE_WEBSERVER_HOSTNAME: 'Peertube Webserver Hostname',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
-            />
-          </template>
+        <template #Peertube-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                PEERTUBE_ADMIN_EMAIL: 'Peertube Admin Email',
+                PT_INITIAL_ROOT_PASSWORD: 'Peertube Initial Root Password',
+                PEERTUBE_WEBSERVER_HOSTNAME: 'Peertube Webserver Hostname',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
+          />
+        </template>
 
-          <template #Funkwhale-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  FUNKWHALE_HOSTNAME: 'Funkwhale Hostname',
-                  DJANGO_SUPERUSER_EMAIL: 'Django Superuser Email',
-                  DJANGO_SUPERUSER_USERNAME: 'Diango Superuser Username',
-                  DJANGO_SUPERUSER_PASSWORD: 'Django Superuser Password',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
-            />
-          </template>
+        <template #Funkwhale-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                FUNKWHALE_HOSTNAME: 'Funkwhale Hostname',
+                DJANGO_SUPERUSER_EMAIL: 'Django Superuser Email',
+                DJANGO_SUPERUSER_USERNAME: 'Diango Superuser Username',
+                DJANGO_SUPERUSER_PASSWORD: 'Django Superuser Password',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
+          />
+        </template>
 
-          <template #Taiga-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  DOMAIN_NAME: 'Domain Name',
-                  ADMIN_USERNAME: 'Admin Username',
-                  ADMIN_PASSWORD: 'Admin Password',
-                  ADMIN_EMAIL: 'Admin Email',
-                  DEFAULT_FROM_EMAIL: 'Default Form Email',
-                  EMAIL_USE_TLS: 'Email Use TLS',
-                  EMAIL_USE_SSL: 'Email Use SSL',
-                  EMAIL_HOST: 'Email Host',
-                  EMAIL_PORT: 'Email Port',
-                  EMAIL_HOST_USER: 'Email Host User',
-                  EMAIL_HOST_PASSWORD: 'Email Host Password',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Admin Panel"
-              color="info"
-              icon="mdi-view-dashboard"
-              :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="secondary"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.DOMAIN_NAME"
-            />
-          </template>
+        <template #Taiga-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                DOMAIN_NAME: 'Domain Name',
+                ADMIN_USERNAME: 'Admin Username',
+                ADMIN_PASSWORD: 'Admin Password',
+                ADMIN_EMAIL: 'Admin Email',
+                DEFAULT_FROM_EMAIL: 'Default Form Email',
+                EMAIL_USE_TLS: 'Email Use TLS',
+                EMAIL_USE_SSL: 'Email Use SSL',
+                EMAIL_HOST: 'Email Host',
+                EMAIL_PORT: 'Email Port',
+                EMAIL_HOST_USER: 'Email Host User',
+                EMAIL_HOST_PASSWORD: 'Email Host Password',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Admin Panel"
+            color="info"
+            icon="mdi-view-dashboard"
+            :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="secondary"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.DOMAIN_NAME"
+          />
+        </template>
 
-          <template #Presearch-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  PRESEARCH_REGISTRATION_CODE: 'Presearch Registration Code',
-                  PRESEARCH_BACKUP_PRI_KEY: 'Presearch Backup Private Key',
-                  PRESEARCH_BACKUP_PUB_KEY: 'Presearch Backup Public Key',
-                })
-              "
-            />
-          </template>
+        <template #Presearch-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                PRESEARCH_REGISTRATION_CODE: 'Presearch Registration Code',
+                PRESEARCH_BACKUP_PRI_KEY: 'Presearch Backup Private Key',
+                PRESEARCH_BACKUP_PUB_KEY: 'Presearch Backup Public Key',
+              })
+            "
+          />
+        </template>
 
-          <template #Mattermost-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  DB_PASSWORD: 'Database Password',
-                  SITE_URL: 'Site URL',
-                  SMTPUsername: 'SMTP Username',
-                  SMTPPassword: 'SMTP Password',
-                  SMTPServer: 'SMTP Server',
-                  SMTPPort: 'SMTP Port',
-                  SSH_KEY: 'Public SSH Key',
-                  MATTERMOST_DOMAIN: 'Mattermost Domain',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="item.value[0].env.SITE_URL"
-            />
-          </template>
+        <template #Mattermost-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                DB_PASSWORD: 'Database Password',
+                SITE_URL: 'Site URL',
+                SMTPUsername: 'SMTP Username',
+                SMTPPassword: 'SMTP Password',
+                SMTPServer: 'SMTP Server',
+                SMTPPort: 'SMTP Port',
+                SSH_KEY: 'Public SSH Key',
+                MATTERMOST_DOMAIN: 'Mattermost Domain',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="item.value[0].env.SITE_URL"
+          />
+        </template>
 
-          <template #Discourse-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  DISCOURSE_HOSTNAME: 'Discourse Hostname',
-                  DISCOURSE_DEVELOPER_EMAILS: 'Discourse Developer Emails',
-                  DISCOURSE_SMTP_ADDRESS: 'Discourse SMTP Address',
-                  DISCOURSE_SMTP_PORT: 'Discourse SMTP Port',
-                  DISCOURSE_SMTP_ENABLE_START_TLS: 'Discourse SMTP Enable Start TLS',
-                  DISCOURSE_SMTP_USER_NAME: 'Discourse SMTP Username',
-                  DISCOURSE_SMTP_PASSWORD: 'Discourse SMTP Password',
-                  THREEBOT_PRIVATE_KEY: 'Threebot Private Key',
-                  FLASK_SECRET_KEY: 'Flask Secret Key',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
-            />
-          </template>
+        <template #Discourse-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                DISCOURSE_HOSTNAME: 'Discourse Hostname',
+                DISCOURSE_DEVELOPER_EMAILS: 'Discourse Developer Emails',
+                DISCOURSE_SMTP_ADDRESS: 'Discourse SMTP Address',
+                DISCOURSE_SMTP_PORT: 'Discourse SMTP Port',
+                DISCOURSE_SMTP_ENABLE_START_TLS: 'Discourse SMTP Enable Start TLS',
+                DISCOURSE_SMTP_USER_NAME: 'Discourse SMTP Username',
+                DISCOURSE_SMTP_PASSWORD: 'Discourse SMTP Password',
+                THREEBOT_PRIVATE_KEY: 'Threebot Private Key',
+                FLASK_SECRET_KEY: 'Flask Secret Key',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
+          />
+        </template>
 
-          <template #Casperlabs-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  CASPERLABS_HOSTNAME: 'Casperlabs Hostname',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
-            />
-          </template>
+        <template #Casperlabs-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                CASPERLABS_HOSTNAME: 'Casperlabs Hostname',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
+          />
+        </template>
 
-          <template #Owncloud-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  OWNCLOUD_DOMAIN: 'Owncloud Domain',
-                  OWNCLOUD_ADMIN_USERNAME: 'Owncloud Admin Username',
-                  OWNCLOUD_ADMIN_PASSWORD: 'Owncloud Admin Password',
-                  OWNCLOUD_MAIL_SMTP_SECURE: 'Owncloud Mail SMTP Secure',
-                  OWNCLOUD_MAIL_DOMAIN: 'Owncloud Mail Domain',
-                  OWNCLOUD_MAIL_FROM_ADDRESS: 'Owncloud Mail From Address',
-                  OWNCLOUD_MAIL_SMTP_HOST: 'Owncloud Mail SMTP Host',
-                  OWNCLOUD_MAIL_SMTP_PORT: 'Owncloud Mail SMTP Port',
-                  OWNCLOUD_MAIL_SMTP_NAME: 'Owncloud Mail SMTP Name',
-                  OWNCLOUD_MAIL_SMTP_PASSWORD: 'Owncloud Mail SMTP Password',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
-            />
-          </template>
+        <template #Owncloud-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                OWNCLOUD_DOMAIN: 'Owncloud Domain',
+                OWNCLOUD_ADMIN_USERNAME: 'Owncloud Admin Username',
+                OWNCLOUD_ADMIN_PASSWORD: 'Owncloud Admin Password',
+                OWNCLOUD_MAIL_SMTP_SECURE: 'Owncloud Mail SMTP Secure',
+                OWNCLOUD_MAIL_DOMAIN: 'Owncloud Mail Domain',
+                OWNCLOUD_MAIL_FROM_ADDRESS: 'Owncloud Mail From Address',
+                OWNCLOUD_MAIL_SMTP_HOST: 'Owncloud Mail SMTP Host',
+                OWNCLOUD_MAIL_SMTP_PORT: 'Owncloud Mail SMTP Port',
+                OWNCLOUD_MAIL_SMTP_NAME: 'Owncloud Mail SMTP Name',
+                OWNCLOUD_MAIL_SMTP_PASSWORD: 'Owncloud Mail SMTP Password',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
+          />
+        </template>
 
-          <template #Subsquid-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  CHAIN_ENDPOINT: 'Chain Endpoint',
-                  SUBSQUID_WEBSERVER_HOSTNAME: 'Subsquid Webserver Hostname',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
-            />
-          </template>
+        <template #Subsquid-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                CHAIN_ENDPOINT: 'Chain Endpoint',
+                SUBSQUID_WEBSERVER_HOSTNAME: 'Subsquid Webserver Hostname',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
+          />
+        </template>
 
-          <template #NodePilot-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Visit"
-              color="info"
-              icon="mdi-web"
-              :href="
-                'http://' +
-                (item.value[0].publicIP?.ip
-                  ? item.value[0].publicIP.ip.slice(0, -3)
-                  : '[' + item.value[0].planetary + ']')
-              "
-            />
-          </template>
+        <template #Algorand-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                NETWORK: 'Network',
+                NODE_TYPE: 'Node Type',
+                ACCOUNT_MNEMONICS: 'Account Mnemonics',
+                FIRST_ROUND: 'First Round',
+                LAST_ROUND: 'Last Round',
+              })
+            "
+          />
+        </template>
 
-          <template #Umbrel-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  USERNAME: 'Username',
-                  PASSWORD: 'Password',
-                  UMBREL_DISK: 'Umbrel Disk',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Admin Panel"
-              color="info"
-              icon="mdi-view-dashboard"
-              :href="
-                'http://' +
-                (item.value[0].publicIP?.ip
-                  ? item.value[0].publicIP.ip.slice(0, -3)
-                  : '[' + item.value[0].planetary + ']')
-              "
-            />
-          </template>
+        <template #NodePilot-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Visit"
+            color="info"
+            icon="mdi-web"
+            :href="
+              'http://' +
+              (item.value[0].publicIP?.ip
+                ? item.value[0].publicIP.ip.slice(0, -3)
+                : '[' + item.value[0].planetary + ']')
+            "
+          />
+        </template>
 
-          <template #Wordpress-actions="{ item }">
-            <IconActionBtn
-              tooltip="Show Details"
-              icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  MYSQL_USER: 'Mysql User',
-                  MYSQL_PASSWORD: 'Mysql Password',
-                  ADMIN_EMAIL: 'Admin Email',
-                  WP_URL: 'WP URL',
-                })
-              "
-            />
-            <IconActionBtn
-              tooltip="Preview"
-              color="info"
-              icon="mdi-web"
-              :href="'https://' + item.value[0].env.WP_URL"
-            />
-            <IconActionBtn
-              tooltip="Admin Panel"
-              color="secondary"
-              icon="mdi-view-dashboard"
-              :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
-            />
-          </template>
-        </VmDeploymentTable>
-      </template>
+        <template #Umbrel-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                USERNAME: 'Username',
+                PASSWORD: 'Password',
+                UMBREL_DISK: 'Umbrel Disk',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Admin Panel"
+            color="info"
+            icon="mdi-view-dashboard"
+            :href="
+              'http://' +
+              (item.value[0].publicIP?.ip
+                ? item.value[0].publicIP.ip.slice(0, -3)
+                : '[' + item.value[0].planetary + ']')
+            "
+          />
+        </template>
+
+        <template #Wordpress-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-information-outline"
+            @click="
+              layout.openDialog(item?.value, {
+                SSH_KEY: 'Public SSH Key',
+                MYSQL_USER: 'Mysql User',
+                MYSQL_PASSWORD: 'Mysql Password',
+                ADMIN_EMAIL: 'Admin Email',
+                WP_URL: 'WP URL',
+              })
+            "
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.WP_URL"
+          />
+          <IconActionBtn
+            tooltip="Admin Panel"
+            color="secondary"
+            icon="mdi-view-dashboard"
+            :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
+          />
+        </template>
+      </VmDeploymentTable>
 
       <template #Kubernetes>
         <K8sDeploymentTable
@@ -432,7 +447,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog v-model="deletingDialog" scrollable persistent width="50%">
+  <v-dialog v-model="deletingDialog" scrollable width="50%">
     <v-card>
       <v-card-title>
         <strong>Are you sure you want to delete the following deployments?</strong>
