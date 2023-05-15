@@ -11,7 +11,7 @@ This module contains Profile Manager page elements.
 class ProfileManager:
     inputField = (
         By.XPATH, '//input[@placeholder="Please insert your mnemonics"]')
-    activateButton = (By.XPATH, '//button[contains(., "Activate")]')
+    activateButton = (By.XPATH, '//button[contains(., "Login")]')
     closeButton = (By.XPATH, '//button[contains(., "Close")]')
     mnemonics_field = (By.XPATH, '//div[@class="Mnemonics"]')
     logoutButton = (By.XPATH, '//button[contains(., "Logout")]')
