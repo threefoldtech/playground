@@ -75,6 +75,7 @@
                     placeholder="Please insert your mnemonic"
                     autofocus
                     v-model="mnemonic"
+                    :hint="isValidMnemonic ? 'Valid' : undefined"
                     v-bind="{ ...passwordInputProps, ...validationProps }"
                   />
                 </div>
