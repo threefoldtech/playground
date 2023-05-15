@@ -18,5 +18,4 @@ def browser():
     driver.get('http://localhost:5173/')
 
     yield driver
-    driver.quit()
 
