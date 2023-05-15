@@ -6,7 +6,7 @@
 
 ### Acceptance Criteria
 
-    - User can login easily by adding his mnemonic, then click on 'activate' button. 
+    - User can login easily by adding his mnemonic, then click on 'login' button. 
     - If user don't have an account, click on 'DON"T HAVE ACCOUNT? CREATE ONE' button to create an account and mnemonic will be generated automatically, then user can add or generate SSH Keys.
 ---
 ## Logout
@@ -340,6 +340,13 @@
     - User can visit its deployment instance of Casperlabs from 'Deployment List (Casperlabs)' by clicking on preview icon or from 'Deployments' in 'My Account' section.
     - User can login easily to casperlabs instance with the deployment data.
 --- 
+## Algorand Deployment
+
+    - As I user I want to know what's Algorand
+### Acceptance Criteria
+
+    - User can learn all about deployments from the 'Quick start documentation', that explains all about it.
+---
 ## Node Pilot Deployment
 
     - As I user I want to know what's Node Pilot
