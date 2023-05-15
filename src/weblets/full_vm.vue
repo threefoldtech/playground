@@ -14,6 +14,7 @@
         { title: 'Config', value: 'config' },
         { title: 'Disks', value: 'disks' },
       ]"
+      ref='tabs'
     >
       <template #config>
         <input-validator
@@ -88,6 +89,7 @@
           }"
           v-model="farm"
         />
+
       </template>
 
       <template #disks>
