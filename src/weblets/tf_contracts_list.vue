@@ -4,7 +4,7 @@
     <template #subtitle>
       <a
         class="app-link"
-        href="https://library.threefold.me/info/manual/#/manual__tfchain_home"
+        href="https://manual.grid.tf/tfchain/tfchain_external_service_contract.html"
         target="_blank"
         >Quick start documentation</a
       >
@@ -22,36 +22,40 @@
       </v-btn>
     </template>
 
-    <template #default>
-      <ListTable
-        :headers="headers"
-        :items="contracts"
-        :loading="loading"
-        :deleting="deleting"
-        v-model="selectedContracts"
-        no-data-text="No contracts found on this account."
-      >
-        <template #[`item.state`]="{ item }">
-          <v-chip :color="getStateColor(item.value.state)">
-            {{ item.value.state }}
-          </v-chip>
-        </template>
+    <ListTable
+      :headers="headers"
+      :items="contracts"
+      :loading="loading"
+      :deleting="deleting"
+      v-model="selectedContracts"
+      no-data-text="No contracts found on this account."
+    >
+      <template #[`item.index`]="{ item }">
+        {{ contracts.indexOf(item.value) + 1 }}
+      </template>
 
-        <template #[`item.actions`]="{ item }">
-          <v-btn
-            color="secondary"
-            variant="tonal"
-            @click="onShowDetails(item.value.contractId)"
-            :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
-            :loading="loadingContractId == item.value.contractId"
-            v-if="item.value.type !== 'name'"
-          >
-            Show Details
-          </v-btn>
-          <p v-else>-</p>
-        </template>
-      </ListTable>
-    </template>
+      <template #[`item.state`]="{ item }">
+        <v-chip :color="getStateColor(item.value.state)">
+          {{ item.value.state }}
+        </v-chip>
+      </template>
+
+      <template #[`item.actions`]="{ item }">
+        <v-btn
+          color="secondary"
+          variant="tonal"
+          @click="
+            item.value.type !== 'name'
+              ? onShowDetails(item.value.contractId)
+              : layout.openDialog(item.value, false, true)
+          "
+          :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
+          :loading="loadingContractId == item.value.contractId"
+        >
+          Show Details
+        </v-btn>
+      </template>
+    </ListTable>
 
     <template #footer-actions>
       <v-btn
@@ -66,7 +70,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="70%" persistent v-model="deletingDialog">
+  <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5">
         Are you sure you want to delete the following contracts?
@@ -105,6 +109,8 @@ const contracts = ref<NormalizedContract[]>([])
 const loading = ref(false)
 const selectedContracts = ref<NormalizedContract[]>([])
 const headers: VDataTableHeader = [
+  { title: '#', key: 'index' },
+  { title: 'PLACEHOLDER', key: 'data-table-select' },
   { title: 'ID', key: 'contractId' },
   { title: 'Type', key: 'type' },
   { title: 'State', key: 'state' },

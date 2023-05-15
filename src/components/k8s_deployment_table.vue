@@ -1,4 +1,10 @@
 <template>
+  <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+    Failed to load <strong>{{ count - items.length }}</strong> deployment{{
+      count - items.length > 1 ? 's' : ''
+    }}.
+  </v-alert>
+
   <ListTable
     :headers="[
       { title: '#', key: 'index' },
@@ -65,7 +71,7 @@
 import { ref, onMounted } from 'vue'
 import { useProfileManager } from '../stores'
 import { getGrid, updateGrid } from '../utils/grid'
-import { loadK8s } from '../utils/load_deployment'
+import { loadK8s, mergeLoadedDeployments } from '../utils/load_deployment'
 
 const profileManager = useProfileManager()
 
@@ -76,6 +82,7 @@ const props = defineProps<{
 }>()
 defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
 
+const count = ref<number>()
 const items = ref<any[]>([])
 const loading = ref(false)
 
@@ -87,7 +94,10 @@ async function loadDeployments() {
   const chunk1 = await loadK8s(grid!)
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }))
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: '' }))
-  items.value = chunk1.concat(chunk2).concat(chunk3)
+
+  const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3)
+  count.value = clusters.count
+  items.value = clusters.items
   loading.value = false
 }
 

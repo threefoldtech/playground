@@ -69,6 +69,11 @@ const router = createRouter({
       meta: { title: 'Casperlabs' },
     },
     {
+      path: '/algorand',
+      component: () => import('../views/algorand_view.vue'),
+      meta: { title: 'Algorand' },
+    },
+    {
       path: '/nodepilot',
       component: () => import('../views/node_pilot.vue'),
       meta: { title: 'Node Pilot' },

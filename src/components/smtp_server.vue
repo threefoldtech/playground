@@ -19,37 +19,33 @@
         validators.required('Username is required.'),
         validators.isEmail('Please provide a valid email address.'),
       ]"
+      #="{ props }"
     >
-      <template #default="{ props }">
-        <v-text-field
-          label="Username"
-          placeholder="username@example.com"
-          v-model="$props.modelValue.username"
-          v-bind="props"
-          autofocus
-        />
-      </template>
+      <v-text-field
+        label="Username"
+        placeholder="username@example.com"
+        v-model="$props.modelValue.username"
+        v-bind="props"
+        autofocus
+      />
     </input-validator>
 
-    <password-input-wrapper>
-      <template #default="{ props }">
-        <input-validator
-          :value="$props.modelValue.password"
-          :rules="[
-            validators.required('Password is required.'),
-            validators.minLength('Password minLength is 6 chars.', 6),
-            validators.maxLength('Password maxLength is 15 chars.', 15),
-          ]"
-        >
-          <template #default="{ props: validatorProps }">
-            <v-text-field
-              label="Password"
-              v-model="$props.modelValue.password"
-              v-bind="{ ...props, ...validatorProps }"
-            />
-          </template>
-        </input-validator>
-      </template>
+    <password-input-wrapper #="{ props }">
+      <input-validator
+        :value="$props.modelValue.password"
+        :rules="[
+          validators.required('Password is required.'),
+          validators.minLength('Password minLength is 6 chars.', 6),
+          validators.maxLength('Password maxLength is 15 chars.', 15),
+        ]"
+        #="{ props: validatorProps }"
+      >
+        <v-text-field
+          label="Password"
+          v-model="$props.modelValue.password"
+          v-bind="{ ...props, ...validatorProps }"
+        />
+      </input-validator>
     </password-input-wrapper>
 
     <input-validator
@@ -59,15 +55,14 @@
         validators.isEmail('Please provide a valid email address.'),
       ]"
       v-if="email"
+      #="{ props }"
     >
-      <template #default="{ props }">
-        <v-text-field
-          label="From Email Address"
-          placeholder="support@example.com"
-          v-bind="props"
-          v-model="$props.modelValue.email"
-        />
-      </template>
+      <v-text-field
+        label="From Email Address"
+        placeholder="support@example.com"
+        v-bind="props"
+        v-model="$props.modelValue.email"
+      />
     </input-validator>
 
     <input-validator
@@ -76,10 +71,9 @@
         validators.required('Hostname is required.'),
         validators.isURL('Please provide a valid hostname.'),
       ]"
+      #="{ props }"
     >
-      <template #default="{ props }">
-        <v-text-field label="Hostname" v-model="$props.modelValue.hostname" v-bind="props" />
-      </template>
+      <v-text-field label="Hostname" v-model="$props.modelValue.hostname" v-bind="props" />
     </input-validator>
 
     <input-validator
@@ -88,10 +82,9 @@
         validators.required('Port is required.'),
         validators.isPort('Please provide a valid port.'),
       ]"
+      #="{ props }"
     >
-      <template #default="{ props }">
-        <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
-      </template>
+      <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
     </input-validator>
 
     <v-switch inset color="primary" label="Use TLS" v-if="tls" />
@@ -100,8 +93,6 @@
 </template>
 
 <script lang="ts" setup>
-import * as validators from '../utils/validators'
-
 defineProps<{
   modelValue: SMTPServer
   ssl?: boolean

@@ -3,10 +3,10 @@ import type { Profile } from '../stores/profile_manager'
 
 const NETWORK = process.env.NETWORK as NetworkEnv
 
-export async function getGrid(profile: Pick<Profile, 'mnemonics'>, projectName?: string) {
+export async function getGrid(profile: Pick<Profile, 'mnemonic'>, projectName?: string) {
   if (!profile) return null
   const grid = new GridClient({
-    mnemonic: profile.mnemonics,
+    mnemonic: profile.mnemonic,
     network: NETWORK,
     backendStorageType: BackendStorageType.tfkvstore,
     projectName,
@@ -49,7 +49,7 @@ export async function loadBalance(grid: GridClient): Promise<Balance> {
 
 export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
-    mnemonics: grid.clientOptions!.mnemonic,
+    mnemonic: grid.clientOptions!.mnemonic,
     ssh: await readSSH(grid),
     twinId: grid!.twinId,
     address: grid.twins.client.client.address,

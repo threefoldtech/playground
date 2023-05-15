@@ -17,10 +17,9 @@
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
+        <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
       <SelectSolutionFlavor v-model="solution" />
@@ -49,7 +48,6 @@ import type { solutionFlavor as SolutionFlavor, GatewayNode, Farm } from '../typ
 import { ProjectName } from '../types'
 import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 import { deployVM } from '../utils/deploy_vm'
@@ -67,9 +65,11 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Caprover.toLowerCase()
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Casperlabs,
+    projectName,
     twinId: profileManager.profile!.twinId,
   })
   const domain = subdomain + '.' + gateway.value.domain
@@ -78,7 +78,7 @@ async function deploy() {
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Casperlabs)
+    grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

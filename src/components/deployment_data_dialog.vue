@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog model-value scrollable width="70%" persistent>
+    <v-dialog model-value @update:model-value="$emit('close')" scrollable width="70%">
       <v-card>
         <v-card-title class="d-flex flex-column" v-if="!onlyJson">
           <div class="d-flex justify-center">
@@ -105,18 +105,18 @@ import hljs from 'highlight.js'
 const props = defineProps({
   data: {
     type: Object as PropType<any>,
-    required: true
+    required: true,
   },
   environments: {
     type: Object as PropType<{ [key: string]: string | boolean } | false>,
     required: false,
-    default: () => ({})
+    default: () => ({}),
   },
   onlyJson: {
     type: Boolean,
     required: false,
-    default: () => false
-  }
+    default: () => false,
+  },
 })
 defineEmits<{ (event: 'close'): void }>()
 
@@ -152,7 +152,7 @@ export default {
   components: {
     CopyReadonlyInput,
     HighlightDark,
-    HighlightLight
-  }
+    HighlightLight,
+  },
 }
 </script>

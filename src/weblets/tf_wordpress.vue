@@ -21,10 +21,9 @@
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </template>
+        <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
       <input-validator
@@ -34,31 +33,27 @@
           validators.minLength('Username minLength is 2 chars.', 2),
           validators.maxLength('Username maxLength is 15 chars.', 15),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field label="Username" v-model="username" v-bind="props" />
-        </template>
+        <v-text-field label="Username" v-model="username" v-bind="props" />
       </input-validator>
 
-      <password-input-wrapper>
-        <template #default="{ props }">
-          <input-validator
-            :value="password"
-            :rules="[
-              validators.required('Password is required.'),
-              validators.minLength('Password minLength is 6 chars.', 6),
-              validators.maxLength('Password maxLength is 15 chars.', 15),
-            ]"
-          >
-            <template #default="{ props: validatorProps }">
-              <v-text-field
-                label="Password"
-                v-model="password"
-                v-bind="{ ...props, ...validatorProps }"
-              />
-            </template>
-          </input-validator>
-        </template>
+      <password-input-wrapper #="{ props }">
+        <input-validator
+          :value="password"
+          :rules="[
+            validators.required('Password is required.'),
+            validators.minLength('Password minLength is 6 chars.', 6),
+            validators.maxLength('Password maxLength is 15 chars.', 15),
+          ]"
+          #="{ props: validatorProps }"
+        >
+          <v-text-field
+            label="Password"
+            v-model="password"
+            v-bind="{ ...props, ...validatorProps }"
+          />
+        </input-validator>
       </password-input-wrapper>
 
       <input-validator
@@ -67,15 +62,14 @@
           validators.required('Email is required.'),
           validators.isEmail('Please provide a valid email address.'),
         ]"
+        #="{ props }"
       >
-        <template #default="{ props }">
-          <v-text-field
-            label="Email"
-            placeholder="This email will be used to login to your instance."
-            v-model="email"
-            v-bind="props"
-          />
-        </template>
+        <v-text-field
+          label="Email"
+          placeholder="This email will be used to login to your instance."
+          v-model="email"
+          v-bind="props"
+        />
       </input-validator>
 
       <SelectSolutionFlavor v-model="solution" />
@@ -104,7 +98,6 @@ import type { solutionFlavor as SolutionFlavor, GatewayNode, Farm } from '../typ
 import { ProjectName } from '../types'
 import { getGrid } from '../utils/grid'
 import { useProfileManager } from '../stores'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
 import { deployVM } from '../utils/deploy_vm'
@@ -125,9 +118,11 @@ const farm = ref() as Ref<Farm>
 async function deploy() {
   layout.value.setStatus('deploy')
 
+  const projectName = ProjectName.Wordpress.toLowerCase()
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
-    projectName: ProjectName.Wordpress,
+    projectName,
     twinId: profileManager.profile!.twinId,
   })
   const domain = subdomain + '.' + gateway.value.domain
@@ -136,7 +131,7 @@ async function deploy() {
   let vm: any
 
   try {
-    grid = await getGrid(profileManager.profile!, ProjectName.Wordpress)
+    grid = await getGrid(profileManager.profile!, projectName)
 
     await layout.value.validateBalance(grid!)
 

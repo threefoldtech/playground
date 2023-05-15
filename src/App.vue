@@ -1,14 +1,18 @@
 <template>
   <v-app>
-    <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar">
+    <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar" theme="dark">
       <v-list>
         <v-list-item>
-          <v-img src="/images/logoTF.png" />
+          <v-img :src="baseUrl + 'images/logoTF.png'" />
         </v-list-item>
         <v-list-item>
-          <v-card color="primary">
-            <v-card-text class="text-center">{{ network.toLocaleUpperCase() }}NET</v-card-text>
+          <v-card color="primary" variant="tonal">
+            <v-card-title class="text-center capitalize">{{ network }}net</v-card-title>
           </v-card>
+        </v-list-item>
+
+        <v-list-item class="justify-center">
+          <AppTheme />
         </v-list-item>
 
         <template v-for="route in routes" :key="route.title">
@@ -25,7 +29,7 @@
               <v-img
                 class="mr-4"
                 width="26"
-                :src="'/images/icons/' + item.icon"
+                :src="baseUrl + 'images/icons/' + item.icon"
                 :alt="item.title"
               />
             </template>
@@ -82,7 +86,7 @@ watch(
 
 const routes: AppRoute[] = [
   {
-    title: 'DEPLOYMENTS',
+    title: 'Deployments',
     items: [
       { title: 'Full Virtual Machine', icon: 'vm.png', route: '/' },
       { title: 'Micro Virtual Machine', icon: 'vm.png', route: '/vm' },
@@ -104,7 +108,7 @@ const routes: AppRoute[] = [
     ],
   },
   {
-    title: 'MY ACCOUNT',
+    title: 'My Account',
     items: [
       { title: 'Contracts', route: '/contractslist' },
       { title: 'Deployments', route: '/deployedlist' },
@@ -117,12 +121,15 @@ const network = process.env.NETWORK as string
 
 const permanent = window.innerWidth > 980
 const openSidebar = ref(permanent)
+
+const baseUrl = import.meta.env.BASE_URL
 </script>
 
 <script lang="ts">
 import DisclaimerToolbar from './components/disclaimer_toolbar.vue'
 import ProfileManager from './weblets/profile_manager.vue'
 import DeploymentListManager from './components/deployment_list_manager.vue'
+import AppTheme from './components/app_theme.vue'
 
 interface AppRoute {
   title: string
@@ -140,6 +147,7 @@ export default {
     DisclaimerToolbar,
     ProfileManager,
     DeploymentListManager,
+    AppTheme,
   },
 }
 </script>
@@ -166,5 +174,9 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.capitalize{
+  text-transform: capitalize !important;
 }
 </style>

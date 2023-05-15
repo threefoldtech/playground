@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar color="primary" v-model="openSnackbar" :timeout="1500">
+  <v-snackbar color="primary" variant="tonal" v-model="openSnackbar" :timeout="1500">
     Copied!
 
     <template v-slot:actions>
@@ -9,7 +9,7 @@
   <slot
     :props="{
       'append-inner-icon': 'mdi-content-copy',
-      'onClick:append-inner': copy
+      'onClick:append-inner': copy,
     }"
   ></slot>
 </template>
@@ -28,6 +28,6 @@ function copy() {
 
 <script lang="ts">
 export default {
-  name: 'CopyInputWrapper'
+  name: 'CopyInputWrapper',
 }
 </script>
