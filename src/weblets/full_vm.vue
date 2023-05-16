@@ -21,6 +21,7 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            validators.isAlpha('Name should consist of letters only.'),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
@@ -36,7 +37,7 @@
           :rules="[
             validators.required('CPU is required.'),
             validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 2 cores.', 2),
+            validators.min('CPU min is 1 cores.', 1),
             validators.max('CPU max is 32 cores.', 32),
           ]"
           #="{ props }"
@@ -62,7 +63,7 @@
           :rules="[
             validators.required('Disk size is required.'),
             validators.isInt('Disk size must be a valid integer.'),
-            validators.min('Minimum allowed disk size is 1 GB.', 1),
+            validators.min('Minimum allowed disk size is 15 GB.', 15),
             validators.max('Maximum allowed disk size is 10000 GB.', 10000),
           ]"
           #="{ props }"
