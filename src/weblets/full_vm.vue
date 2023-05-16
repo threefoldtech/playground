@@ -14,12 +14,15 @@
         { title: 'Config', value: 'config' },
         { title: 'Disks', value: 'disks' },
       ]"
+      ref='tabs'
     >
       <template #config>
         <input-validator
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            validators.isAlphanumeric('Name should consist of letters only.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
@@ -35,7 +38,7 @@
           :rules="[
             validators.required('CPU is required.'),
             validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 2 cores.', 2),
+            validators.min('CPU min is 1 cores.', 1),
             validators.max('CPU max is 32 cores.', 32),
           ]"
           #="{ props }"
@@ -61,7 +64,7 @@
           :rules="[
             validators.required('Disk size is required.'),
             validators.isInt('Disk size must be a valid integer.'),
-            validators.min('Minimum allowed disk size is 1 GB.', 1),
+            validators.min('Minimum allowed disk size is 15 GB.', 15),
             validators.max('Maximum allowed disk size is 10000 GB.', 10000),
           ]"
           #="{ props }"
@@ -88,6 +91,7 @@
           }"
           v-model="farm"
         />
+
       </template>
 
       <template #disks>
@@ -97,10 +101,7 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              validators.pattern(
-                'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
-                { pattern: /^[A-Za-z]/ }
-              ),
+              name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
               validators.maxLength('Disk maxLength is 15 chars.', 15),
