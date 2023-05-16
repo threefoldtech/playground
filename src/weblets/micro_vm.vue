@@ -25,6 +25,7 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
@@ -42,7 +43,7 @@
           :rules="[
             validators.required('CPU is required.'),
             validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 2 cores.', 2),
+            validators.min('CPU min is 1 cores.', 1),
             validators.max('CPU max is 32 cores.', 32),
           ]"
           #="{ props }"
@@ -90,7 +91,7 @@
                 { pattern: /^[a-zA-Z]/ }
               ),
               validators.pattern(
-                'Key can\'t start with a number, a non-alphanumeric character or a whitespace.',
+                'Invalid key format.',
                 { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
               ),
               validators.maxLength('Key max length is 128 chars.', 128),
