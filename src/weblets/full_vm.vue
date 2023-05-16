@@ -21,7 +21,8 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
-            validators.isAlpha('Name should consist of letters only.'),
+            validators.isAlphanumeric('Name should consist of letters only.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
@@ -100,10 +101,7 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              validators.pattern(
-                'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
-                { pattern: /^[A-Za-z]/ }
-              ),
+              name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
               validators.maxLength('Disk maxLength is 15 chars.', 15),
