@@ -87,10 +87,7 @@
             :value="envs[index].key"
             :rules="[
               validators.required('Key name is required.'),
-              validators.pattern(
-                'Key can\'t start with a number, a non-alphanumeric character or a whitespace.',
-                { pattern: /^[a-zA-Z]/ }
-              ),
+              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
               validators.pattern(
                 'Invalid key format.',
                 { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
