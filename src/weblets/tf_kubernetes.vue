@@ -25,6 +25,8 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
             validators.minLength('Name minimum length is 2 chars.', 2),
             validators.maxLength('Name max length is 15 chars.', 15),
           ]"
