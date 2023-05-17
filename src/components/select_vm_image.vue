@@ -17,23 +17,23 @@
       ]"
       :async-rules="image.name === 'Other' ? [isFlistExist] : []"
       :value="flist"
+      #="{ props }"
     >
-      <template #default="{ props }">
-        <v-text-field label="Flist" v-model="flist" v-bind="props" />
-      </template>
+      <v-text-field label="Flist" v-model="flist" v-bind="props" />
     </input-validator>
 
-    <input-validator :rules="[validators.required('Entry point is required.')]" :value="entryPoint">
-      <template #default="{ props }">
-        <v-text-field label="Entry Point" v-model="entryPoint" v-bind="props" />
-      </template>
+    <input-validator
+      :rules="[validators.required('Entry point is required.')]"
+      :value="entryPoint"
+      #="{ props }"
+    >
+      <v-text-field label="Entry Point" v-model="entryPoint" v-bind="props" />
     </input-validator>
   </template>
 </template>
 
 <script lang="ts" setup>
 import { type PropType, ref, watch } from 'vue'
-import * as validators from '../utils/validators'
 import type { Flist } from '../types'
 
 export interface VmImage {

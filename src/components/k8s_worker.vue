@@ -3,13 +3,14 @@
     :value="$props.modelValue.name"
     :rules="[
       validators.required('Name is required.'),
+      name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+      validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
       validators.minLength('Name minimum length is 2 chars.', 2),
       validators.maxLength('Name max length is 15 chars.', 15),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
-    </template>
+    <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
   </input-validator>
 
   <input-validator
@@ -17,18 +18,17 @@
     :rules="[
       validators.required('CPU is required.'),
       validators.isInt('CPU must be a valid integer.'),
-      validators.min('CPU min is 2 cores.', 2),
+      validators.min('CPU min is 1 cores.', 1),
       validators.max('CPU max is 32 cores.', 32),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field
-        label="CPU (vCores)"
-        type="number"
-        v-model.number="$props.modelValue.cpu"
-        v-bind="props"
-      />
-    </template>
+    <v-text-field
+      label="CPU (vCores)"
+      type="number"
+      v-model.number="$props.modelValue.cpu"
+      v-bind="props"
+    />
   </input-validator>
 
   <input-validator
@@ -36,18 +36,17 @@
     :rules="[
       validators.required('Memory is required.'),
       validators.isInt('Memory must be a valid integer.'),
-      validators.min('Minimum allowed memory is 256 MB.', 256),
+      validators.min('Minimum allowed memory is 1024 MB.', 1024),
       validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field
-        label="Memory (MB)"
-        type="number"
-        v-model.number="$props.modelValue.memory"
-        v-bind="props"
-      />
-    </template>
+    <v-text-field
+      label="Memory (MB)"
+      type="number"
+      v-model.number="$props.modelValue.memory"
+      v-bind="props"
+    />
   </input-validator>
 
   <input-validator
@@ -58,15 +57,14 @@
       validators.min('Minimum allowed disk size is 1 GB.', 1),
       validators.max('Maximum allowed disk size is 10000 GB.', 10000),
     ]"
+    #="{ props }"
   >
-    <template #default="{ props }">
-      <v-text-field
-        label="Disk Size (GB)"
-        type="number"
-        v-model.number="$props.modelValue.diskSize"
-        v-bind="props"
-      />
-    </template>
+    <v-text-field
+      label="Disk Size (GB)"
+      type="number"
+      v-model.number="$props.modelValue.diskSize"
+      v-bind="props"
+    />
   </input-validator>
 
   <v-switch label="Public IPv4" inset color="primary" v-model="$props.modelValue.ipv4" />
@@ -91,8 +89,6 @@
 </template>
 
 <script lang="ts" setup>
-import * as validators from '../utils/validators'
-
 defineProps<{ modelValue: K8SWorker }>()
 </script>
 
@@ -105,7 +101,7 @@ import type { K8SWorker, Farm } from '../types'
 export function createWorker(name: string = 'WR' + generateString(9)): K8SWorker {
   return {
     name,
-    cpu: 2,
+    cpu: 1,
     memory: 4096,
     diskSize: 100,
     ipv4: false,

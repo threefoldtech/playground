@@ -9,146 +9,127 @@
       .
     </template>
 
-    <template #default>
-      <d-tabs
-        :tabs="[
-          { title: 'Config', value: 'config' },
-          { title: 'Disks', value: 'disks' },
-        ]"
-      >
-        <template #config>
+    <d-tabs
+      :tabs="[
+        { title: 'Config', value: 'config' },
+        { title: 'Disks', value: 'disks' },
+      ]"
+      ref='tabs'
+    >
+      <template #config>
+        <input-validator
+          :value="name"
+          :rules="[
+            validators.required('Name is required.'),
+            validators.isAlphanumeric('Name should consist of letters only.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            validators.minLength('Name minLength is 2 chars.', 2),
+            validators.maxLength('Name maxLength is 15 chars.', 15),
+          ]"
+          #="{ props }"
+        >
+          <v-text-field label="Name" v-model="name" v-bind="props" />
+        </input-validator>
+
+        <SelectVmImage :images="images" v-model="flist" />
+
+        <input-validator
+          :value="cpu"
+          :rules="[
+            validators.required('CPU is required.'),
+            validators.isInt('CPU must be a valid integer.'),
+            validators.min('CPU min is 1 cores.', 1),
+            validators.max('CPU max is 32 cores.', 32),
+          ]"
+          #="{ props }"
+        >
+          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+        </input-validator>
+
+        <input-validator
+          :value="memory"
+          :rules="[
+            validators.required('Memory is required.'),
+            validators.isInt('Memory must be a valid integer.'),
+            validators.min('Minimum allowed memory is 256 MB.', 256),
+            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
+          ]"
+          #="{ props }"
+        >
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+        </input-validator>
+
+        <input-validator
+          :value="diskSize"
+          :rules="[
+            validators.required('Disk size is required.'),
+            validators.isInt('Disk size must be a valid integer.'),
+            validators.min('Minimum allowed disk size is 15 GB.', 15),
+            validators.max('Maximum allowed disk size is 10000 GB.', 10000),
+          ]"
+          #="{ props }"
+        >
+          <v-text-field
+            label="Disk Size (GB)"
+            type="number"
+            v-model.number="diskSize"
+            v-bind="props"
+          />
+        </input-validator>
+
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+        <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
+        <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
+        <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
+
+        <SelectFarm
+          :filters="{
+            cpu,
+            memory,
+            publicIp: ipv4,
+            ssd: disks.reduce((total, disk) => total + disk.size, diskSize),
+          }"
+          v-model="farm"
+        />
+
+      </template>
+
+      <template #disks>
+        <ExpandableLayout v-model="disks" @add="addDisk" #="{ index }">
+          <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
-            :value="name"
+            :value="disks[index].name"
             :rules="[
-              validators.required('Name is required.'),
-              validators.minLength('Name minLength is 2 chars.', 2),
-              validators.maxLength('Name maxLength is 15 chars.', 15),
+              validators.required('Disk name is required.'),
+              name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+              validators.minLength('Disk minLength is 2 chars.', 2),
+              validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
+              validators.maxLength('Disk maxLength is 15 chars.', 15),
             ]"
+            #="{ props }"
           >
-            <template #default="{ props }">
-              <v-text-field label="Name" v-model="name" v-bind="props" />
-            </template>
+            <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
           </input-validator>
-
-          <SelectVmImage :images="images" v-model="flist" />
-
           <input-validator
-            :value="cpu"
-            :rules="[
-              validators.required('CPU is required.'),
-              validators.isInt('CPU must be a valid integer.'),
-              validators.min('CPU min is 2 cores.', 2),
-              validators.max('CPU max is 32 cores.', 32),
-            ]"
-          >
-            <template #default="{ props }">
-              <v-text-field
-                label="CPU (vCores)"
-                type="number"
-                v-model.number="cpu"
-                v-bind="props"
-              />
-            </template>
-          </input-validator>
-
-          <input-validator
-            :value="memory"
-            :rules="[
-              validators.required('Memory is required.'),
-              validators.isInt('Memory must be a valid integer.'),
-              validators.min('Minimum allowed memory is 256 MB.', 256),
-              validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-            ]"
-          >
-            <template #default="{ props }">
-              <v-text-field
-                label="Memory (MB)"
-                type="number"
-                v-model.number="memory"
-                v-bind="props"
-              />
-            </template>
-          </input-validator>
-
-          <input-validator
-            :value="diskSize"
+            :value="disks[index].size"
             :rules="[
               validators.required('Disk size is required.'),
               validators.isInt('Disk size must be a valid integer.'),
               validators.min('Minimum allowed disk size is 1 GB.', 1),
               validators.max('Maximum allowed disk size is 10000 GB.', 10000),
             ]"
+            #="{ props }"
           >
-            <template #default="{ props }">
-              <v-text-field
-                label="Disk Size (GB)"
-                type="number"
-                v-model.number="diskSize"
-                v-bind="props"
-              />
-            </template>
+            <v-text-field
+              label="Size (GB)"
+              type="number"
+              v-model.number="disks[index].size"
+              v-bind="props"
+            />
           </input-validator>
-
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-          <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
-
-          <SelectFarm
-            :filters="{
-              cpu,
-              memory,
-              publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, diskSize),
-            }"
-            v-model="farm"
-          />
-        </template>
-
-        <template #disks>
-          <ExpandableLayout v-model="disks" @add="addDisk">
-            <template #default="{ index }">
-              <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
-              <input-validator
-                :value="disks[index].name"
-                :rules="[
-                  validators.required('Disk name is required.'),
-                  validators.pattern(
-                    'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
-                    { pattern: /^[A-Za-z]/ }
-                  ),
-                  validators.minLength('Disk minLength is 2 chars.', 2),
-                  validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-                  validators.maxLength('Disk maxLength is 15 chars.', 15),
-                ]"
-              >
-                <template #default="{ props }">
-                  <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
-                </template>
-              </input-validator>
-              <input-validator
-                :value="disks[index].size"
-                :rules="[
-                  validators.required('Disk size is required.'),
-                  validators.isInt('Disk size must be a valid integer.'),
-                  validators.min('Minimum allowed disk size is 1 GB.', 1),
-                  validators.max('Maximum allowed disk size is 10000 GB.', 10000),
-                ]"
-              >
-                <template #default="{ props }">
-                  <v-text-field
-                    label="Size (GB)"
-                    type="number"
-                    v-model.number="disks[index].size"
-                    v-bind="props"
-                  />
-                </template>
-              </input-validator>
-            </template>
-          </ExpandableLayout>
-        </template>
-      </d-tabs>
-    </template>
+        </ExpandableLayout>
+      </template>
+    </d-tabs>
 
     <template #footer-actions>
       <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid">
@@ -164,7 +145,6 @@ import { generateString } from '@threefold/grid_client'
 import { type Disk, deployVM } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import * as validators from '../utils/validators'
 import { normalizeError } from '../utils/helpers'
 import { type Farm, type Flist, ProjectName } from '../types'
 import { useLayout } from '../components/weblet_layout.vue'

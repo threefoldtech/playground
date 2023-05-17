@@ -12,61 +12,57 @@
       </a>
     </template>
 
-    <template #default>
-      <d-tabs
-        :tabs="[
-          { title: 'Config', value: 'config' },
-          { title: 'Master', value: 'master' },
-          { title: 'Workers', value: 'workers' },
-        ]"
-        ref="tabs"
-      >
-        <template #config>
-          <input-validator
-            :value="name"
-            :rules="[
-              validators.required('Name is required.'),
-              validators.minLength('Name minimum length is 2 chars.', 2),
-              validators.maxLength('Name max length is 15 chars.', 15),
-            ]"
-          >
-            <template #default="{ props }">
-              <v-text-field label="Name" v-model="name" v-bind="props" />
-            </template>
-          </input-validator>
+    <d-tabs
+      :tabs="[
+        { title: 'Config', value: 'config' },
+        { title: 'Master', value: 'master' },
+        { title: 'Workers', value: 'workers' },
+      ]"
+      ref="tabs"
+    >
+      <template #config>
+        <input-validator
+          :value="name"
+          :rules="[
+            validators.required('Name is required.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
+            validators.minLength('Name minimum length is 2 chars.', 2),
+            validators.maxLength('Name max length is 15 chars.', 15),
+          ]"
+          #="{ props }"
+        >
+          <v-text-field label="Name" v-model="name" v-bind="props" />
+        </input-validator>
 
-          <input-validator
-            :value="clusterToken"
-            :rules="[
-              validators.required('Token is required.'),
-              validators.minLength('Token minimum length is 6 chars.', 6),
-              validators.maxLength('Token max length is 15 chars.', 15),
-              validators.isAlphanumeric(
-                'Token cannot contain any characters other than alphabets and numbers.'
-              ),
-            ]"
-          >
-            <template #default="{ props }">
-              <password-input-wrapper>
-                <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
-              </password-input-wrapper>
-            </template>
-          </input-validator>
-        </template>
+        <input-validator
+          :value="clusterToken"
+          :rules="[
+            validators.required('Token is required.'),
+            validators.minLength('Token minimum length is 6 chars.', 6),
+            validators.maxLength('Token max length is 15 chars.', 15),
+            validators.isAlphanumeric(
+              'Token cannot contain any characters other than alphabets and numbers.'
+            ),
+          ]"
+          #="{ props }"
+        >
+          <password-input-wrapper>
+            <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
+          </password-input-wrapper>
+        </input-validator>
+      </template>
 
-        <template #master>
-          <K8SWorker v-model="master" />
-        </template>
+      <template #master>
+        <K8SWorker v-model="master" />
+      </template>
 
-        <template #workers>
-          <ExpandableLayout v-model="workers" @add="addWorker">
-            <template #default="{ index }">
-              <K8SWorker v-model="workers[index]" />
-            </template>
-          </ExpandableLayout>
-        </template>
-      </d-tabs>
-    </template>
+      <template #workers>
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
+          <K8SWorker v-model="workers[index]" />
+        </ExpandableLayout>
+      </template>
+    </d-tabs>
 
     <template #footer-actions>
       <v-btn variant="tonal" color="primary" @click="deploy" :disabled="tabs?.invalid">
@@ -84,7 +80,6 @@ import type { K8SWorker as K8sWorker } from '../types'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
 import { deployK8s } from '../utils/deploy_k8s'
-import * as validators from '../utils/validators'
 import { useLayout } from '../components/weblet_layout.vue'
 
 const layout = useLayout()

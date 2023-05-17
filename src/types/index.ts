@@ -1,4 +1,5 @@
 import type { VDataTable } from 'vuetify/lib/labs/components'
+import type * as validators from '../utils/validators'
 
 export interface K8SWorker {
   name: string
@@ -106,3 +107,5 @@ export interface SMTPServer {
   tls: boolean
   ssl: boolean
 }
+
+export type Validators = typeof validators

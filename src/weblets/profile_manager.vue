@@ -35,7 +35,7 @@
         Please visit
         <a
           class="app-link"
-          href="https://library.threefold.me/info/manual/#/manual__weblets_profile_manager"
+          href="https://manual.grid.tf/weblets/weblets_profile_manager.html"
           target="_blank"
         >
           the manual
@@ -49,55 +49,51 @@
         max-width="700px"
       >
         <template #activator="{ props: tooltipProps }">
-          <password-input-wrapper>
-            <template #default="{ props: passwordInputProps }">
-              <form-validator v-model="isValidMnemonic">
-                <input-validator
-                  ref="mnemonicInput"
-                  :value="mnemonic"
-                  :rules="[
-                    validators.required('Mnemonic is required.'),
-                    (v) =>
-                      validateMnemonic(v)
-                        ? undefined
-                        : { message: `Mnemonic doesn't seem to be valid.` },
-                  ]"
-                  :async-rules="[
-                    (mnemonic) =>
-                      getGrid({ mnemonic })
-                        .then(() => undefined)
-                        .catch(() => ({ message: 'Failed to load grid for this user.' })),
-                  ]"
-                >
-                  <template #default="{ props: validationProps }">
-                    <div v-bind="tooltipProps" v-show="!profileManager.profile">
-                      <v-text-field
-                        label="Mnemonic"
-                        placeholder="Please insert your mnemonic"
-                        autofocus
-                        v-model="mnemonic"
-                        v-bind="{ ...passwordInputProps, ...validationProps }"
-                      />
-                    </div>
-                  </template>
-                </input-validator>
-              </form-validator>
-            </template>
+          <password-input-wrapper #="{ props: passwordInputProps }">
+            <form-validator v-model="isValidMnemonic">
+              <input-validator
+                ref="mnemonicInput"
+                :value="mnemonic"
+                :rules="[
+                  validators.required('Mnemonic is required.'),
+                  (v) =>
+                    validateMnemonic(v)
+                      ? undefined
+                      : { message: `Mnemonic doesn't seem to be valid.` },
+                ]"
+                :async-rules="[
+                  (mnemonic) =>
+                    getGrid({ mnemonic })
+                      .then(() => undefined)
+                      .catch(() => ({ message: 'Failed to load grid for this user.' })),
+                ]"
+                valid-message="Mnemonic is valid."
+                #="{ props: validationProps }"
+              >
+                <div v-bind="tooltipProps" v-show="!profileManager.profile">
+                  <v-text-field
+                    label="Mnemonic"
+                    placeholder="Please insert your mnemonic"
+                    autofocus
+                    v-model="mnemonic"
+                    v-bind="{ ...passwordInputProps, ...validationProps }"
+                  />
+                </div>
+              </input-validator>
+            </form-validator>
           </password-input-wrapper>
         </template>
       </v-tooltip>
 
       <template v-if="profileManager.profile">
-        <password-input-wrapper>
-          <template #default="{ props }">
-            <v-text-field
-              label="Mnemonic"
-              readonly
-              v-model="profileManager.profile.mnemonic"
-              v-bind="props"
-              :disabled="activating || creatingAccount"
-            />
-          </template>
+        <password-input-wrapper #="{ props }">
+          <v-text-field
+            label="Mnemonic"
+            readonly
+            v-model="profileManager.profile.mnemonic"
+            v-bind="props"
+            :disabled="activating || creatingAccount"
+          />
         </password-input-wrapper>
 
         <section class="d-flex flex-column align-center">
@@ -105,7 +101,7 @@
             Scan the QRcode using
             <a
               class="app-link"
-              href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
+              href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html"
               target="_blank"
             >
               ThreeFold Connect
@@ -141,25 +137,23 @@
           max-width="700px"
         >
           <template #activator="{ props }">
-            <copy-input-wrapper :data="profileManager.profile.ssh">
-              <template #default="{ props: copyInputProps }">
-                <v-textarea
-                  label="Public SSH Key"
-                  no-resize
-                  :spellcheck="false"
-                  v-model.trim="ssh"
-                  v-bind="{ ...props, ...copyInputProps }"
-                  :disabled="updatingSSH || generatingSSH"
-                  :hint="
-                    updatingSSH
-                      ? 'Updating your public ssh key.'
-                      : generatingSSH
-                      ? 'Generating a new public ssh key.'
-                      : undefined
-                  "
-                  :persistent-hint="updatingSSH || generatingSSH"
-                />
-              </template>
+            <copy-input-wrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
+              <v-textarea
+                label="Public SSH Key"
+                no-resize
+                :spellcheck="false"
+                v-model.trim="ssh"
+                v-bind="{ ...props, ...copyInputProps }"
+                :disabled="updatingSSH || generatingSSH"
+                :hint="
+                  updatingSSH
+                    ? 'Updating your public ssh key.'
+                    : generatingSSH
+                    ? 'Generating a new public ssh key.'
+                    : undefined
+                "
+                :persistent-hint="updatingSSH || generatingSSH"
+              />
             </copy-input-wrapper>
           </template>
         </v-tooltip>
@@ -186,26 +180,22 @@
           </v-btn>
         </v-row>
 
-        <copy-input-wrapper :data="profileManager.profile.twinId.toString()">
-          <template #default="{ props }">
-            <v-text-field
-              label="Twin ID"
-              readonly
-              v-model="profileManager.profile.twinId"
-              v-bind="props"
-            />
-          </template>
+        <copy-input-wrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
+          <v-text-field
+            label="Twin ID"
+            readonly
+            v-model="profileManager.profile.twinId"
+            v-bind="props"
+          />
         </copy-input-wrapper>
 
-        <copy-input-wrapper :data="profileManager.profile.address">
-          <template #default="{ props }">
-            <v-text-field
-              label="Address"
-              readonly
-              v-model="profileManager.profile.address"
-              v-bind="props"
-            />
-          </template>
+        <copy-input-wrapper :data="profileManager.profile.address" #="{ props }">
+          <v-text-field
+            label="Address"
+            readonly
+            v-model="profileManager.profile.address"
+            v-bind="props"
+          />
         </copy-input-wrapper>
       </template>
 
@@ -236,7 +226,7 @@
             :loading="activating"
             :disabled="!isValidMnemonic || creatingAccount"
           >
-            Activate
+            Login
           </v-btn>
         </template>
         <v-btn color="error" variant="outlined" @click="openManager = false"> Close </v-btn>
@@ -247,7 +237,6 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, type Ref } from 'vue'
-import * as validators from '../utils/validators'
 import { validateMnemonic } from 'bip39'
 import {
   getGrid,

@@ -5,7 +5,7 @@
       >Deploy a new micro virtual machine on the Threefold Grid
       <a
         class="app-link"
-        href="https://library.threefold.me/info/manual/#/manual__weblets_vm"
+        href="https://manual.grid.tf/weblets/weblets_vm.html"
         target="_blank"
       >
         Quick start documentation
@@ -25,13 +25,14 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
-          </template>
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
@@ -43,13 +44,12 @@
           :rules="[
             validators.required('CPU is required.'),
             validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 2 cores.', 2),
+            validators.min('CPU min is 1 cores.', 1),
             validators.max('CPU max is 32 cores.', 32),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-          </template>
+          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
         </input-validator>
 
         <input-validator
@@ -60,15 +60,9 @@
             validators.min('Minimum allowed memory is 256 MB.', 256),
             validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
           ]"
+          #="{ props }"
         >
-          <template #default="{ props }">
-            <v-text-field
-              label="Memory (MB)"
-              type="number"
-              v-model.number="memory"
-              v-bind="props"
-            />
-          </template>
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
         </input-validator>
 
         <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
@@ -88,86 +82,75 @@
       </template>
 
       <template #env>
-        <ExpandableLayout v-model="envs" @add="envs.push({ key: '', value: '' })">
-          <template #default="{ index }">
-            <input-validator
-              :value="envs[index].key"
-              :rules="[
-                validators.required('Key name is required.'),
-                validators.pattern(
-                  'Key can\'t start with a number, a non-alphanumeric character or a whitespace.',
-                  { pattern: /^[a-zA-Z]/ }
-                ),
-                validators.pattern(
-                  'Key can\'t start with a number, a non-alphanumeric character or a whitespace.',
-                  { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
-                ),
-                validators.maxLength('Key max length is 128 chars.', 128),
-              ]"
-            >
-              <template #default="{ props }">
-                <v-text-field label="Name" v-model="envs[index].key" v-bind="props" />
-              </template>
-            </input-validator>
+        <ExpandableLayout v-model="envs" @add="envs.push({ key: '', value: '' })" #="{ index }">
+          <input-validator
+            :value="envs[index].key"
+            :rules="[
+              validators.required('Key name is required.'),
+              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
+              validators.pattern(
+                'Invalid key format.',
+                { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }
+              ),
+              validators.maxLength('Key max length is 128 chars.', 128),
+            ]"
+            #="{ props }"
+          >
+            <v-text-field label="Name" v-model="envs[index].key" v-bind="props" />
+          </input-validator>
 
-            <input-validator
-              :value="envs[index].value"
-              :rules="[validators.required('Value is required.')]"
-            >
-              <template #default="{ props }">
-                <v-textarea
-                  label="Value"
-                  v-model="envs[index].value"
-                  no-resize
-                  :spellcheck="false"
-                  v-bind="props"
-                />
-              </template>
-            </input-validator>
-          </template>
+          <input-validator
+            :value="envs[index].value"
+            :rules="[validators.required('Value is required.')]"
+            #="{ props }"
+          >
+            <v-textarea
+              label="Value"
+              v-model="envs[index].value"
+              no-resize
+              :spellcheck="false"
+              v-bind="props"
+            />
+          </input-validator>
         </ExpandableLayout>
       </template>
 
       <template #disks>
-        <ExpandableLayout v-model="disks" @add="addDisk">
-          <template #default="{ index }">
-            <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
-            <input-validator
-              :value="disks[index].name"
-              :rules="[
-                validators.required('Disk name is required.'),
-                validators.pattern(
-                  'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
-                  { pattern: /^[A-Za-z]/ }
-                ),
-                validators.minLength('Disk minLength is 2 chars.', 2),
-                validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-                validators.maxLength('Disk maxLength is 15 chars.', 15),
-              ]"
-            >
-              <template #default="{ props }">
-                <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
-              </template>
-            </input-validator>
-            <input-validator
-              :value="disks[index].size"
-              :rules="[
-                validators.required('Disk size is required.'),
-                validators.isInt('Disk size must be a valid integer.'),
-                validators.min('Minimum allowed disk size is 1 GB.', 1),
-                validators.max('Maximum allowed disk size is 10000 GB.', 10000),
-              ]"
-            >
-              <template #default="{ props }">
-                <v-text-field
-                  label="Size (GB)"
-                  type="number"
-                  v-model.number="disks[index].size"
-                  v-bind="props"
-                />
-              </template>
-            </input-validator>
-          </template>
+        <ExpandableLayout v-model="disks" @add="addDisk" #="{ index }">
+          <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
+          <input-validator
+            :value="disks[index].name"
+            :rules="[
+              validators.required('Disk name is required.'),
+              validators.pattern(
+                'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
+                { pattern: /^[A-Za-z]/ }
+              ),
+              validators.minLength('Disk minLength is 2 chars.', 2),
+              validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
+              validators.maxLength('Disk maxLength is 15 chars.', 15),
+            ]"
+            #="{ props }"
+          >
+            <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+          </input-validator>
+          <input-validator
+            :value="disks[index].size"
+            :rules="[
+              validators.required('Disk size is required.'),
+              validators.isInt('Disk size must be a valid integer.'),
+              validators.min('Minimum allowed disk size is 1 GB.', 1),
+              validators.max('Maximum allowed disk size is 10000 GB.', 10000),
+            ]"
+            #="{ props }"
+          >
+            <v-text-field
+              label="Size (GB)"
+              type="number"
+              v-model.number="disks[index].size"
+              v-bind="props"
+            />
+          </input-validator>
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -187,7 +170,6 @@ import { type Farm, type Flist, ProjectName } from '../types'
 import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
 import { useProfileManager } from '../stores'
 import { getGrid } from '../utils/grid'
-import * as validators from '../utils/validators'
 import { useLayout } from '../components/weblet_layout.vue'
 
 const layout = useLayout()
