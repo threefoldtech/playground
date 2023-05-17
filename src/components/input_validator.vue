@@ -7,6 +7,7 @@
       loading: inputStatus === ValidatorStatus.PENDING,
       hint,
       'persistent-hint': hintPersistent,
+      class: inputStatus === ValidatorStatus.VALID ? 'is-valid-input' : undefined,
     }"
   ></slot>
 </template>
@@ -150,3 +151,11 @@ export default {
   name: 'InputValidator',
 }
 </script>
+
+<style lang="scss">
+.is-valid-input {
+  .v-messages__message {
+    color: rgba(var(--v-theme-success));
+  }
+}
+</style>
