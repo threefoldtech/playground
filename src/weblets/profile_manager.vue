@@ -67,6 +67,7 @@
                       .then(() => undefined)
                       .catch(() => ({ message: 'Failed to load grid for this user.' })),
                 ]"
+                valid-message="Mnemonic is valid."
                 #="{ props: validationProps }"
               >
                 <div v-bind="tooltipProps" v-show="!profileManager.profile">

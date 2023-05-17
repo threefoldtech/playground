@@ -5,8 +5,9 @@
       errorMessages: touched ? errorMessage : undefined,
       error: touched && !!errorMessage,
       loading: inputStatus === ValidatorStatus.PENDING,
-      hint: inputStatus === ValidatorStatus.PENDING ? 'Validating ...' : undefined,
-      'persistent-hint': inputStatus === ValidatorStatus.PENDING
+      hint,
+      'persistent-hint': hintPersistent,
+      class: inputStatus === ValidatorStatus.VALID ? 'is-valid-input' : undefined,
     }"
   ></slot>
 </template>
@@ -20,7 +21,7 @@ import {
   onUnmounted,
   inject,
   computed,
-  type PropType
+  type PropType,
 } from 'vue'
 import debounce from 'lodash/debounce.js'
 import type { FormValidatorService } from '../types'
@@ -34,26 +35,43 @@ const uid = getCurrentInstance()!.uid
 const props = defineProps({
   status: {
     type: String as PropType<ValidatorStatus>,
-    required: false
+    required: false,
   },
   rules: {
     type: Array as PropType<SyncRule[]>,
-    required: true
+    required: true,
   },
   asyncRules: {
     type: Array as PropType<AsyncRule[]>,
     required: false,
-    default: [] as AsyncRule[]
+    default: [] as AsyncRule[],
   },
   value: {
     type: String as PropType<string | number | undefined>,
-    required: true
-  }
+    required: true,
+  },
+  validMessage: {
+    type: String,
+    required: false,
+  },
 })
 const emits = defineEmits<{
   (events: 'update:status', value: ValidatorStatus): void
   (events: 'update:valid', value: boolean): void
 }>()
+
+const hint = computed(() => {
+  if (inputStatus.value === ValidatorStatus.PENDING) return 'Validating ...'
+  if (inputStatus.value === ValidatorStatus.VALID) return props.validMessage
+  return undefined
+})
+
+const hintPersistent = computed(() => {
+  return (
+    inputStatus.value === ValidatorStatus.PENDING ||
+    (inputStatus.value === ValidatorStatus.VALID && props.validMessage)
+  )
+})
 
 const form = inject('form:validator', null) as FormValidatorService | null
 
@@ -95,7 +113,7 @@ defineExpose({
   validate,
   touch() {
     isTouched.value = true
-  }
+  },
 })
 function reset() {
   isTouched.value = false
@@ -126,10 +144,18 @@ async function validate(value: string): Promise<boolean> {
 export enum ValidatorStatus {
   VALID = 'VALID',
   INVALID = 'INVALID',
-  PENDING = 'PENDING'
+  PENDING = 'PENDING',
 }
 
 export default {
-  name: 'InputValidator'
+  name: 'InputValidator',
 }
 </script>
+
+<style lang="scss">
+.is-valid-input {
+  .v-messages__message {
+    color: rgba(var(--v-theme-success));
+  }
+}
+</style>
